@@ -12,9 +12,9 @@
 #
 # Created on Sep 7, 2011 by: rch
 
-from etsproxy.traits.api import \
-    Float, Int, Property, cached_property, Bool, Array, Callable, Any, \
-    WeakRef
+from traits.api import \
+    Float, Int, Property, cached_property, Array, Callable, Any
+
 from crease_pattern import CreasePattern
 
 import numpy as np
@@ -150,7 +150,7 @@ class WaterBombCreasePattern(CreasePattern):
         y_j = y_bg[1::2, 1::4]
         X_j = np.c_[ x_j.flatten(), y_j.flatten() ]
 
-        # node enumeration in grid form on 
+        # node enumeration in grid form on
         N_h = np.arange(x_h.size).reshape(x_h.shape)
         N_k = N_h.size + np.arange(x_k.size).reshape(x_k.shape)
         N_i = N_h.size + N_k.size + np.arange(x_i.size).reshape(x_i.shape)
@@ -234,5 +234,5 @@ if __name__ == '__main__':
 
     from mayavi import mlab
     mlab.figure(fgcolor=(0, 0, 0), bgcolor=(1, 1, 1))
-    cp.show(mlab)
+    cp.add_to_mlab(mlab)
     mlab.show()

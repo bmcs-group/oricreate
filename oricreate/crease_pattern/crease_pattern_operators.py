@@ -14,20 +14,21 @@
 
 import numpy as np
 
-from etsproxy.traits.api import HasStrictTraits, \
+from traits.api import HasStrictTraits, \
     Property, cached_property, \
     Array
 
-from einsum_utils import DELTA, EPS
+from oricreate.util.einsum_utils import DELTA, EPS
 
 class CreaseNodeOperators(HasStrictTraits):
-    '''Operators delivering the instantaneous states related to nodes.
+    '''Operators delivering the instantaneous values of parameters
+    related to nodes. All attributes return arrays with first dimension
+    equal to ``n_N``.
     '''
     iN_theta = Property
-    '''List of crease angles around interior nodes in the format
-    ``[ (node, np.array([neighbor_node1, neighbor_node2, ... neighbor_node1)), ... ]``
-
-    The expression has the form:
+    '''List of arrays with sector angles around each interior node in the format
+    ``[ np.array([neighbor_node1, neighbor_node2, ... neighbor_node1), ... ]``
+    The expression for each angle has the form:
 
     .. math::
         \\theta = \\arccos\left(\\frac{a \cdot b}{ \left| a \\right| \left| b \\right| }\\right)
@@ -36,37 +37,42 @@ class CreaseNodeOperators(HasStrictTraits):
         return self.get_iN_theta(np.zeros_like(self.x_0))
 
     def get_iN_theta(self, u):
-        '''Assemble the crease angles around a node I
+        '''Assemble the sector angles around a node :math:`i`
         '''
-        NxN_theta = self.get_NxN_theta(u)
-        return [NxN_theta[n, neighbors[:-1]]
-                for n, neighbors in zip(self.iN, self.iN_neighbors)]
+        NN_theta = self.get_NN_theta(u)
+        return [NN_theta[n, neighbors[:-1]]
+                for n, neighbors in zip(self.iN, self.iN_nbr)]
 
     def get_iN_theta_du(self, u):
-        '''Assemble the crease angles around a node I
+        '''Assemble the derivatives of sector angles around a node :math:`i`
         '''
-        NxN_theta_du = self.get_NxN_theta_du(u)
-        return [NxN_theta_du[n, neighbors[:-1], :, :]
-                for n, neighbors in zip(self.iN, self.iN_neighbors)]
+        NN_theta_du = self.get_NN_theta_du(u)
+        return [NN_theta_du[n, neighbors[:-1], :, :]
+                for n, neighbors in zip(self.iN, self.iN_nbr)]
 
-    def get_NxN_theta(self, u):
-        '''Get the crease angle at node I for line heading to neighbor J
-        to the next line reached in a counter-clockwise direction.
+    def get_NN_theta(self, u):
+        '''Array of angles :math:``[n_L,n_L]`` containing the values of sector angle
+        between two consecutive lines. The starting line is between the nodes
+        :math:`ij`. The second one is obtained by rotating the first line by angle
+        :math:`\\theta_{ij}` around the node :math:`i` in a counter-
+        clockwise manner.
+
+        .. image:: figs/crease_node_operators_NN_theta.png
         '''
-        NxN_theta = np.zeros_like(self.NxN_L, dtype='float_')
+        NN_theta = np.zeros_like(self.NN_L, dtype='float_')
         F_theta = self.get_F_theta(u)
-        NxN_theta[ self.F_N[:, (0, 1, 2)], self.F_N[:, (1, 2, 0)]] = F_theta[:, (0, 1, 2)]
-        return NxN_theta
+        NN_theta[ self.F_N[:, (0, 1, 2)], self.F_N[:, (1, 2, 0)]] = F_theta[:, (0, 1, 2)]
+        return NN_theta
 
-    def get_NxN_theta_du(self, u):
-        '''Get the crease angle at node I for line heading to neighbor J
-        to the next line reached in a counter-clockwise direction.
+    def get_NN_theta_du(self, u):
+        '''Array of derivatives :math:``[n_L,n_L,n_dofs]`` of an angle between
+        two lines of a facet.
         '''
-        NxN_theta_du = np.zeros((self.n_N, self.n_N, self.n_N, self.n_D), dtype='float_')
+        NN_theta_du = np.zeros((self.n_N, self.n_N, self.n_N, self.n_D), dtype='float_')
         F_theta_du = self.get_F_theta_du(u)
-        NxN_theta_du[ self.F_N[:, (0, 1, 2)], self.F_N[:, (1, 2, 0)], :, :] = \
+        NN_theta_du[ self.F_N[:, (0, 1, 2)], self.F_N[:, (1, 2, 0)], :, :] = \
             F_theta_du[:, (0, 1, 2), :, :]
-        return NxN_theta_du
+        return NN_theta_du
 
 class CreaseLineOperators(HasStrictTraits):
     '''Operators delivering the instantaneous states of crease lines.
@@ -521,13 +527,13 @@ if __name__ == '__main__':
     print 'faces counter-clockwise'
     print cp.F_N
     print 'node neighbors'
-    print cp.N_neighbors
+    print cp.N_nbr
     print 'interior nodes'
     print cp.iN
     print 'edge nodes'
     print cp.eN
     print 'interior node neighbor (cycles ordered)'
-    print cp.iN_neighbors
+    print cp.iN_nbr
     print 'lines associated with the interior nodes'
     print cp.iN_L
     print 'interior lines'
@@ -584,8 +590,8 @@ if __name__ == '__main__':
     print 'F_theta: crease angles within each triangular facet'
     print cp.get_F_theta(u)
     print
-    print 'NxN_theta: '
-    print cp.get_NxN_theta(u)
+    print 'NN_theta: '
+    print cp.get_NN_theta(u)
 
     print '------------------------'
     cp = CreasePattern(X=[[0, 0, 0],
@@ -610,14 +616,14 @@ if __name__ == '__main__':
     print 'F_theta'
     print cp.get_F_theta(u)
     print
-    print 'NxN_theta'
-    print cp.get_NxN_theta(u)
+    print 'NN_theta'
+    print cp.get_NN_theta(u)
     print
     print 'iN'
     print cp.iN
     print
     print 'iN_neighbors'
-    print cp.iN_neighbors
+    print cp.iN_nbr
     print
     print 'iN_theta'
     print cp.get_iN_theta(u)
@@ -634,8 +640,8 @@ if __name__ == '__main__':
     print 'F_theta_du'
     print [cp.get_F_theta_du(u)]
     print
-    print 'NxN_theta_du'
-    print cp.get_NxN_theta_du(u)
+    print 'NN_theta_du'
+    print cp.get_NN_theta_du(u)
     print
     print 'iN_theta_du'
     print cp.get_iN_theta_du(u)

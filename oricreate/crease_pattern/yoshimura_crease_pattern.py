@@ -12,12 +12,11 @@
 #
 # Created on Sep 7, 2011 by: rch
 
-from etsproxy.traits.api import \
-    HasStrictTraits, Float, Int, Property, cached_property, Bool, Array, Callable, Any, \
-    WeakRef
-from etsproxy.traits.ui.api import \
-    Item, View, HGroup, RangeEditor
-from crease_pattern import CreasePattern
+from traits.api import \
+    Float, Int, Property, cached_property, Bool, Array, Callable, Any
+
+from crease_pattern import \
+    CreasePattern
 
 import numpy as np
 import sympy as sp
@@ -97,7 +96,7 @@ class YoshimuraCreasePattern(CreasePattern):
                     zip(self.interior_vertices, self.cycled_neighbors.T)]
         return con
 
-    #deformed nodes    
+    # deformed nodes
     XX = Property(depends_on='fx, nodes')
     def _get_XX(self):
 
@@ -163,9 +162,9 @@ class YoshimuraCreasePattern(CreasePattern):
         y_i = (y_e[1:, 1::2] + y_e[:-1, 1::2]) / 2.0
         X_i = np.c_[ x_i.flatten(), y_i.flatten() ]
 
-        # node enumeration in grid form on 
+        # node enumeration in grid form on
         # (1) the even horizontal crease lines
-        # (2) 
+        # (2)
         # (3)
 
         n_h = np.arange((n_x + 1) * (n_y / 2 + 1)).reshape((n_x + 1), (n_y / 2 + 1))
@@ -264,7 +263,7 @@ if __name__ == '__main__':
     print cp.X
     print cp.XX
 
-    #cp.nodes = np.array([0, 0, 0])
+    # cp.nodes = np.array([0, 0, 0])
 
     print 'n_dofs', cp.n_dofs
     print 'n_crease_lines', cp.n_L
@@ -276,5 +275,5 @@ if __name__ == '__main__':
 
     from mayavi import mlab
     mlab.figure(fgcolor=(0, 0, 0), bgcolor=(1, 1, 1))
-    cp.show(mlab)
+    cp.add_to_mlab(mlab)
     mlab.show()
