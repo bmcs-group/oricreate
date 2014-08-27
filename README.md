@@ -1,4 +1,5 @@
 oricreate
 =========
 
-Modeling framework for design and manufacturing of folded plate structure
+Modeling framework for design and manufacturing of folded plate structures.
+

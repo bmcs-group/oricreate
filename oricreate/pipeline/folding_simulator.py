@@ -14,12 +14,12 @@
 
 import numpy as np
 
-from etsproxy.traits.api import HasStrictTraits, \
+from traits.api import HasStrictTraits, \
     Event, Property, cached_property, Str, \
     Int, Float, Array, Bool, Dict, List, \
     Constant, Instance, DelegatesTo, Trait, Enum
 
-from etsproxy.traits.ui.api import View
+from traitsui.api import View
 from opt_crit_target_face import TargetFaces
 
 from opt_crit_potential_energy import OptCritPotentialEnergy

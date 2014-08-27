@@ -40,7 +40,17 @@ CreaseFacetOperators
 .. autoclass:: CreaseFacetOperators
 	:members:
 
-	
+Auxiliary methods
+=================
+
+.. autofunction:: get_gamma
+
+.. autofunction:: get_gamma_du
+
+.. autofunction:: get_theta
+
+.. autofunction:: get_theta_du3
+
 Crease pattern exporters
 ========================
 

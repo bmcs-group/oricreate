@@ -185,5 +185,5 @@ if __name__ == '__main__':
 
     gd = GenDoc(build_mode='global')
     gd.generate_html()
-    gd.generate_latex()
+    # gd.generate_latex()
     # gd.push_html()

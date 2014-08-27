@@ -40,11 +40,22 @@ class CreasePattern(TreeNode,
     * array of lines -- ``L``
     * array of facets -- ``F``
 
-    All remaining attributes providing topological or geometrical
-    characteristics of the crease pattern are provided as property
+    All remaining attributes providing topological mappings
+    of the crease pattern are provided as property
     attributes calculated on demand using the input values.
+    The mappings implemented in this class
+    are independent on the interim configuration of the reshaping
+    process of the crease pattern.
     Recalculation of derived properties is initiated only upon a change
     of the mentioned input attributes.
+
+    Geometric characteristics, like line lengths, sector angles, dihedral
+    angles, surface areas, potential energy and their derivatives
+    are implemented in the operator classes.
+    Each of the state characterization methods starts with
+    ``get_`` followed by the variable name and has
+    the parameter ``u`` representing the interim configuration
+    of the crease pattern.
     '''
 
     #===============================================================================
@@ -63,7 +74,7 @@ class CreasePattern(TreeNode,
         return self.X
 
     n_D = Constant(3)
-    '''Dinensionality of the Euklidian space.
+    '''Dinensionality of the Euklidian space (constant = 3).
     '''
 
     #===========================================================================
@@ -95,7 +106,8 @@ class CreasePattern(TreeNode,
         return NN
 
     N_nbr = Property(depends_on=INPUT)
-    '''List of arrays ``[n_N,n_nbr(i)]`` of neighbors attached to each node ``i``.
+    '''List with ``n_N`` entries, each containing
+    an array with neighbor nodes attached to a node :math:`i`.
     '''
     @cached_property
     def _get_N_nbr(self):
@@ -110,29 +122,35 @@ class CreasePattern(TreeNode,
     iN = Property(depends_on=INPUT)
     '''Array of interior nodes.
     Included are all nodes that have a closed cycle of neighbors.
+    For these nodes, the mappings :math:`\mathrm{nbr}(i,\\kappa)` and
+    :math:`\mathrm{aln}(i,\\lambda)` (see below) are provided.
     '''
     @cached_property
     def _get_iN(self):
         return self._get_nbr_cycles()[0]
 
     iN_nbr = Property(depends_on=INPUT)
-    '''Neighbors nodes attached to each interior node.
-    List of arrays, neighbors ordered in a counter-clockwise manner.
+    '''List of arrays implementing the mapping
+    :math:`\mathrm{nbr}(i,\\kappa)` that delivers the global index
+    of a :math:`\\kappa`-th neighbor of an interior node :math:`i` in
+    a counter-clockwise order.
     '''
     @cached_property
     def _get_iN_nbr(self):
         return self._get_ordered_nbr_cycles()
 
-    iN_L = Property(depends_on=INPUT)
-    '''Lines attached to each interior node.
-    List of arrays, lines ordered in a counter-clockwise manner.
+    iN_aln = Property(depends_on=INPUT)
+    '''List of arrays implementing the mapping
+    :math:`\mathrm{aln}(i,\\lambda)` that delivers the global index
+    of a :math:`\\lambda`-th line attached to an interior node :math:`i` in
+    a counter-clockwise order.
     '''
     @cached_property
-    def _get_iN_L(self):
-        iN_L_lst = []
+    def _get_iN_aln(self):
+        iN_aln_lst = []
         for i, neighbors in zip(self.iN, self.iN_nbr):
-            iN_L_lst.append(self.NN_L[i, neighbors[:-1]])
-        return iN_L_lst
+            iN_aln_lst.append(self.NN_L[i, neighbors[:-1]])
+        return iN_aln_lst
 
     eN = Property(depends_on=INPUT)
     '''Array of edge nodes obtained as a complement of interior nodes.
@@ -160,8 +178,9 @@ class CreasePattern(TreeNode,
         return self.L.shape[0]
 
     LLL_F = Property(depends_on=INPUT)
-    '''Matrix with ``(n_L,n_L,n_L)`` entries containing facet numbers
-    for the connected lines. For unconnected lines it contains the value ``-1``
+    '''Matrix with ``(n_L,n_L,n_L)`` entries delivering the facet number
+    for a triple of lines constituting this facet.
+    For unconnected lines it contains the value ``-1``.
     '''
     @cached_property
     def _get_LLL_F(self):
@@ -215,7 +234,10 @@ class CreasePattern(TreeNode,
 
     iL_F = Property(depends_on=INPUT)
     '''Array of facets associated with interior lines ``(n_L,2)``.
-    Mapping from interior lines to two adjacent facets: ``iL->[f1,f2]``.
+    Mapping from interior lines to two adjacent facets:
+    :math:`\mathrm{afa}(l,\\phi), \; \\phi \\in (1,2)`.
+    The ordering of facets is given by the counter-clockwise rotation
+    around the first of the line :math:`l`.
     '''
     @cached_property
     def _get_iL_F(self):
