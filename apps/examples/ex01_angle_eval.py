@@ -26,10 +26,10 @@ The derivatives of the vectors with respect to the node :math:`u_1` are
         \pard{a_1}{u_{1x}} = -1
 '''
 
-from oricreate.crease_pattern import \
-    get_gamma, get_gamma_du, get_theta, get_theta_du3, get_theta_du2
-
 import numpy as np
+from oricreate.util import \
+    get_gamma, get_gamma_du, get_theta, get_theta_du, get_gamma_du2
+
 
 a = np.array([[1, 0], [1, 0]], dtype='f')
 b = np.array([[0, 1], [1, 1]], dtype='f')
@@ -57,7 +57,7 @@ b_du = np.array([[
                   ]],
                 dtype='f')
 
-print 'gamma_du3'
+print 'gamma_du'
 print get_gamma_du(a, a_du, b, b_du)
-print 'theta_du2'
-print get_theta_du2(a, a_du, b, b_du)
+print 'gamma_du2'
+print get_gamma_du2(a, a_du, b, b_du)

@@ -2,7 +2,7 @@
 Operators evaluating angles between sets of vectors
 ===================================================
 
-.. currentmodule:: oricreate.crease_pattern
+.. currentmodule:: oricreate.util
 
 .. autofunction:: get_gamma
 

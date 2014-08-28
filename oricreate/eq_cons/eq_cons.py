@@ -16,8 +16,8 @@ from etsproxy.traits.api import \
     HasStrictTraits, Interface, implements, WeakRef, \
     Array, DelegatesTo, PrototypedFrom, cached_property, Property, \
     List, Bool
-
 import numpy as np
+
 
 class IEqCons(Interface):
     '''Interface of an equality constraint.

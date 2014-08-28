@@ -12,32 +12,25 @@
 #
 # Created on Jan 29, 2013 by: matthias
 
-import numpy as np
-
-from etsproxy.traits.api import HasStrictTraits, Range, Instance, on_trait_change, \
-    Event, Property, Constant, DelegatesTo, PrototypedFrom, cached_property, Str, Delegate, \
-    Int, Float, Array, Bool, List, Dict, Interface, implements, WeakRef
-
 from crease_pattern import \
     CreasePattern
-
 from eq_cons import \
     IEqCons, GrabPoints, \
     PointsOnLine, DofConstraints
-
 from eq_cons_angle_based import \
     EqConsDevelopability, \
     EqConsFlatFoldability
-
-from eq_cons_control_face import \
-    EqConsPointsOnSurface
-
 from eq_cons_constant_length import \
     EqConsConstantLength
-
+from eq_cons_control_face import \
+    EqConsPointsOnSurface
+from etsproxy.traits.api import HasStrictTraits, Range, Instance, on_trait_change, \
+    Event, Property, Constant, DelegatesTo, PrototypedFrom, cached_property, Str, Delegate, \
+    Int, Float, Array, Bool, List, Dict, Interface, implements, WeakRef
 from folding_simulator import FoldingSimulator
-
+import numpy as np
 from ori_node import IOriNode, OriNode
+
 
 class IReshaping(IOriNode):
     '''Interface for reshaping process

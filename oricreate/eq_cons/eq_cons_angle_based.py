@@ -12,11 +12,11 @@
 #
 # Created on Jan 3, 2013 by: rch, schmerl
 
+from eq_cons import EqCons
 from etsproxy.traits.api import \
     DelegatesTo, cached_property, Property
-
-from eq_cons import EqCons
 import numpy as np
+
 
 class AngleEqCons(EqCons):
     '''Base class for angle equality constraints.

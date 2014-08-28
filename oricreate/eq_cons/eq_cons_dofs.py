@@ -15,8 +15,10 @@
 
 '''
 
-import numpy as np
 import collections
+
+import numpy as np
+
 
 def _broadcast_nd(n, d):
     '''Construct the combination of supplied node and dimension indexes.

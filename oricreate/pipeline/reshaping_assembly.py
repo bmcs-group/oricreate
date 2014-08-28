@@ -3,14 +3,14 @@ Created on Jun 20, 2013
 
 @author: rch
 '''
-import numpy as np
+import math
 
 from etsproxy.traits.api import HasStrictTraits, Range, Instance, on_trait_change, \
     Event, Property, Constant, DelegatesTo, PrototypedFrom, cached_property, Str, Delegate, \
     Button, Int, Float, Array, Bool, List, Dict, Interface, implements, WeakRef, cached_property
-
+import numpy as np
 from reshaping import Reshaping
-import math
+
 
 class RotSymAssembly(Reshaping):
     ''' Replicate the source to form a structure.

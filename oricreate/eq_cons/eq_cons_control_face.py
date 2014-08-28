@@ -12,12 +12,11 @@
 #
 # Created on Nov 18, 2011 by: matthias
 
+from eq_cons import EqCons
 from etsproxy.traits.api import HasTraits, Property, DelegatesTo, Str
-
 import numpy as np
 import sympy as sp
 
-from eq_cons import EqCons
 
 x_, y_, z_, r_, s_, t_ = sp.symbols('x,y,z,r,s,t')
 

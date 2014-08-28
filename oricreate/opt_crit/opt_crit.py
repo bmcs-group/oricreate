@@ -16,6 +16,7 @@ from etsproxy.traits.api import \
     HasStrictTraits, Interface, implements, WeakRef, \
     DelegatesTo, Bool
 
+
 class IOptCrit(Interface):
     '''Interface of an equality constraint.
     '''

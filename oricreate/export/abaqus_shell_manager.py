@@ -1,8 +1,9 @@
+import errno
 import os
 import subprocess
-import errno
-import time
 import sys
+import time
+
 
 PIPE = subprocess.PIPE
 

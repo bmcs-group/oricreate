@@ -13,6 +13,12 @@
 # Created on Sep 8, 2011 by: matthias
 
 
+import copy
+import os
+import string
+import tempfile
+
+from crease_pattern import CreasePattern
 from etsproxy.mayavi.core.api import PipelineBase
 from etsproxy.mayavi.core.ui.api import MayaviScene, SceneEditor, MlabSceneModel
 from etsproxy.mayavi.modules.api import Axes
@@ -22,17 +28,12 @@ from etsproxy.traits.api import HasTraits, Range, Instance, on_trait_change, \
 from etsproxy.traits.ui.api import View, Item, Group, ButtonEditor, RangeEditor, \
     VGroup, HGroup, HSplit, Tabbed, ViewSubElement, VGrid, Include, TreeEditor, \
     TreeNode, Handler, ListEditor, VSplit
-
+from face_view import FaceView
+import numpy as np
 from ori_node import IOriNode, OriNode
-from crease_pattern import CreasePattern
 from reshaping import IReshaping, Initialization, Reshaping, FormFinding, Folding, Lifting
 from reshaping_assembly import RotSymAssembly, MonoShapeAssembly
-from face_view import FaceView
-import copy
-import numpy as np
-import os
-import string
-import tempfile
+
 
 reshaping_tree_editor = TreeEditor(
     nodes=[

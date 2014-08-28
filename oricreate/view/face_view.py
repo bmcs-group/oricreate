@@ -4,23 +4,22 @@ Created on Jan 19, 2012
 @author: matthias
 '''
 
+import os
+
+from etsproxy.mayavi import mlab
+from etsproxy.mayavi.core.api import Engine
 from etsproxy.mayavi.core.api import PipelineBase
 from etsproxy.mayavi.core.ui.api import MayaviScene, SceneEditor, \
     MlabSceneModel
 from etsproxy.mayavi.modules.api import Axes
-
 from etsproxy.traits.api import HasTraits, Range, Instance, on_trait_change, \
     Trait, Property, Constant, DelegatesTo, cached_property, Str, Delegate, \
     Button, Int, Bool, File, Array, List, Float, TraitType, WeakRef
-
 from etsproxy.traits.ui.api import \
     View, Item, Group, ButtonEditor, RangeEditor, VGroup, HGroup, HSplit, Tabbed, \
     ViewSubElement, VGrid
-from etsproxy.mayavi import mlab
-from etsproxy.mayavi.core.api import Engine
-
-import os
 import numpy as np
+
 
 class FaceView(HasTraits):
     '''

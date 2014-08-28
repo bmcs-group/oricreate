@@ -12,9 +12,9 @@
 #
 # Created on Nov 18, 2011 by: matthias
 
+import numpy as np
 from opt_crit import OptCrit
 
-import numpy as np
 
 class OptCritPotentialEnergy(OptCrit):
     '''Optimization criteria based on minimum potential energy of gravity.

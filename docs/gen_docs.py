@@ -12,13 +12,12 @@
 #
 # Created on Dec 21, 2011 by: rch
 
+from os.path import expanduser
+import os.path
 from traits.api import \
     HasTraits, Str, Property, cached_property, \
     Enum
 
-import os.path
-
-from os.path import expanduser
 
 HOME_DIR = expanduser("~")
 # build directory

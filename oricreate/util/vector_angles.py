@@ -6,6 +6,7 @@ Created on Aug 28, 2014
 
 import numpy as np
 
+
 def get_gamma(a, b):
     '''Get the cosine of an angle between two vectors :math:`a` and :math:`b`
     Given two compatible arrays (n-dimensional) :math:`a`
@@ -52,7 +53,8 @@ def get_gamma_du(a, a_du, b, b_du):
         \left( a_d b_d \\right)
         \\right]
 
-    By factoring out the term :math:`\left(\left\| a \\right\| \left\| b \\right\| \\right)`
+    By factoring out the term
+    :math:`\left(\left\| a \\right\| \left\| b \\right\| \\right)`
     the expression reduces to a form
 
     .. math::
@@ -61,7 +63,8 @@ def get_gamma_du(a, a_du, b, b_du):
         \\left[
         \\frac{\partial \left(a_d  b_d \\right)}{\partial u_{Ie}}
         -
-        \\frac{\partial \left( \left\| a \\right\| \left\| b \\right\| \\right) }{ \partial u_{Ie} }
+        \\frac{\partial \left( \left\| a \\right\|
+        \left\| b \\right\| \\right) }{ \partial u_{Ie} }
         \;
         \gamma
         \\right]
@@ -75,11 +78,14 @@ def get_gamma_du(a, a_du, b, b_du):
         +
         \\frac{\partial b_d }{\partial u_{Ie}} \; a_d
         \;\;\mathrm{and}\;\;
-        \\frac{\partial \left( \left\| a \\right\| \left\| b \\right\| \\right) }{ \partial u_{Ie} }
+        \\frac{\partial \left( \left\| a \\right\|
+        \left\| b \\right\| \\right) }{ \partial u_{Ie} }
         =
-        \\frac{\partial \left\| a \\right\|  }{ \partial u_{Ie} } \; \left\| b \\right\|
+        \\frac{\partial \left\| a \\right\|  }{ \partial u_{Ie} }
+        \; \left\| b \\right\|
         +
-        \\frac{\partial \left\| b \\right\|  }{ \partial u_{Ie} } \; \left\| a \\right\|
+        \\frac{\partial \left\| b \\right\|  }{ \partial u_{Ie} }
+        \; \left\| a \\right\|
 
     The derivative of a vector norm in a summation form can be rewritten as
 
@@ -94,8 +100,10 @@ def get_gamma_du(a, a_du, b, b_du):
         a_{d}
         \\right)
 
-    Using these expressions and using the terms given in the function ``get_gamma``
-    the code for a vectorized evaluation for the supplied multidimensional arrays of
+    Using these expressions and using the terms given in the function
+    ``get_gamma``
+    the code for a vectorized evaluation for the supplied
+    multidimensional arrays of
     ``a, a_du, b, b_du`` looks as follows::
 
         ab_du = np.einsum('...dIe,...d->...Ie', a_du, b) + np.einsum('...dIe,...d->...Ie', b_du, a)
@@ -111,21 +119,22 @@ def get_gamma_du(a, a_du, b, b_du):
     sqrt_bb = np.sqrt(np.einsum('...d,...d->...', b, b))
     sqrt_aa_x_sqrt_bb = sqrt_aa * sqrt_bb
     gamma = ab / sqrt_aa_x_sqrt_bb
-
     ab_du = (np.einsum('...dIe,...d->...Ie', a_du, b) +
              np.einsum('...dIe,...d->...Ie', b_du, a))
-
-    sqrt_aa_du_x_sqrt_bb = np.einsum('...,...dIe,...d->...Ie', sqrt_bb / sqrt_aa, a_du, a)
-    sqrt_bb_du_x_sqrt_aa = np.einsum('...,...dIe,...d->...Ie', sqrt_aa / sqrt_bb, b_du, b)
+    sqrt_aa_du_x_sqrt_bb = np.einsum('...,...dIe,...d->...Ie',
+                                     sqrt_bb / sqrt_aa, a_du, a)
+    sqrt_bb_du_x_sqrt_aa = np.einsum('...,...dIe,...d->...Ie',
+                                     sqrt_aa / sqrt_bb, b_du, b)
     sqrt_aa_x_sqrt_bb_du = sqrt_aa_du_x_sqrt_bb + sqrt_bb_du_x_sqrt_aa
-    sqrt_aa_x_sqrt_bb_du_gamma = np.einsum('...Ie,...->...Ie', sqrt_aa_x_sqrt_bb_du, gamma)
-
+    sqrt_aa_x_sqrt_bb_du_gamma = np.einsum('...Ie,...->...Ie',
+                                           sqrt_aa_x_sqrt_bb_du, gamma)
     gamma_du = np.einsum('...,...Ie->...Ie',
-                         1. / sqrt_aa_x_sqrt_bb, (ab_du - sqrt_aa_x_sqrt_bb_du_gamma))
+                         1. / sqrt_aa_x_sqrt_bb,
+                         (ab_du - sqrt_aa_x_sqrt_bb_du_gamma))
 
     return gamma_du
 
-def get_theta_du2(a, a_du, b, b_du):
+def get_gamma_du2(a, a_du, b, b_du):
     '''Given two arrays (n-dimensional) of vectors a, b and their
     derivatives a_du and b_du with respect to the nodal displacments du
     return the derivatives of the mutual angles theta between
@@ -147,27 +156,8 @@ def get_theta_du2(a, a_du, b, b_du):
                      np.einsum('...,...iKj,...i->...Kj',
                                gamma_aa__bb, b_du, b))
 
-    print 'xxx2'
-    print gamma_aa_bb_du
-
-    bb__aa = sqrt_bb / sqrt_aa
-    aa__bb = sqrt_aa / sqrt_bb
-    aa_bb_du = (np.einsum('...,...iKj,...i->...Kj',
-                          bb__aa, a_du, a) +
-                np.einsum('...,...iKj,...i->...Kj',
-                          aa__bb, b_du, b))
-    ygamma_aa_bb_du = np.einsum('...,...Kj->...Kj', gamma, aa_bb_du)
-    print 'yyy2'
-    print ygamma_aa_bb_du
-
     gamma_du = np.einsum('...,...Kj->...Kj', 1. / sqrt_aa_x_sqrt_bb, (ab_du - gamma_aa_bb_du))
-
-    print 'gamma_du2'
-    print gamma_du
-
-    sqarg = 1 - gamma ** 2
-    theta_du = np.einsum('...,...Kj->...Kj', -1. / np.sqrt(sqarg), gamma_du)
-    return theta_du
+    return gamma_du
 
 def get_theta(a, b):
     '''
@@ -177,18 +167,18 @@ def get_theta(a, b):
 
     .. math::
 
-        \\theta = \\arccos{( c^{(ab)} )}
+        \\theta = \\arccos{( \gamma )}
 
     realized by calling the vectorized numpy function::
 
-        theta = np.arccos(c_ab)
+        theta = np.arccos(\)
 
     '''
     c_ab = get_gamma(a, b)
     theta = np.arccos(c_ab)
     return theta
 
-def get_theta_du3(a, a_du, b, b_du):
+def get_theta_du(a, a_du, b, b_du):
     '''
     Get the derivative of the angle between two vectors :math:`a` and :math:`b`
     with respect to ``du`` using the supplied chain derivatives ``a_du, b_du``.
@@ -216,5 +206,5 @@ def get_theta_du3(a, a_du, b, b_du):
     '''
     gamma = get_gamma(a, b)
     gamma_du = get_gamma_du(a, a_du, b, b_du)
-    theta_du = np.einsum('...,...Ie->...Ie', -1 / np.sqrt(1 - gamma ** 2), gamma_du)
+    theta_du = np.einsum('...,...Ie->...Ie', -1. / np.sqrt(1. - gamma ** 2), gamma_du)
     return theta_du

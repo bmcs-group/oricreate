@@ -12,15 +12,15 @@
 #
 # Created on Nov 18, 2011 by: matthias
 
+from scipy.optimize import fsolve
+
 from etsproxy.traits.api import HasTraits, Range, Instance, on_trait_change, \
     Trait, Property, Constant, DelegatesTo, cached_property, Str, Delegate, \
     Button, Int, Bool, File, Array, Float, Any, List
-
-from opt_crit import OptCrit
-
 import numpy as np
+from opt_crit import OptCrit
 import sympy as sm
-from scipy.optimize import fsolve
+
 
 r_, s_, x_, y_, z_, t_ = sm.symbols('r,s,x,y,z,t')
 

@@ -16,8 +16,8 @@ from etsproxy.traits.api import HasStrictTraits, \
     Event, Property, cached_property, Str, \
     Int, Float, Array, Bool, Dict, List, \
     Constant, Instance, Self, Interface, implements
-
 from etsproxy.traits.ui.api import View
+
 
 class IOriNode(Interface):
     pass
