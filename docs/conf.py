@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# oricrete documentation build configuration file, created by
+# oricreate documentation build configuration file, created by
 # sphinx-quickstart on Mon Feb 27 11:03:20 2012.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -207,12 +207,21 @@ latex_documents = [
 # If true, show URL addresses after external links.
 # latex_show_urls = False
 
+pngmath_latex_preamble = r'''
+\newcommand{\inl}[2]{\mbox{$\displaystyle\int_{#1}^{#2}$}}
+\newcommand{\sul}[2]{\mbox{$\displaystyle\sum_{#1}^{#2}\,$}}
+\newcommand{\del}[2]{\displaystyle\frac{#1}{#2}}
+\newcommand{\pard}[2]{\displaystyle\frac{\partial #1}{\partial #2}}
+\newcommand{\norm}[1]{\left\| \bm{#1} \right\|}
+\newcommand{\dotp}[2]{\bm{#1} \cdot \bm{#2}}
+'''
+
 # Additional stuff for the LaTeX preamble.
-latex_preamble = '''
-\\newcommand{\inl}[2]{\mbox{$\displaystyle\int_{#1}^{#2}$}}
-\\newcommand{\sul}[2]{\mbox{$\displaystyle\sum_{#1}^{#2}\,$}}
-\\newcommand{\\bm}[1]{\mbox{\\boldmath$#1$}}
-\\newcommand{\del}[2]{\mbox{$\displaystyle\\frac{#1}{#2}$}}
+latex_preamble = r'''
+\newcommand{\inl}[2]{\mbox{$\displaystyle\int_{#1}^{#2}$}}
+\newcommand{\sul}[2]{\mbox{$\displaystyle\sum_{#1}^{#2}\,$}}
+\newcommand{\bm}[1]{\mbox{\boldmath$#1$}}
+\newcommand{\del}[2]{\mbox{$\displaystyle\\frac{#1}{#2}$}}
 '''
 
 # Documents to append as an appendix to all manuals.
@@ -221,13 +230,13 @@ latex_preamble = '''
 # If false, no module index is generated.
 # latex_domain_indices = True
 
-# latex_elements = {
-#          'papersize':'a4paper',
-#          'pointsize':'11pt',
-#          'classoptions': ',openany',
-#          'babel': '\\usepackage[english]{babel}',
-#          'preamble': latex_preamble
-#       }
+latex_elements = {
+         'papersize':'a4paper',
+         'pointsize':'11pt',
+         'classoptions': ',openany',
+         'babel': '\\usepackage[english]{babel}',
+         'preamble': latex_preamble
+      }
 
 # -- Options for manual page output --------------------------------------------
 
@@ -241,3 +250,4 @@ man_pages = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'http://docs.python.org/': None}
+

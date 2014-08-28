@@ -26,8 +26,7 @@ Description of classes
 .. toctree::
    :maxdepth: 2
 
-   vector_angles
-   crease_pattern_classes
+   crease_pattern/index
 
 Indices and tables
 ------------------
