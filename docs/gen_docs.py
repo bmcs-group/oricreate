@@ -18,7 +18,6 @@ from traits.api import \
     HasTraits, Str, Property, cached_property, \
     Enum
 
-
 HOME_DIR = expanduser("~")
 # build directory
 BUILD_DIR = os.path.join(HOME_DIR, '.oricreate', 'docs')

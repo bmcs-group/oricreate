@@ -6,8 +6,6 @@
 Crease pattern representation
 =============================
 
-
-
 .. toctree::
    :maxdepth: 2
 
