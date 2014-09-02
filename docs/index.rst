@@ -3,6 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+===================================
 Welcome to oricreate documentation!
 ===================================
 
@@ -12,7 +13,7 @@ Welcome to oricreate documentation!
 	:linenothreshold: 5
 	
 Tutorial
---------
+========
 	
 .. toctree::
    :maxdepth: 2
@@ -20,16 +21,22 @@ Tutorial
    front
    intro
 
-Description of classes
-----------------------
+Mathematical ingredients
+========================
+
+	howtos/index
+
+Reference manual
+================
 
 .. toctree::
    :maxdepth: 2
 
    crease_pattern/index
+   opt_crit/index
 
 Indices and tables
-------------------
+==================
 
 * :ref:`genindex`
 * :ref:`modindex`

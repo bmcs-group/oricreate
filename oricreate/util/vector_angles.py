@@ -9,11 +9,6 @@ import numpy as np
 
 def get_gamma(a, b):
     r'''Get the cosine of an angle between two vectors :math:`a` and :math:`b`
-    Given two compatible arrays (n-dimensional) :math:`a`
-    and :math:`b` of vectors with last index :math:`I`
-    labeling the vector component the array :math:`\gamma`
-    of angle cosines between each pair of vectors in :math:`a`, :math:`b`.
-    gets calculated as
 
     .. math::
         \gamma =
@@ -26,7 +21,21 @@ def get_gamma(a, b):
             { \sqrt{a_d a_d} \sqrt{b_d b_d} }
         :label: gamma
 
-    corresponding to the code::
+    It is convenient to implement this function in a vectorized
+    form so that two arrays of vectors can be supplied and
+    evaluated using several sum-product evaluations over their
+    last index :math:`d` standing for the spatial dimension of
+    the vectors.
+
+    Such an evaluation can be conveniently done using the
+    method
+    `numpy.einsum(subscript_mappings, *operands)
+    <http://docs.scipy.org/doc/numpy/reference/generated/numpy.einsum.html>`_.
+    Given two compatible arrays (n-dimensional) :math:`a`
+    and :math:`b` of vectors with last index :math:`d`
+    labeling their spatial component the array :math:`\gamma`
+    of angle cosines between each pair of vectors in :math:`a`, :math:`b`.
+    gets calculated as::
 
         ab = np.einsum('...d,...d->...', a, b)
         sqrt_aa = np.sqrt(np.einsum('...d,...d->...', a, a))
@@ -42,7 +51,10 @@ def get_gamma(a, b):
     return c_ab
 
 def get_gamma_du(a, a_du, b, b_du):
-    r'''Given two arrays (n-dimensional) of vectors :math:`a, b` and their
+    r'''Get the derivatives of directional cosines
+    between two vectors :math:`a` and :math:`b`.
+
+    Given two arrays (n-dimensional) of vectors :math:`a, b` and their
     derivatives a_du and b_du with respect to the nodal displacments du
     return the derivatives of the cosine between mutual angles theta between
     a and b with respect to the node displacement du.
@@ -182,7 +194,7 @@ def get_gamma_du2(a, a_du, b, b_du):
 def get_theta(a, b):
     r'''
     Get the angle between two vectors :math:`a` and :math:`b`.
-    Using the function ``get_c_ab(a,b)`` delivering the cosine of the angle
+    Using the function ``get_gamma(a,b)`` delivering the cosine of the angle
     this method just evaluates the expression
 
     .. math::
@@ -202,7 +214,7 @@ def get_theta_du(a, a_du, b, b_du):
     r'''
     Get the derivative of the angle between two vectors :math:`a` and :math:`b`
     with respect to ``du`` using the supplied chain derivatives ``a_du, b_du``.
-    Using the function ``get_c_ab(a,b)`` delivering the cosine of the angle
+    Using the function ``get_gamma(a,b)`` delivering the cosine of the angle
     this method evaluates the expression
 
     .. math::
