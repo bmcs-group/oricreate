@@ -11,11 +11,10 @@ elementary examples. Examples are provided as enumerated scripts
 named exN_name.py where N stands for the example number. They are located
 in the module ``apps.examples``
 
+Vector angles
+=============
+
 .. toctree::
    :maxdepth: 2
-
-
-ex01_vector_angles
-------------------
 
 .. automodule:: apps.examples.ex01_vector_angles

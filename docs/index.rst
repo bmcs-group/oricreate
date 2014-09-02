@@ -28,15 +28,14 @@ Mathematical ingredients
    :maxdepth: 2
 
    howtos/index
-
-Reference manual
+   
+Reference Manual
 ================
-
+   
 .. toctree::
    :maxdepth: 2
 
-   crease_pattern/index
-   opt_crit/index
+   reference_manual/index
 
 Indices and tables
 ==================

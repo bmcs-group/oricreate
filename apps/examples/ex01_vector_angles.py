@@ -95,9 +95,17 @@ if __name__ == '__main__':
     a = np.array([[1, 0], [1, 0]], dtype='f')
     b = np.array([[0, 1], [1, 1]], dtype='f')
 
-    print get_gamma(a, b)
-    print get_theta(a, b)
+    print('gamma')
+    print(get_gamma(a, b))
+    print('theta')
+    print(get_theta(a, b))
 
+    I = np.diag(np.ones((2,), dtype='f'))
+    # dimensions of the derivatives are stored as:
+    # index of a vector,
+    # component of the vector,
+    # index of a node,
+    # component of a node.
     a_du = np.array([[
                       [[-1, 0]],
                       [[0, -1]]
@@ -118,9 +126,8 @@ if __name__ == '__main__':
                       ]],
                     dtype='f')
 
-    print 'gamma_du'
-    print get_gamma_du(a, a_du, b, b_du)
-    print 'gamma_du2'
-    print get_gamma_du2(a, a_du, b, b_du)
+    print('gamma_du')
+    print(get_gamma_du(a, a_du, b, b_du))
 
+    print 'theta_du'
     print(get_theta_du(a, a_du, b, b_du))

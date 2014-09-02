@@ -368,7 +368,19 @@ class CreaseFacetOperators(HasStrictTraits):
         return X[ F_N[:, (1, 2, 0)] ] - X[ F_N[:, (0, 1, 2)] ]
 
     def get_F_L_vectors_du(self, u):
-        '''Get the derivatives of the line vectors around the facets.
+        r'''Get the derivatives of the line vectors around the facets.
+
+        For a facet :math:`o` with lines :math:`l` return the derivatives
+        with respect to the displacement of the corner nodes connected by
+        the triangle edges.Given the nodes
+        :math:`\bm{x}_1, \bm{x}_2, \bm{x}_3` and the lines
+        vectors as
+
+        .. math::
+            \bm{a}_1 = \bm{x}_2 - \bm{x}_1 \\
+            \bm{a}_2 = \bm{x}_3 - \bm{x}_2 \\
+            \bm{a}_3 = \bm{x}_1 - \bm{x}_3
+
         '''
         F_L_vectors_du = np.zeros((self.n_F, 3, self.n_N), dtype='float_')
         F_idx = np.arange(self.n_F)
