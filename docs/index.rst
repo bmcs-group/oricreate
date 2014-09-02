@@ -24,7 +24,10 @@ Tutorial
 Mathematical ingredients
 ========================
 
-	howtos/index
+.. toctree::
+   :maxdepth: 2
+
+   howtos/index
 
 Reference manual
 ================
