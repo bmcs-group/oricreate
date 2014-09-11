@@ -6,20 +6,35 @@
 Mathematical ingredients
 ========================
 
-This chapter describes the ingredients of goal functions and constraints using
-elementary examples. Examples are provided as enumerated scripts 
-named exN_name.py where N stands for the example number. They are located
-in the module ``apps.examples``
-
-Vector angles
-=============
+This chapter presents the functionality provided 
+within oricreate package using elementary examples.
 
 .. toctree::
    :maxdepth: 2
 
-.. automodule:: apps.examples.ex01_vector_angles
+Vector angles
+=============
+
+.. automodule:: docs.howtos.ex01_vector_angles
+
+.. include:: ex01_vector_angles.py
+   :literal:
+   :start-after: # end_doc
+
+The output of the script looks as follows:
+
+.. program-output:: python howtos/ex01_vector_angles.py
 
 Single vertex
 =============
 
-.. automodule:: apps.examples.ex04_single_vertex
+.. automodule:: docs.howtos.ex04_single_vertex
+
+.. include:: ex04_single_vertex.py
+   :literal:
+   :start-after: # end_doc
+
+The output of the script looks as follows:
+
+.. program-output:: python howtos/ex04_single_vertex.py
+      

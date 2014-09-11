@@ -13,6 +13,8 @@
 
 import sys, os
 
+print 'PATH', sys.path
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -27,10 +29,20 @@ sys.path.insert(0, root_path_simvisage)
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest',
-              'sphinx.ext.inheritance_diagram', 'sphinx.ext.graphviz',
-              'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath',
-              'sphinx.ext.ifconfig', 'sphinx.ext.viewcode']
+extensions = ['sphinx.ext.autodoc',
+              'sphinx.ext.doctest',
+              'matplotlib.sphinxext.mathmpl',
+              'matplotlib.sphinxext.only_directives',
+              'matplotlib.sphinxext.plot_directive',
+              'matplotlib.sphinxext.ipython_directive',
+              'sphinx.ext.inheritance_diagram',
+              'sphinx.ext.graphviz',
+              'sphinx.ext.todo',
+              'sphinx.ext.coverage',
+              'sphinx.ext.pngmath',
+              'sphinx.ext.ifconfig',
+              'sphinx.ext.viewcode',
+              'sphinxcontrib.programoutput']
 
 [extensions]
 
