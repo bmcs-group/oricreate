@@ -381,15 +381,25 @@ class CreaseFacetOperators(HasStrictTraits):
             \bm{a}_2 = \bm{x}_3 - \bm{x}_2 \\
             \bm{a}_3 = \bm{x}_1 - \bm{x}_3
 
+        The corresponding derivatives are then
+
+        .. math::
+            \pard{\bm{a}_1}{\bm{u}_1} = -1, \;\;\;
+            \pard{\bm{a}_1}{\bm{u}_2} = 1 \\
+            \pard{\bm{a}_2}{\bm{u}_2} = -1, \;\;\;
+            \pard{\bm{a}_2}{\bm{u}_3} = 1 \\
+            \pard{\bm{a}_3}{\bm{u}_3} = -1, \;\;\;
+            \pard{\bm{a}_3}{\bm{u}_1} = 1 \\
+
         '''
-        F_L_vectors_du = np.zeros((self.n_F, 3, self.n_N), dtype='float_')
+        F_L_vectors_du = np.zeros((self.n_F, 3, self.n_N, 3), dtype='float_')
         F_idx = np.arange(self.n_F)
-        F_L_vectors_du[F_idx, 0, self.F_N[:, 1]] = 1
-        F_L_vectors_du[F_idx, 1, self.F_N[:, 2]] = 1
-        F_L_vectors_du[F_idx, 2, self.F_N[:, 0]] = 1
-        F_L_vectors_du[F_idx, 0, self.F_N[:, 0]] = -1
-        F_L_vectors_du[F_idx, 1, self.F_N[:, 1]] = -1
-        F_L_vectors_du[F_idx, 2, self.F_N[:, 2]] = -1
+        F_L_vectors_du[F_idx, 0, self.F_N[:, 0], 0] = -1
+        F_L_vectors_du[F_idx, 1, self.F_N[:, 1], 1] = -1
+        F_L_vectors_du[F_idx, 2, self.F_N[:, 2], 2] = -1
+        F_L_vectors_du[F_idx, 0, self.F_N[:, 1], 0] = 1
+        F_L_vectors_du[F_idx, 1, self.F_N[:, 2], 1] = 1
+        F_L_vectors_du[F_idx, 2, self.F_N[:, 0], 2] = 1
         return F_L_vectors_du
 
     def get_norm_F_L_vectors(self, u):

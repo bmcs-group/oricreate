@@ -18,3 +18,8 @@ Vector angles
    :maxdepth: 2
 
 .. automodule:: apps.examples.ex01_vector_angles
+
+Single vertex
+=============
+
+.. automodule:: apps.examples.ex04_single_vertex
