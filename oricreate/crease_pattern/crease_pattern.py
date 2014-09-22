@@ -349,6 +349,51 @@ class CreasePattern(TreeNode,
             oc.append(neighbors)
         return oc
 
+    def plot_2D(self, ax):
+
+        # set plot range
+        x_max = np.amax(self.x_0[:, :2], axis=0)
+        x_min = np.amin(self.x_0[:, :2], axis=0)
+        x_delta = x_max - x_min
+        larger_range = np.amax(x_delta)
+        pad = larger_range * 0.1
+        x_mid = (x_max + x_min) / 2.0
+
+        shift = np.array([-0.5, 0.5], dtype='f')
+        padding = np.array([-pad, pad], dtype='f')
+        x_deltas = x_delta[:, np.newaxis] * shift[np.newaxis, :] + padding[np.newaxis, :]
+        x_range = x_mid[:, np.newaxis] + x_deltas
+
+        # plot lines
+        lines = self.x_0[:, (0, 1)][self.L]
+        ax.plot(lines[:, :, 0].T, lines[:, :, 1].T, color='black')
+        ax.set_xlim(*x_range[0, :])
+        ax.set_ylim(*x_range[1, :])
+        ax.set_aspect('equal')
+        # plot node numbers
+        xy_offset = (3, 3)
+        for n, x_0 in enumerate(self.x_0):
+            xy = (x_0[0], x_0[1])
+            ax.annotate(xy=xy, s='%g' % n,
+                        xytext=xy_offset, color='blue',
+                        textcoords='offset points')
+        # plot line numbers
+        xy_offset = (1, 1)
+        line_pos = 0.5 * np.sum(self.x_0[self.L], axis=1)
+        for n, x_0 in enumerate(line_pos):
+            xy = (x_0[0], x_0[1])
+            ax.annotate(xy=xy, s='%g' % n,
+                        xytext=xy_offset, color='red',
+                        textcoords='offset points')
+        # plot facet numbers
+        xy_offset = (0, 0)
+        line_pos = 1 / 3.0 * np.sum(self.x_0[self.F], axis=1)
+        for n, x_0 in enumerate(line_pos):
+            xy = (x_0[0], x_0[1])
+            ax.annotate(xy=xy, s='%g' % n,
+                        xytext=xy_offset, color='green',
+                        textcoords='offset points')
+
     #===============================================================================
     # methods and Information for Abaqus calculation
     #===============================================================================

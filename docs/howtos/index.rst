@@ -32,9 +32,16 @@ Single vertex
 
 .. include:: ex04_single_vertex.py
    :literal:
-   :start-after: # end_doc
+   :start-after: # begin
+   :end-before: # end
 
-The output of the script looks as follows:
+The output of the srcipt looks as follows:
 
 .. program-output:: python howtos/ex04_single_vertex.py
+
+The ``plot_2D`` commands renders the crease pattern in the base
+plane. 
+
+.. plot:: howtos/ex04_single_vertex_plt.py
+
       
