@@ -14,11 +14,17 @@
 
 import numpy as np
 
-from traits.api import HasStrictTraits, \
+from traits.api import \
+    HasStrictTraits, Float, \
     Property, cached_property, \
     Array
 
-from oricreate.util.einsum_utils import DELTA, EPS
+from util import \
+    get_theta, get_theta_du
+
+INPUT = '+cp_input'
+
+from util.einsum_utils import DELTA, EPS
 
 class CreaseNodeOperators(HasStrictTraits):
     '''Operators delivering the instantaneous values of parameters
@@ -30,47 +36,45 @@ class CreaseNodeOperators(HasStrictTraits):
     ``[ np.array([neighbor_node1, neighbor_node2, ... neighbor_node1), ... ]``
     '''
     def _get_iN_theta(self):
-        return self.get_iN_theta(np.zeros_like(self.x_0))
-
-    def get_iN_theta(self, u):
-        '''Assemble the sector angles around a node :math:`i`
-        '''
-        NN_theta = self.get_NN_theta(u)
+        NN_theta = self.NN_theta
         return [NN_theta[n, neighbors[:-1]]
                 for n, neighbors in zip(self.iN, self.iN_nbr)]
 
-    def get_iN_theta_du(self, u):
-        '''Assemble the derivatives of sector angles around a node :math:`i`
-        '''
-        NN_theta_du = self.get_NN_theta_du(u)
+    iN_theta_du = Property
+    '''Assemble the derivatives of sector angles around a node :math:`i`
+    '''
+    def _get_iN_theta_du(self):
+        NN_theta_du = self.NN_theta_du
         return [NN_theta_du[n, neighbors[:-1], :, :]
                 for n, neighbors in zip(self.iN, self.iN_nbr)]
 
-    def get_NN_theta(self, u):
-        '''Matrix of angles ``[n_L,n_L]`` containing the values of sector angle
-        between two consecutive lines. Angles are provided for each
-        pair of lines that fullfill the following condition:
-        If the first line connects the nodes :math:`ij` the second can
-        be obtained by rotating the first line by the sector angle
-        :math:`\\theta_{ij}` around the node :math:`i` in a counter-
-        clockwise manner. Remaining position in the matrix are set to zero.
+    NN_theta = Property
+    '''Matrix of angles ``[n_L,n_L]`` containing the values of sector angle
+    between two consecutive lines. Angles are provided for each
+    pair of lines that fulfill the following condition:
+    If the first line connects the nodes :math:`ij` the second can
+    be obtained by rotating the first line by the sector angle
+    :math:`\\theta_{ij}` around the node :math:`i` in a counter-
+    clockwise manner. Remaining position in the matrix are set to zero.
 
-        This matrix serves as an interim result for a simple assembly
-        of the ``iN_theta`` array.
+    This matrix serves as an interim result for a simple assembly
+    of the ``iN_theta`` array.
 
-        .. image:: figs/crease_node_operators_NN_theta.png
-        '''
+    .. image:: figs/crease_node_operators_NN_theta.png
+    '''
+    def _get_NN_theta(self):
         NN_theta = np.zeros_like(self.NN_L, dtype='float_')
-        F_theta = self.get_F_theta(u)
+        F_theta = self.F_theta
         NN_theta[ self.F_N[:, (0, 1, 2)], self.F_N[:, (1, 2, 0)]] = F_theta[:, (0, 1, 2)]
         return NN_theta
 
-    def get_NN_theta_du(self, u):
-        '''Array of derivatives ``[n_L,n_L,n_dofs]`` of an angle between
-        two lines of a facet.
-        '''
+    NN_theta_du = Property
+    '''Array of derivatives ``[n_L,n_L,n_dofs]`` of an angle between
+    two lines of a facet.
+    '''
+    def _get_NN_theta_du(self):
         NN_theta_du = np.zeros((self.n_N, self.n_N, self.n_N, self.n_D), dtype='float_')
-        F_theta_du = self.get_F_theta_du(u)
+        F_theta_du = self.F_theta_du
         NN_theta_du[ self.F_N[:, (0, 1, 2)], self.F_N[:, (1, 2, 0)], :, :] = \
             F_theta_du[:, (0, 1, 2), :, :]
         return NN_theta_du
@@ -82,41 +86,50 @@ class CreaseLineOperators(HasStrictTraits):
     #===========================================================================
     # Property operators for initial configuration
     #===========================================================================
-    L_vectors = Property(Array, depends_on='N, L')
+    L_vectors = Property(Array, depends_on=INPUT)
     '''Vectors of the crease lines.
+
+    ... math::
+        \bm{v} = \bm{x}_2 - \bm{x}_1
+
     '''
     @cached_property
     def _get_L_vectors(self):
-        return self.get_L_vectors(np.zeros_like(self.x_0))
+        return self.x[ self.L[:, 1] ] - self.x[ self.L[:, 0] ]
 
-    L_lengths = Property(Array, depends_on='X, L')
-    '''Lengths of the crease lines.
+    L_lengths = Property(Array, depends_on=INPUT)
+    r'''Lengths of the crease lines.
+
+    ... math::
+        \ell = \left\| \bm{v} \right\|
+
     '''
     @cached_property
     def _get_L_lengths(self):
-        return self.get_L_lengths(np.zeros_like(self.x_0))
-
-    #===========================================================================
-    # Public operators for interim configurations
-    #===========================================================================
-    def get_L_lengths(self, u):
-        v = self.get_L_vectors(u)
+        v = self.L_vectors
         return np.sqrt(np.sum(v ** 2, axis=1))
 
-    def get_L_vectors(self, u):
-        '''Get crease line vectors
-        '''
-        X = self.x_0 + u
-        L = self.L
-        return X[ L[:, 1] ] - X[ L[:, 0] ]
+    L_vectors_du = Property(Array, depends_on=INPUT)
+    r'''Get the derivatives of the line vectors
 
-    def get_L_vectors_du(self, u):
-        '''Get the derivatives of the line vectors
-        '''
-        L_vectors_du = np.zeros((self.n_L, self.n_N), dtype='float_')
+    .. math::
+       v_{l,d,\mathrm{lnode}(l,0),e} = -\delta_{de}
+
+       v_{l,d,\mathrm{lnode}(l,1),e} = +\delta_{de}
+
+       v_{l,d,I,e} = 0 \; \mathrm{where} \; I \neq \mathrm{lnode}(l,[0,1])
+
+    with the indices :math:`l,d,I,e` representing the line, component,
+    node and coordinate, respectively.
+    '''
+    @cached_property
+    def _get_L_vectors_du(self):
+        L_vectors_du = np.zeros((self.n_L, self.n_D, self.n_N, self.n_D), dtype='float_')
         L_idx = np.arange(self.n_L)
-        L_vectors_du[L_idx, self.L[:, 1]] = 1
-        L_vectors_du[L_idx, self.L[:, 0]] = -1
+        L_N0_idx = self.L[L_idx, 0]
+        L_N1_idx = self.L[L_idx, 1]
+        L_vectors_du[L_idx, :, L_N0_idx, :] = DELTA
+        L_vectors_du[L_idx, :, L_N1_idx, :] = -DELTA
         return L_vectors_du
 
     iL_within_F0 = Property
@@ -130,44 +143,47 @@ class CreaseLineOperators(HasStrictTraits):
         iL_within_F0 = np.where(iL[:, np.newaxis] == L_of_F0_of_iL)
         return iL_within_F0
 
-    def get_iL_vectors(self, u):
-        '''Get the line vector of an interior line oriented in the
-        sense of counter-clockwise direction of its first adjacent facet.
-        '''
-        F_L_vectors = self.get_F_L_vectors(u)
+    iL_vectors = Property(Array, depends_on=INPUT)
+    '''Get the line vector of an interior line oriented in the
+    sense of counter-clockwise direction of its first adjacent facet.
+    '''
+    @cached_property
+    def _get_iL_vectors(self):
+        F_L_vectors = self.F_L_vectors
         return F_L_vectors[self.iL_within_F0]
 
-    def get_norm_iL_vectors(self, u):
-        '''Get the line vector of an interior line oriented in the
-        sense of counter-clockwise direction of its first adjacent facet.
-        '''
-        iL_vectors = self.get_iL_vectors(u)
+    norm_iL_vectors = Property(Array, depends_on=INPUT)
+    '''Get the normed line vector of an interior line oriented in the
+    sense of counter-clockwise direction of its first adjacent facet.
+    '''
+    def _get_norm_iL_vectors(self):
+        iL_vectors = self.iL_vectors
         mag_iL_vectors = np.sqrt(np.einsum('...i,...i->...', iL_vectors, iL_vectors))
         return iL_vectors / mag_iL_vectors[:, np.newaxis]
 
-    def get_iL_F_normals(self, u):
-        '''Get normals of facets adjacent to an interior line.
-        '''
-        F_normals = self.get_F_normals(u)
+    iL_F_normals = Property(Array, depends_on=INPUT)
+    '''Get normals of facets adjacent to an interior line.
+    '''
+    @cached_property
+    def _get_iL_F_normals(self):
+        F_normals = self.F_normals
         return F_normals[self.iL_F]
 
-    def get_norm_iL_F_normals(self, u):
-        '''Get normals of facets adjacent to an interior line.
-        '''
-        norm_F_normals = self.get_norm_F_normals(u)
+    norm_iL_F_normals = Property(Array, depends_on=INPUT)
+    '''Get normed normals of facets adjacent to an interior line.
+    '''
+    @cached_property
+    def _get_norm_iL_F_normals(self):
+        norm_F_normals = self.norm_F_normals
         return norm_F_normals[self.iL_F]
 
-    iL_psi = Property
-    '''Dihedral angles around the interior lines.
+    iL_psi = Property(Array, depends_on=INPUT)
+    '''Calculate the dihedral angle.
     '''
+    @cached_property
     def _get_iL_psi(self):
-        return self.get_iL_psi(np.zeros_like(self.x_0))
-
-    def get_iL_psi(self, u):
-        '''Calculate the dihedral angle.
-        '''
-        n_iL_vectors = self.get_norm_iL_vectors(u)
-        iL_F_normals = self.get_iL_F_normals(u)
+        n_iL_vectors = self.norm_iL_vectors
+        iL_F_normals = self.iL_F_normals
         a, b = np.einsum('ijk->jik', iL_F_normals)
         axb = np.einsum('...i,...j,...kij->...k', a, b, EPS)
         mag_axb = np.sqrt(np.einsum('...i,...i->...', axb, axb))
@@ -178,11 +194,13 @@ class CreaseLineOperators(HasStrictTraits):
         gamma = sign_rot * mag_axb / mag_aa_bb
         return np.arcsin(gamma)
 
-    def get_iL_psi2(self, u):
-        '''Calculate the dihedral angle for the intermediate configuration.
-        '''
-        l = self.get_norm_iL_vectors(u)
-        n = self.get_norm_iL_F_normals(u)
+    iL_psi2 = Property(Array, depends_on=INPUT)
+    '''Calculate the dihedral angle for the intermediate configuration.
+    '''
+    @cached_property
+    def _get_iL_psi2(self):
+        l = self.norm_iL_vectors
+        n = self.norm_iL_F_normals
         n0, n1 = np.einsum('ijk->jik', n)
         lxn0 = np.einsum('...i,...j,...kij->...k', l, n0, EPS)
         T = np.concatenate([l[:, np.newaxis, :],
@@ -228,64 +246,245 @@ class CreaseFacetOperators(HasStrictTraits):
         F_N[turn_facets, :] = self.F[turn_facets, ::-1]
         return F_N
 
-    F_area = Property(Array, depends_on='X, L, F')
+    F0_area = Property(Array, depends_on='X, L, F')
     '''Facet areas.
     '''
     @cached_property
+    def _get_F0_area(self):
+        return self.get_F0_area(np.zeros_like(self.x_0))
+
+    F_normals = Property(Array, depends_on=INPUT)
+    '''Get the normals of the facets.
+    '''
+    @cached_property
+    def _get_F_normals(self):
+        return self.get_F_normals(self.x)
+
+    def get_F_normals(self, x):
+        n = self._get_Fa_normals(x)
+        return np.sum(n, axis=1)
+
+    norm_F_normals = Property(Array, depends_on=INPUT)
+    '''Get the normed normals of the facets.
+    '''
+    @cached_property
+    def _get_norm_F_normals(self):
+        return self.get_F_normals(self.x)
+
+    def get_norm_F_normals(self, x):
+        n = self.get_F_normals(x)
+        mag_n = np.sqrt(np.einsum('...i,...i', n, n))
+        return n / mag_n[:, np.newaxis]
+
+    F_normals_du = Property(Array, depends_on=INPUT)
+    '''Get the normals of the facets.
+    '''
+    @cached_property
+    def _get_F_normals_du(self):
+        return self.get_F_normals_du(self.x)
+
+    def get_F_normals_du(self, x):
+        n_du = self._get_Fa_normals_du(x)
+        return np.sum(n_du, axis=1)
+
+    F_area = Property(Array, depends_on=INPUT)
+    '''Get the surface area of the facets.
+    '''
+    @cached_property
     def _get_F_area(self):
-        return self.get_F_area(np.zeros_like(self.x_0))
+        a = self._get_Fa_area(self.x)
+        A = np.einsum('a,Ia->I', self.eta_w, a)
+        return A
 
-    #===============================================================================
-    # Integration scheme
-    #===============================================================================
+    #===========================================================================
+    # Potential energy
+    #===========================================================================
+    F_V = Property(Array, depends_on=INPUT)
+    '''Get the total potential energy of gravity for each facet
+    '''
+    @cached_property
+    def _get_F_V(self, u):
+        eta_w = self.eta_w
+        a = self._get_Fa_area(self.x)
+        ra = self._get_Fa_r(self.x)
+        F_V = np.einsum('a,Ia,Ia->I', eta_w, ra[..., 2], a)
+        return F_V
 
+    F_V = Property(Array, depends_on=INPUT)
+    '''Get the derivative of total potential energy of gravity for each facet
+    with respect to each node and displacement component [FIi]
+    '''
+    @cached_property
+    def _get_F_V_du(self):
+        r = self._get_Fa_r(self.x)
+        a = self._get_Fa_area(self.x)
+        a_dx = self._get_Fa_area_du(self.x)
+        r3_a_dx = np.einsum('Ia,IaJj->IaJj', r[..., 2], a_dx)
+        N_eta_ip = self.Na
+        r3_dx = np.einsum('aK,KJ,j->aJj', N_eta_ip, DELTA, DELTA[2, :])
+        a_r3_dx = np.einsum('Ia,aJj->IaJj', a, r3_dx)
+        F_V_du = np.einsum('a,IaJj->IJj', self.eta_w, (a_r3_dx + r3_a_dx))
+        return F_V_du
+
+    #===========================================================================
+    # Line vectors
+    #===========================================================================
+
+    F_L_vectors = Property(Array, depends_on=INPUT)
+    r'''Get the cycled line vectors around the facet
+    The cycle is closed - the first and last vector are identical.
+
+    .. math::
+        v_{pld} \; \mathrm{where} \; p \in \mathcal{F}, l \in (0,1,2), d \in (0,1,2)
+
+    with the indices :math:`p,l,d` representing the facet, line vector around the facet and
+    and vector component, respectively.
+    '''
+    @cached_property
+    def _get_F_L_vectors(self):
+        F_N = self.F_N  # F_N is cycled counter clockwise
+        return self.x[ F_N[:, (1, 2, 0)] ] - self.x[ F_N[:, (0, 1, 2)] ]
+
+    F_L_vectors_du = Property(Array, depends_on=INPUT)
+    r'''Get the derivatives of the line vectors around the facets.
+
+    .. math::
+        \pard{v_{pld}}{x_{Ie}} \; \mathrm{where} \;
+        p \in \mathcal{F}, l \in (0,1,2), d \in (0,1,2), I \in \mathcal{N}, e \in (0,1,3)
+
+    with the indices :math:`p,l,d,I,e` representing the facet, line vector around the facet and
+    and vector component, node vector and and its component index, respectively.
+
+    This array works essentially as an index function delivering -1 for the components
+    of the first node in each dimension and +1 for the components of the second node
+    in each dimension.
+
+    For a facet :math:`p` with lines :math:`l` and component :math:`d` return the derivatives
+    with respect to the displacement of the node :math:`I` in the direction :math:`e`.
+
+    .. math::
+        \bm{a}_1 = \bm{x}_2 - \bm{x}_1 \\
+        \bm{a}_2 = \bm{x}_3 - \bm{x}_2 \\
+        \bm{a}_3 = \bm{x}_1 - \bm{x}_3
+
+    The corresponding derivatives are then
+
+    .. math::
+        \pard{\bm{a}_1}{\bm{u}_1} = -1, \;\;\;
+        \pard{\bm{a}_1}{\bm{u}_2} = 1 \\
+        \pard{\bm{a}_2}{\bm{u}_2} = -1, \;\;\;
+        \pard{\bm{a}_2}{\bm{u}_3} = 1 \\
+        \pard{\bm{a}_3}{\bm{u}_3} = -1, \;\;\;
+        \pard{\bm{a}_3}{\bm{u}_1} = 1 \\
+
+    '''
+    def _get_F_L_vectors_du(self):
+        return self.L_vectors_du[self.F_L]
+
+    norm_F_L_vectors = Property(Array, depends_on=INPUT)
+    '''Get the cycled line vectors around the facet
+    The cycle is closed - the first and last vector are identical.
+    '''
+    @cached_property
+    def _get_norm_F_L_vectors(self):
+        v = self.get_F_L_vectors
+        mag_v = np.sqrt(np.einsum('...i,...i', v, v))
+        return v / mag_v[..., np.newaxis]
+
+    norm_F_L_vectors_du = Property(Array, depends_on=INPUT)
+    '''Get the derivatives of cycled line vectors around the facet
+    '''
+    def _get_norm_F_L_vectors_du(self):
+        v = self.F_L_vectors
+        v_du = self.F_L_vectors_du
+        mag_v = np.einsum('...i,...i', v, v)
+        # ## @todo: finish the chain rule
+        raise NotImplemented
+
+    #===========================================================================
+    # Orthonormal basis of each fact.
+    #===========================================================================
+    F_L_bases = Property(Array, depends_on=INPUT)
+    '''Line bases around a facet.
+    '''
+    def _get_F_L_bases(self):
+        l = self.get_norm_F_L_vectors
+        n = self.get_norm_F_normals
+        lxn = np.einsum('...li,...j,...kij->...lk', l, n, EPS)
+        n_ = n[:, np.newaxis, :] * np.ones((1, 3, 1), dtype='float_')
+        T = np.concatenate([l[:, :, np.newaxis, :],
+                            n_[:, :, np.newaxis, :],
+                            lxn[:, :, np.newaxis, :]], axis=2)
+        return T
+
+    F_L_bases = Property(Array, depends_on=INPUT)
+    '''Derivatives of the line bases around a facet.
+    '''
+    def _get_F_L_bases_du(self):
+        '''Derivatives of line bases'''
+        raise NotImplemented
+
+    #===========================================================================
+    # Sector angles
+    #===========================================================================
+    F_theta = Property(Array, depends_on=INPUT)
+    '''Get the sector angles :math:`\theta`  within a facet.
+    '''
+    def _get_F_theta(self):
+        v = self.F_L_vectors
+        a = -v[..., (2, 0, 1)]
+        b = v[..., (0, 1, 2)]
+        return get_theta(a, b)
+
+    F_theta_du = Property(Array, depends_on=INPUT)
+    '''Get the derivatives of sector angles :math:`\theta` within a facet.
+    '''
+    def _get_F_theta_du(self):
+        v = self.F_L_vectors
+        v_du = self.F_L_vectors_du
+
+        a = -v[..., (2, 0, 1)]
+        b = v[..., (0, 1, 2)]
+        a_du = -v_du[..., (2, 0, 1)]
+        b_du = v_du[..., (0, 1, 2)]
+
+        return get_theta_du(a, a_du, b, b_du)
+
+    #===========================================================================
+    # Surface integrals using numerical integration
+    #===========================================================================
     eta_ip = Array('float_')
+    '''Integration points within a triangle.
+    '''
     def _eta_ip_default(self):
         return np.array([[1. / 3., 1. / 3.]], dtype='f')
 
     eta_w = Array('float_')
+    '''Weight factors for numerical integration.
+    '''
     def _eta_w_default(self):
         return np.array([1. / 2.], dtype='f')
 
-    #===============================================================================
-    # Shape functions and their derivatives
-    #===============================================================================
     Na = Property(depends_on='eta_ip')
+    '''Shape function values in integration points.
+    '''
     @cached_property
     def _get_Na(self):
         eta = self.eta_ip
         return np.array([eta[:, 0], eta[:, 1], 1 - eta[:, 0] - eta[:, 1]], dtype='f').T
 
     Na_deta = Property(depends_on='eta_ip')
+    '''Derivatives of the shape functions in the integration points.
+    '''
     @cached_property
     def _get_Na_deta(self):
         return np.array([[[1, 0, -1],
                           [0, 1, -1]],
                          ], dtype='f')
 
-    def get_F_normals(self, u):
-        '''Get the normals of the facets.
-        '''
-        n = self.get_Fa_normals(u)
-        return np.sum(n, axis=1)
-
-    def get_norm_F_normals(self, u):
-        '''Get the normals of the facets.
-        '''
-        n = self.get_F_normals(u)
-        mag_n = np.sqrt(np.einsum('...i,...i', n, n))
-        return n / mag_n[:, np.newaxis]
-
-    def get_F_normals_du(self, u):
-        '''Get the normals of the facets.
-        '''
-        n_du = self.get_Fa_normals_du(u)
-        return np.sum(n_du, axis=1)
-
-    def get_Fa_normals_du(self, u):
+    def _get_Fa_normals_du(self, x):
         '''Get the derivatives of the normals with respect to the node displacements.
         '''
-        x = self.x_0 + u
         x_F = x[self.F_N]
         N_deta_ip = self.Na_deta
         NN_delta_eps_x1 = np.einsum('aK,aL,KJ,jli,ILl->IaJji',
@@ -295,188 +494,66 @@ class CreaseFacetOperators(HasStrictTraits):
         n_du = NN_delta_eps_x1 + NN_delta_eps_x2
         return n_du
 
-    def get_Fa_area_du(self, u):
+    def _get_Fa_area_du(self, x):
         '''Get the derivatives of the facet area with respect to node displacements.
         '''
-        a = self.get_Fa_area(u)
-        n = self.get_Fa_normals(u)
-        n_du = self.get_Fa_normals_du(u)
+        a = self._get_Fa_area(x)
+        n = self._get_Fa_normals(x)
+        n_du = self._get_Fa_normals_du(x)
         a_du = np.einsum('Ia,Iak,IaJjk->IaJj', 1 / a, n, n_du)
         return a_du
 
-    def get_Fa_normals(self, u):
+    def _get_Fa_normals(self, x):
         '''Get normals of the facets.
         '''
-        x = self.x_0 + u
         x_F = x[self.F_N]
         N_deta_ip = self.Na_deta
         r_deta = np.einsum('ajK,IKi->Iaij', N_deta_ip, x_F)
         return np.einsum('Iai,Iaj,ijk->Iak', r_deta[..., 0], r_deta[..., 1], EPS)
 
-    def get_F_area(self, u):
+    def _get_Fa_area(self, x):
         '''Get the surface area of the facets.
         '''
-        a = self.get_Fa_area(u)
-        A = np.einsum('a,Ia->I', self.eta_w, a)
-        return A
-
-    def get_Fa_area(self, u):
-        '''Get the surface area of the facets.
-        '''
-        n = self.get_Fa_normals(u)
+        n = self._get_Fa_normals(x)
         a = np.sqrt(np.einsum('Iai,Iai->Ia', n, n))
         return a
 
-    def get_Fa_r(self, u):
+    def _get_Fa_r(self, x):
         '''Get the reference vector to integrations point in each facet.
         '''
-        x = self.x_0 + u
         x_F = x[self.F_N]
         N_eta_ip = self.Na
         r = np.einsum('aK,IKi->Iai', N_eta_ip, x_F)
         return r
 
-    def get_F_V(self, u):
-        '''Get the total potential energy of gravity for each facet
-        '''
-        eta_w = self.eta_w
-        a = self.get_Fa_area(u)
-        ra = self.get_Fa_r(u)
-        F_V = np.einsum('a,Ia,Ia->I', eta_w, ra[..., 2], a)
-        return F_V
-
-    def get_F_V_du(self, u):
-        '''Get the derivative of total potential energy of gravity for each facet
-        with respect to each node and displacement component [FIi]
-        '''
-        r = self.get_Fa_r(u)
-        a = self.get_Fa_area(u)
-        a_dx = self.get_Fa_area_du(u)
-        r3_a_dx = np.einsum('Ia,IaJj->IaJj', r[..., 2], a_dx)
-        N_eta_ip = self.Na
-        r3_dx = np.einsum('aK,KJ,j->aJj', N_eta_ip, DELTA, DELTA[2, :])
-        a_r3_dx = np.einsum('Ia,aJj->IaJj', a, r3_dx)
-        F_V_du = np.einsum('a,IaJj->IJj', self.eta_w, (a_r3_dx + r3_a_dx))
-        return F_V_du
-
-    def get_F_L_vectors(self, u):
-        '''Get the cycled line vectors around the facet
-        The cycle is closed - the first and last vector are identical.
-        '''
-        X = self.x_0 + u
-        F_N = self.F_N  # F_N is cycled counter clockwise
-        return X[ F_N[:, (1, 2, 0)] ] - X[ F_N[:, (0, 1, 2)] ]
-
-    def get_F_L_vectors_du(self, u):
-        r'''Get the derivatives of the line vectors around the facets.
-
-        For a facet :math:`o` with lines :math:`l` return the derivatives
-        with respect to the displacement of the corner nodes connected by
-        the triangle edges.Given the nodes
-        :math:`\bm{x}_1, \bm{x}_2, \bm{x}_3` and the lines
-        vectors as
-
-        .. math::
-            \bm{a}_1 = \bm{x}_2 - \bm{x}_1 \\
-            \bm{a}_2 = \bm{x}_3 - \bm{x}_2 \\
-            \bm{a}_3 = \bm{x}_1 - \bm{x}_3
-
-        The corresponding derivatives are then
-
-        .. math::
-            \pard{\bm{a}_1}{\bm{u}_1} = -1, \;\;\;
-            \pard{\bm{a}_1}{\bm{u}_2} = 1 \\
-            \pard{\bm{a}_2}{\bm{u}_2} = -1, \;\;\;
-            \pard{\bm{a}_2}{\bm{u}_3} = 1 \\
-            \pard{\bm{a}_3}{\bm{u}_3} = -1, \;\;\;
-            \pard{\bm{a}_3}{\bm{u}_1} = 1 \\
-
-        '''
-        F_L_vectors_du = np.zeros((self.n_F, 3, self.n_N, 3), dtype='float_')
-        F_idx = np.arange(self.n_F)
-        F_L_vectors_du[F_idx, 0, self.F_N[:, 0], 0] = -1
-        F_L_vectors_du[F_idx, 1, self.F_N[:, 1], 1] = -1
-        F_L_vectors_du[F_idx, 2, self.F_N[:, 2], 2] = -1
-        F_L_vectors_du[F_idx, 0, self.F_N[:, 1], 0] = 1
-        F_L_vectors_du[F_idx, 1, self.F_N[:, 2], 1] = 1
-        F_L_vectors_du[F_idx, 2, self.F_N[:, 0], 2] = 1
-        return F_L_vectors_du
-
-    def get_norm_F_L_vectors(self, u):
-        '''Get the cycled line vectors around the facet
-        The cycle is closed - the first and last vector are identical.
-        '''
-        v = self.get_F_L_vectors(u)
-        mag_v = np.sqrt(np.einsum('...i,...i', v, v))
-        return v / mag_v[..., np.newaxis]
-
-    def get_norm_F_L_vectors_du(self, u):
-        v = self.get_F_L_vectors(u)
-        v_du = self.get_F_L_vectors_du(u)
-        mag_v = np.einsum('...i,...i', v, v)
-        # ## @todo: finish the chain rule
-        raise NotImplemented
-
-    def get_F_L_bases(self, u):
-        '''Line bases around a facet'''
-        l = self.get_norm_F_L_vectors(u)
-        n = self.get_norm_F_normals(u)
-        lxn = np.einsum('...li,...j,...kij->...lk', l, n, EPS)
-        n_ = n[:, np.newaxis, :] * np.ones((1, 3, 1), dtype='float_')
-        T = np.concatenate([l[:, :, np.newaxis, :],
-                            n_[:, :, np.newaxis, :],
-                            lxn[:, :, np.newaxis, :]], axis=2)
-        return T
-
-    def get_F_L_bases_du(self):
-        '''Derivatives of line bases'''
-        raise NotImplemented
-
-    def get_F_theta(self, u):
-        '''Get the crease angles within a facet.
-        '''
-        v = self.get_F_L_vectors(u)
-        a = -v[:, (2, 0, 1)]
-        b = v[:, (0, 1, 2)]
-        return get_theta(a, b)
-
-    def get_F_theta_du(self, u):
-        '''Get the derivatives of crease angles theta within a facet.
-        '''
-        v = self.get_F_L_vectors(u)
-        v_du = self.get_F_L_vectors_du(u)
-
-        a = -v[:, (2, 0, 1)]
-        b = v[:, (0, 1, 2)]
-        a_du = -v_du[:, (2, 0, 1)]
-        b_du = v_du[:, (0, 1, 2)]
-
-        return get_theta_du(a, a_du, b, b_du)
-
-class CummulativeOperators(HasStrictTraits):
+class CreaseCummulativeOperators(HasStrictTraits):
     '''Characteristics of the whole crease pattern.
     '''
-    def get_V(self, u):
-        '''Get the total potential energy of gravity
-        '''
-        return np.sum(self.get_F_V(u))
+    V = Property(Float, depends_on=INPUT)
+    '''Get the total potential energy of gravity
+    '''
+    @cached_property
+    def _get_V(self):
+        return np.sum(self.get_F_V)
 
-    def get_V_du(self, u):
-        '''Get the gradient of potential energy with respect to the current nodal position.
-        '''
+    V_du = Property(Array, depends_on=INPUT)
+    '''Get the gradient of potential energy with respect to the current nodal position.
+    '''
+    @cached_property
+    def _get_V_du(self):
         F = self.F_N
-        F_V_du = self.get_F_V_du(u)
+        F_V_du = self.F_V_du
         dof_map = (3 * F[:, :, np.newaxis] + np.arange(3)[np.newaxis, np.newaxis, :])
         V_du = np.bincount(dof_map.flatten(), weights=F_V_du.flatten())
         return V_du
 
 if __name__ == '__main__':
-    from crease_pattern import CreasePattern
-    cp = CreasePattern(X=[[0, 0, 0],
+    from crease_pattern_state import CreasePatternState
+    cp = CreasePatternState(X=[[0, 0, 0],
                           [1, 0, 0],
                           [1, 1, 0],
                           [0, 1, 0],
-                          [2, 2, 1]],
+                          [3, 2, 1]],
                        L=[[0, 1], [1, 2], [3, 2], [0, 3], [0, 2], [1, 4], [2, 4], [3, 4]],
                        F=[[0, 1, 2], [2, 0, 3], [1, 2, 4], [2, 3, 4]])
 
@@ -528,45 +605,35 @@ if __name__ == '__main__':
     print
 
     u = np.zeros_like(cp.x_0)
+    cp.u = u
     # dependent attributes in initial state
 
     print 'L_lengths: line lengths'
-    print cp.get_L_lengths(u)
+    print cp.L_lengths
     print
     print 'F_normals: facet normals'
-    print cp.get_F_normals(u)
+    print cp.F_normals
     print
     print 'F_area: facet area'
-    print cp.get_F_area(u)
+    print cp.F_area
     print
     print 'iN_theta: angles around the interior nodes'
-    print cp.get_iN_theta(u)
+    print cp.iN_theta
     print
     print 'iL_psi: dihedral angles around interior lines'
-    print cp.get_iL_psi(u)
+    print cp.iL_psi
     print
     print 'iL_psi: dihedral angles around interior lines'
-    print cp.get_iL_psi2(u)
+    print cp.iL_psi2
     print
 #     print 'iL_psi_du: dihedral angles around interior lines'
 #     print cp.get_iL_psi_du(u)
 #     print
     print 'F_theta: crease angles within each triangular facet'
-    print cp.get_F_theta(u)
+    print cp.F_theta
     print
     print 'NN_theta: '
-    print cp.get_NN_theta(u)
-
-    print '------------------------'
-    cp = CreasePattern(X=[[0, 0, 0],
-                          [2, 0, 0],
-                          [2, 2, 0],
-                          [0, 2, 0],
-                          [0.5, 0.5, 0]],
-                       L=[[0, 1], [1, 2], [3, 2], [0, 3], [0, 4], [1, 4], [2, 4], [3, 4]],
-                       F=[[0, 1, 4], [1, 2, 4], [2, 3, 4], [3, 0, 4]])
-
-    u = np.zeros_like(cp.x_0)
+    print cp.NN_theta
 
     # tests the counter-clockwise enumeration of facets (the second faces
     # is reversed from [2,0,3] to [3,0,2]
@@ -578,10 +645,10 @@ if __name__ == '__main__':
     print cp.iN_aln
     print
     print 'F_theta'
-    print cp.get_F_theta(u)
+    print cp.F_theta
     print
     print 'NN_theta'
-    print cp.get_NN_theta(u)
+    print cp.NN_theta
     print
     print 'iN'
     print cp.iN
@@ -590,23 +657,26 @@ if __name__ == '__main__':
     print cp.iN_nbr
     print
     print 'iN_theta'
-    print cp.get_iN_theta(u)
+    print cp.iN_theta
     print
     print 'F_L_vectors'
-    print cp.get_F_L_vectors(u)
+    print cp.F_L_vectors
     print
     print 'L_vectors_du'
-    print cp.get_L_vectors_du(u)
+    print cp.L_vectors_du
     print
     print 'F_L_vectors_du'
-    print cp.get_F_L_vectors_du(u)
+    print cp.F_L_vectors_du
+    print
+    print 'F_theta'
+    print [cp.F_theta]
     print
     print 'F_theta_du'
-    print [cp.get_F_theta_du(u)]
+    print [cp.F_theta_du]
     print
     print 'NN_theta_du'
-    print cp.get_NN_theta_du(u)
+    print cp.NN_theta_du
     print
     print 'iN_theta_du'
-    print cp.get_iN_theta_du(u)
+    print cp.iN_theta_du
     print

@@ -17,12 +17,12 @@ import numpy as np
 from traits.api import HasStrictTraits, \
     Event, Property, cached_property, Str, \
     Int, Float, Array, Bool, Dict, List, \
-    Constant, Instance, DelegatesTo, Trait, Enum
+    Constant, DelegatesTo, Trait
 
 from traitsui.api import View
-from opt_crit_target_face import TargetFaces
-
-from opt_crit_potential_energy import OptCritPotentialEnergy
+from opt_crit import \
+    TargetFaces, \
+    OptCritPotentialEnergy
 
 from eq_cons import \
     IEqCons

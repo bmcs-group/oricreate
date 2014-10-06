@@ -19,21 +19,18 @@ import string
 import tempfile
 
 from crease_pattern import CreasePattern
-from etsproxy.mayavi.core.api import PipelineBase
-from etsproxy.mayavi.core.ui.api import MayaviScene, SceneEditor, MlabSceneModel
-from etsproxy.mayavi.modules.api import Axes
-from etsproxy.traits.api import HasTraits, Range, Instance, on_trait_change, \
-    Trait, Property, Constant, DelegatesTo, cached_property, Str, Delegate, Button, \
-    Int, Bool, File, Array, List, Float, WeakRef, Tuple
-from etsproxy.traits.ui.api import View, Item, Group, ButtonEditor, RangeEditor, \
-    VGroup, HGroup, HSplit, Tabbed, ViewSubElement, VGrid, Include, TreeEditor, \
-    TreeNode, Handler, ListEditor, VSplit
+from mayavi.core.api import PipelineBase
+from mayavi.core.ui.api import MayaviScene, SceneEditor, MlabSceneModel
+from traits.api import HasTraits, Range, Instance, on_trait_change, \
+    Property, DelegatesTo, cached_property, Button, \
+    Int, Bool, File, Array, List, Float
+from traitsui.api import View, Item, Group, RangeEditor, \
+    VGroup, HSplit, TreeEditor, \
+    TreeNode, ListEditor, VSplit
 from face_view import FaceView
 import numpy as np
-from ori_node import IOriNode, OriNode
-from reshaping import IReshaping, Initialization, Reshaping, FormFinding, Folding, Lifting
-from reshaping_assembly import RotSymAssembly, MonoShapeAssembly
-
+from pipeline.ori_node import IOriNode, OriNode
+from pipeline.reshaping import IReshaping
 
 reshaping_tree_editor = TreeEditor(
     nodes=[
@@ -62,7 +59,7 @@ class CreasePatternView(HasTraits):
     '''
     def _data_changed(self):
         self.fold_step = 0
-        fig = self.scene.mlab.clf()
+        self.scene.mlab.clf()
         fig = self.scene.mlab.gcf()
         self.scene.mlab.figure(fig, fgcolor=(0, 0, 0),
                                bgcolor=(1, 1, 1))

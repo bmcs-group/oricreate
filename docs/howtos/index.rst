@@ -39,9 +39,7 @@ The output of the srcipt looks as follows:
 
 .. program-output:: python howtos/ex04_single_vertex.py
 
-The ``plot_2D`` commands renders the crease pattern in the base
+The ``plot_mpl`` commands renders the crease pattern in the base
 plane. 
 
-.. plot:: howtos/ex04_single_vertex_plt.py
-
-      
+.. plot:: howtos/ex04_single_vertex_mpl.py

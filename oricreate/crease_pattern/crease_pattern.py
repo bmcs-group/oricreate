@@ -17,20 +17,22 @@ from traits.api import \
     Array, Constant
 
 import numpy as np
-from oricreate.tree import \
-    TreeNode
+
 from crease_pattern_export import \
     CreasePatternExport
+from crease_pattern_plot_helper import \
+    CreasePatternPlotHelper
 from crease_pattern_operators import \
-    CreaseNodeOperators, CreaseLineOperators, CreaseFacetOperators, CummulativeOperators
+    CreaseNodeOperators, CreaseLineOperators, CreaseFacetOperators, \
+    CreaseCummulativeOperators
 
 INPUT = '+cp_input'
 
-class CreasePattern(TreeNode,
-                    CreaseNodeOperators,
+class CreasePattern(CreaseNodeOperators,
                     CreaseLineOperators,
                     CreaseFacetOperators,
-                    CummulativeOperators,
+                    CreaseCummulativeOperators,
+                    CreasePatternPlotHelper,
                     CreasePatternExport):
     '''
     Representation of a crease pattern.
@@ -72,6 +74,14 @@ class CreasePattern(TreeNode,
     '''
     def _get_x_0(self):
         return self.X
+    def _set_x_0(self, x_0):
+        self.X = x_0
+
+    x = Property
+    '''Array of current coordinates :math:`(n_N, n_D)`.
+    '''
+    def _get_x(self):
+        return self.x_0
 
     n_D = Constant(3)
     '''Dinensionality of the Euklidian space (constant = 3).
@@ -349,78 +359,6 @@ class CreasePattern(TreeNode,
             oc.append(neighbors)
         return oc
 
-    def plot_2D(self, ax):
-
-        # set plot range
-        x_max = np.amax(self.x_0[:, :2], axis=0)
-        x_min = np.amin(self.x_0[:, :2], axis=0)
-        x_delta = x_max - x_min
-        larger_range = np.amax(x_delta)
-        pad = larger_range * 0.1
-        x_mid = (x_max + x_min) / 2.0
-
-        shift = np.array([-0.5, 0.5], dtype='f')
-        padding = np.array([-pad, pad], dtype='f')
-        x_deltas = x_delta[:, np.newaxis] * shift[np.newaxis, :] + padding[np.newaxis, :]
-        x_range = x_mid[:, np.newaxis] + x_deltas
-
-        # plot lines
-        lines = self.x_0[:, (0, 1)][self.L]
-        ax.plot(lines[:, :, 0].T, lines[:, :, 1].T, color='black')
-        ax.set_xlim(*x_range[0, :])
-        ax.set_ylim(*x_range[1, :])
-        ax.set_aspect('equal')
-        # plot node numbers
-        xy_offset = (3, 3)
-        for n, x_0 in enumerate(self.x_0):
-            xy = (x_0[0], x_0[1])
-            ax.annotate(xy=xy, s='%g' % n,
-                        xytext=xy_offset, color='blue',
-                        textcoords='offset points')
-        # plot line numbers
-        xy_offset = (1, 1)
-        line_pos = 0.5 * np.sum(self.x_0[self.L], axis=1)
-        for n, x_0 in enumerate(line_pos):
-            xy = (x_0[0], x_0[1])
-            ax.annotate(xy=xy, s='%g' % n,
-                        xytext=xy_offset, color='red',
-                        textcoords='offset points')
-        # plot facet numbers
-        xy_offset = (0, 0)
-        line_pos = 1 / 3.0 * np.sum(self.x_0[self.F], axis=1)
-        for n, x_0 in enumerate(line_pos):
-            xy = (x_0[0], x_0[1])
-            ax.annotate(xy=xy, s='%g' % n,
-                        xytext=xy_offset, color='green',
-                        textcoords='offset points')
-
-    #===============================================================================
-    # methods and Information for Abaqus calculation
-    #===============================================================================
-    aligned_facets = Property(depends_on=INPUT)
-    @cached_property
-    def _get_aligned_facets(self):
-        '''
-        Aligns all faces, so the normal is in same direction. This
-        is necessary for the export to Abaqus.
-        '''
-        a_f = []
-        for i in self.F:
-            v1 = np.array(self.X[i[1]] - self.X[i[0]])
-            v2 = np.array(self.X[i[2]] - self.X[i[1]])
-            normal = np.cross(v1, v2)
-            if(normal[2] < 0):
-                temp = np.copy(i)
-                temp[1] = i[2]
-                temp[2] = i[1]
-                a_f.append(temp)
-            else:
-                a_f.append(i)
-
-        a_f = np.array(a_f)
-        print a_f + 1
-        return a_f
-
 if __name__ == '__main__':
 
     # trivial example with a single triangle positioned
@@ -437,10 +375,4 @@ if __name__ == '__main__':
                        )
 
     print 'vectors\n', cp.L_vectors
-
     print 'lengths\n', cp.L_lengths
-
-    from mayavi import mlab
-    mlab.figure(fgcolor=(0, 0, 0), bgcolor=(1, 1, 1))
-    cp.add_to_mlab(mlab)
-    mlab.show()

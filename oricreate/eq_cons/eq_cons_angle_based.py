@@ -13,7 +13,7 @@
 # Created on Jan 3, 2013 by: rch, schmerl
 
 from eq_cons import EqCons
-from etsproxy.traits.api import \
+from traits.api import \
     DelegatesTo, cached_property, Property
 import numpy as np
 
@@ -116,7 +116,7 @@ class AngleEqCons(EqCons):
                 ix = np.where(gamma == 1)[0]
                 print 'Warning', 'Penetration occurred along the lines (%d, %d) and (%d, %d)' % \
                     (i, neighbors[ix], i, neighbors[ix + 1])
-                #raise ValueError, 'Penetration occurred along the lines (%d, %d) and (%d, %d)' % \
+                # raise ValueError, 'Penetration occurred along the lines (%d, %d) and (%d, %d)' % \
                 #    (i, neighbors[ix], i, neighbors[ix + 1])
 
             d_atb = np.dot(self.partial_a, b.T) + np.dot(self.partial_b, a.T)
@@ -134,7 +134,7 @@ class AngleEqCons(EqCons):
             theta_ij_du[i_dof_ix, j_dof_ix] = theta_du.T.flatten()
             theta_i_du = np.sum(theta_ij_du, axis=0)
 
-            # add the values to the global arrays 
+            # add the values to the global arrays
             node_ix = np.hstack([ [i], neighbors[:-1]])
             k_dof_ix = (node_ix[:, None] * self.n_D + np.arange(self.n_D)[None, :])
             G_du[idx, k_dof_ix.flatten()] += theta_i_du
@@ -206,4 +206,4 @@ if __name__ == '__main__':
     print 'G\n', uf.get_G(U, 0)
 
     print 'G_du\n', uf.get_G_du(U, 0)
-    #print 'G_du\n', uf.x_get_G_du(U, 0)
+    # print 'G_du\n', uf.x_get_G_du(U, 0)

@@ -40,6 +40,15 @@ CreaseFacetOperators
 .. autoclass:: CreaseFacetOperators
 	:members:
 
+CreaseCummulativeOperators
+--------------------------
+
+.. inheritance-diagram:: CreaseCummulativeOperators
+	:parts: 1
+
+.. autoclass:: CreaseCummulativeOperators
+	:members:
+
 Crease pattern exporters
 ========================
 

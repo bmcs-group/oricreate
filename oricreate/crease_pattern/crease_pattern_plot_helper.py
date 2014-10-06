@@ -13,21 +13,97 @@
 # Created on Sep 7, 2011 by: rch
 
 from traits.api import \
-    HasStrictTraits, Property, cached_property
+    HasStrictTraits, Property, Float
 
 import numpy as np
 
-INPUT = '+cp_input'
-
-class CreasePatternExport(HasStrictTraits):
+class CreasePatternPlotHelper(HasStrictTraits):
     '''
     Methods exporting the crease pattern geometry into other formats.
-    @todo: methods taken from the original version by ms - should be
-    updated and vectorized.
     '''
 
-    def get_cnstr_pos(self, iteration_step):
+    def plot_mpl(self, ax, nodes=True, lines=True, facets=True):
+        r'''Plot the crease pattern using mpl
         '''
+        # set plot range
+        x_max = np.amax(self.x_0[:, :2], axis=0)
+        x_min = np.amin(self.x_0[:, :2], axis=0)
+        x_delta = x_max - x_min
+        larger_range = np.amax(x_delta)
+        pad = larger_range * 0.1
+        x_mid = (x_max + x_min) / 2.0
+
+        shift = np.array([-0.5, 0.5], dtype='f')
+        padding = np.array([-pad, pad], dtype='f')
+        x_deltas = x_delta[:, np.newaxis] * shift[np.newaxis, :] + padding[np.newaxis, :]
+        x_range = x_mid[:, np.newaxis] + x_deltas
+
+        # plot lines
+        line_pos = self.x_0[:, (0, 1)][self.L]
+        ax.plot(line_pos[:, :, 0].T, line_pos[:, :, 1].T, color='black')
+        ax.set_xlim(*x_range[0, :])
+        ax.set_ylim(*x_range[1, :])
+        ax.set_aspect('equal')
+        # plot node numbers
+        if nodes == True:
+            xy_offset = (3, 3)
+            for n, x_0 in enumerate(self.x_0):
+                xy = (x_0[0], x_0[1])
+                ax.annotate(xy=xy, s='%g' % n,
+                            xytext=xy_offset, color='blue',
+                            textcoords='offset points')
+        # plot line numbers
+        if lines == True:
+            xy_offset = (1, 1)
+            line_pos = 0.5 * np.sum(self.x_0[self.L], axis=1)
+            for n, x_0 in enumerate(line_pos):
+                xy = (x_0[0], x_0[1])
+                ax.annotate(xy=xy, s='%g' % n,
+                            xytext=xy_offset, color='red',
+                            textcoords='offset points')
+        # plot facet numbers
+        if facets == True:
+            xy_offset = (0, 0)
+            line_pos = 1 / 3.0 * np.sum(self.x_0[self.F], axis=1)
+            for n, x_0 in enumerate(line_pos):
+                xy = (x_0[0], x_0[1])
+                ax.annotate(xy=xy, s='%g' % n,
+                            xytext=xy_offset, color='green',
+                            textcoords='offset points')
+
+    def _get_bounding_box(self):
+        return np.min(self.x, axis=0), np.max(self.x, axis=0)
+
+    def _get_max_length(self):
+        return np.linalg.norm(self._get_bounding_box())
+
+    line_with_factor = Float(0.004)
+
+    def _get_line_width(self):
+        return self._get_max_length() * self.line_with_factor
+
+    #===========================================================================
+    # Garbage
+    #===========================================================================
+    def plot_mlab(self, mlab, nodes=True, lines=True):
+        r'''Visualize the crease pattern in a supplied mlab instance.
+        '''
+        x, y, z = self.x.T
+        if len(self.F) > 0:
+            cp_pipe = mlab.triangular_mesh(x, y, z, self.F,
+                                           line_width=3,
+                                           color=(0.6, 0.6, 0.6))
+            cp_pipe.mlab_source.dataset.lines = self.L
+            if lines == True:
+                tube = mlab.pipeline.tube(cp_pipe, tube_radius=self._get_line_width())
+                mlab.pipeline.surface(tube, color=(1.0, 1.0, 1.0))
+
+        else:
+            cp_pipe = mlab.points3d(x, y, z, scale_factor=0.2)
+            cp_pipe.mlab_source.dataset.lines = self.L
+
+    def get_cnstr_pos(self, iteration_step):
+        r'''
          Get the coordinates of the constraints.
 
         @todo this should be moved to Reshaping
@@ -40,7 +116,7 @@ class CreasePatternExport(HasStrictTraits):
         return (pts_l, con_l, pts_p, faces_p)
 
     def get_line_position(self, i):
-        '''
+        r'''
         This method prints the procentual position of a linepoint element on
         his line over all timesteps.
 
@@ -80,8 +156,8 @@ class CreasePatternExport(HasStrictTraits):
             print 'Step ', p, ': r = ', r
 
     def create_rcp_tex(self, name='rcp_output.tex', x=15., y=15.):
-        '''
-        This methode returns a \*.tex file with the top view of the
+        r'''
+        This methode returns a *.tex file with the top view of the
         creasepattern and the nodeindex of every node. This file
         can be implemented into a latex documentation, using package
         pst-all.
@@ -109,7 +185,7 @@ class CreasePatternExport(HasStrictTraits):
         f.close()
 
     def create_3D_tex(self, name='standart3Doutput.tex', x=5, y=5, alpha=140, beta=30):
-        '''
+        r'''
         This method returns a .tex file with a 3D view of the
         creasepattern and the nodeindex of every node, as a sketch. This file
         can be implemented into a latex documentation, using package
@@ -140,29 +216,3 @@ class CreasePatternExport(HasStrictTraits):
         f.write(' \\end{pspicture}' + '\n')
 #        f.write(' \\end{pdfdisplay}' + '\n')
         f.close()
-
-    aligned_facets = Property(depends_on=INPUT)
-    '''Methods and Information for Abaqus calculation
-    '''
-    @cached_property
-    def _get_aligned_facets(self):
-        '''
-        Aligns all faces, so the normal is in same direction. This
-        is necessary for the export to Abaqus.
-        '''
-        a_f = []
-        for i in self.F:
-            v1 = np.array(self.X[i[1]] - self.X[i[0]])
-            v2 = np.array(self.X[i[2]] - self.X[i[1]])
-            normal = np.cross(v1, v2)
-            if(normal[2] < 0):
-                temp = np.copy(i)
-                temp[1] = i[2]
-                temp[2] = i[1]
-                a_f.append(temp)
-            else:
-                a_f.append(i)
-
-        a_f = np.array(a_f)
-        print a_f + 1
-        return a_f

@@ -17,32 +17,20 @@ from crease_pattern import \
 from eq_cons import \
     IEqCons, GrabPoints, \
     PointsOnLine, DofConstraints
-from eq_cons_angle_based import \
+from eq_cons import \
     EqConsDevelopability, \
     EqConsFlatFoldability
-from eq_cons_constant_length import \
+from eq_cons import \
     EqConsConstantLength
-from eq_cons_control_face import \
+from eq_cons import \
     EqConsPointsOnSurface
-from etsproxy.traits.api import HasStrictTraits, Range, Instance, on_trait_change, \
-    Event, Property, Constant, DelegatesTo, PrototypedFrom, cached_property, Str, Delegate, \
-    Int, Float, Array, Bool, List, Dict, Interface, implements, WeakRef
+from traits.api import Instance, \
+    Property, cached_property, Str, \
+    Int, Float, Array, List, Dict, implements
 from folding_simulator import FoldingSimulator
 import numpy as np
-from ori_node import IOriNode, OriNode
-
-
-class IReshaping(IOriNode):
-    '''Interface for reshaping process
-    simulation step within the origami design process.
-    '''
-
-    # method required by subsequent reshaping steps
-    U_1 = Property(Array)
-    cp = Instance(CreasePattern)
-
-    # method required for visualization
-    U_t = Property(Array)
+from ori_node import OriNode
+from pipeline import IReshaping
 
 class Reshaping(OriNode, FoldingSimulator):
     """Reshaping class is a base class for specialized configurations
@@ -316,14 +304,14 @@ class Folding(Reshaping):
                 }
 
 class Lifting(Reshaping):
-    ''' Lifting class is for lifting a creasepattern with a crane.
+    ''' Lifting class is for lifting a crease pattern with a crane.
 
     Lifting takes all equality constraints and is used to simulate
-    the lifting act with a cranestructure.
-    To be able to lift the structure, you need to have a predeformation u_0.
-    In Lifting you can set an tragetface to init_tf_lst and with this
-    targetface, Lifting will initialize a predeformation fully automatically.
-    Instead of this you can although put in your own predeformation.
+    the lifting act with a crane structure.
+    To be able to lift the structure, you need to have a pre-deformation u_0.
+    In Lifting you can set an target face to init_tf_lst and with this
+    target face, Lifting will initialize a pre-deformation fully automatically.
+    Instead of this you can although put in your own pre-deformation.
     '''
 
     name = Str('lifting')
@@ -342,9 +330,9 @@ class Lifting(Reshaping):
 
 if __name__ == '__main__':
 
-    from crease_pattern_view import CreasePatternView
+    from view.crease_pattern_view import CreasePatternView
     from opt_crit_target_face import r_, s_, t_, x_, y_, z_
-    from eq_cons_control_face import CF
+    from eq_cons import CF
 
     cp = CreasePattern(X=[[0, 0, 0],
                           [1, 0, 0],

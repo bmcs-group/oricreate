@@ -12,23 +12,13 @@
 #
 # Created on Jan 3, 2013 by: rch, schmerl
 
-from etsproxy.traits.api import \
-    HasStrictTraits, Interface, implements, WeakRef, \
-    Array, DelegatesTo, PrototypedFrom, cached_property, Property, \
-    List, Bool
+from i_eq_cons import IEqCons
+
+from traits.api import \
+    HasStrictTraits, implements, WeakRef, \
+    Array, DelegatesTo, cached_property, Property, \
+    Bool
 import numpy as np
-
-
-class IEqCons(Interface):
-    '''Interface of an equality constraint.
-    '''
-    def get_G(self, U, t):
-        '''Return the vector of equality constraint values.
-        '''
-
-    def get_G_du(self, U, t):
-        '''Return the jacobian of equality constraint values.
-        '''
 
 class EqCons(HasStrictTraits):
 
@@ -82,7 +72,7 @@ class GrabPoints(EqCons):
         L = np.array([])
 
         for i in self.GP:
-            f_i = i[1] #actual facet index
+            f_i = i[1]  # actual facet index
             T = np.c_[n[f[f_i][0]] - x4, n[f[f_i][1]] - x4]
             T = np.c_[T, n[f[f_i][2]] - x4]
             Tinv = np.linalg.inv(T)
@@ -91,7 +81,7 @@ class GrabPoints(EqCons):
             Li = np.dot(Tinv, x)
             L = np.append(L, Li)
 
-        L = L.reshape(-1, 3)    # gives L1,L2,L3 for each grabpoint
+        L = L.reshape(-1, 3)  # gives L1,L2,L3 for each grabpoint
         return L
 
     def get_G(self, U, t):
@@ -172,7 +162,7 @@ class PointsOnLine(EqCons):
                 R[i * 2] = Ry[i]
                 R[i * 2 + 1] = Rz[i]
             elif((p1[i][1] == p2[i][1])and(p1[i][2] == p2[i][2])):
-                #check if line lays on y-axis
+                # check if line lays on y-axis
                 R[i * 2] = Rx[i]
                 R[i * 2 + 1] = Rz[i]
             else:

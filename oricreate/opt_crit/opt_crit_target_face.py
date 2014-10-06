@@ -14,15 +14,14 @@
 
 from scipy.optimize import fsolve
 
-from etsproxy.traits.api import HasTraits, Range, Instance, on_trait_change, \
-    Trait, Property, Constant, DelegatesTo, cached_property, Str, Delegate, \
-    Button, Int, Bool, File, Array, Float, Any, List
+from traits.api import HasTraits, Instance, \
+    Property, DelegatesTo, cached_property, Str, \
+    Array, Float, Any, List
 import numpy as np
 from opt_crit import OptCrit
+
 import sympy as sm
-
-
-r_, s_, x_, y_, z_, t_ = sm.symbols('r,s,x,y,z,t')
+from util import x_, y_, z_, r_, s_, t_
 
 class ParamFaceOperator(HasTraits):
     '''
@@ -39,7 +38,7 @@ class ParamFaceOperator(HasTraits):
         return sm.Matrix([x_, y_, z_])
 
     #===========================================================================
-    # Parametric surface F(r,s) 
+    # Parametric surface F(r,s)
     #===========================================================================
     F = List(input=True)
     def _F_default(self):
@@ -168,7 +167,7 @@ class ParamFaceOperator(HasTraits):
         return np.linalg.norm(x_pnt - self.F_fn(*args))
 
     #===========================================================================
-    # Get Derivative of Distance of X to F with respect to X 
+    # Get Derivative of Distance of X to F with respect to X
     #===========================================================================
 
     d_dist_xyz = Property(depends_on='+input')

@@ -12,7 +12,7 @@
 #
 # Created on Nov 18, 2011 by: matthias
 
-from etsproxy.traits.api import DelegatesTo, PrototypedFrom
+from traits.api import DelegatesTo, PrototypedFrom
 
 import numpy as np
 
@@ -73,11 +73,11 @@ class EqConsConstantLength(EqCons):
             G_du[ l, i, : ] += -2 * v_0 + 2 * u_i - 2 * u_j
             G_du[ l, j, : ] += 2 * v_0 - 2 * u_i + 2 * u_j
 
-        # reshape the 3D matrix to a 2D matrix 
-        # with rows for crease lines and columns representing 
+        # reshape the 3D matrix to a 2D matrix
+        # with rows for crease lines and columns representing
         # the derivatives with respect to the node displacements
         # in 3d.
-        # 
+        #
         G_du = G_du.reshape(self.n_L, self.n_N * self.n_D)
         return G_du
 
