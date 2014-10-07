@@ -257,7 +257,7 @@ class CnstrTargetFace(HasTraits):
 
 TF = CnstrTargetFace
 
-class TargetFaces(OptCrit):
+class OptCritTargetFaces(OptCrit):
 
     tf_lst = List([])
 

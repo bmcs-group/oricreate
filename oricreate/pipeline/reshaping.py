@@ -27,14 +27,19 @@ from eq_cons import \
 from traits.api import Instance, \
     Property, cached_property, Str, \
     Int, Float, Array, List, Dict, implements
-from folding_simulator import FoldingSimulator
+from optimization_problem import OptimizationProblem
 import numpy as np
 from ori_node import OriNode
 from pipeline import IReshaping
 
-class Reshaping(OriNode, FoldingSimulator):
-    """Reshaping class is a base class for specialized configurations
-    of the simulation tool with different use cases.
+class ReshapingTask(OriNode, OptimizationProblem):
+    """Reshaping tasks use the crease pattern state
+    attained within the previous reshaping task
+    and bring it to the next stage.
+
+    It is realized as a specialized configurations
+    of the OptimizationProblem with the goal to
+    represent the.
     """
     implements(IReshaping)
 
@@ -141,7 +146,7 @@ class Reshaping(OriNode, FoldingSimulator):
     '''Auxiliary facets used for visualization.
     '''
 
-class Initialization(OriNode, FoldingSimulator):
+class Initialization(OriNode, OptimizationProblem):
     '''Initialization of the pattern for the reshaping control.
 
     The crease pattern object will be mapped on an target face, without any
@@ -255,7 +260,7 @@ class Initialization(OriNode, FoldingSimulator):
     def _get_X_1(self):
         return self.X_0
 
-class FormFinding(Reshaping):
+class FormFinding(ReshapingTask):
     '''FormFinding forms the creasepattern, so flatfold conditions are fulfilled
 
     The creasepattern is iterabaly deformed, till every inner node fulfilles
@@ -284,7 +289,7 @@ class FormFinding(Reshaping):
     def _get_U_1(self):
         return np.zeros_like(self.U_t[-1])
 
-class Folding(Reshaping):
+class Folding(ReshapingTask):
     '''Folding folds a crease pattern while using the classic constraints like
     constant length, dof constraints and surface constraints.
 
@@ -303,7 +308,7 @@ class Folding(Reshaping):
                 'dc' : DofConstraints(reshaping=self)
                 }
 
-class Lifting(Reshaping):
+class Lifting(ReshapingTask):
     ''' Lifting class is for lifting a crease pattern with a crane.
 
     Lifting takes all equality constraints and is used to simulate
@@ -331,7 +336,7 @@ class Lifting(Reshaping):
 if __name__ == '__main__':
 
     from view.crease_pattern_view import CreasePatternView
-    from opt_crit_target_face import r_, s_, t_, x_, y_, z_
+    from util import r_, s_, t_, x_, y_, z_
     from eq_cons import CF
 
     cp = CreasePattern(X=[[0, 0, 0],

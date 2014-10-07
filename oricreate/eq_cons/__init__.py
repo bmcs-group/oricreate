@@ -2,6 +2,9 @@
 from i_eq_cons import \
     IEqCons
 
+from eq_cons import \
+    EqCons
+
 from eq_cons_angle_based import \
     EqConsDevelopability, EqConsFlatFoldability
 

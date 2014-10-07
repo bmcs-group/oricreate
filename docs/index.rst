@@ -25,7 +25,7 @@ Mathematical ingredients
 ========================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    howtos/index
    
@@ -33,7 +33,7 @@ Reference Manual
 ================
    
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    reference_manual/index
 

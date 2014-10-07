@@ -34,9 +34,9 @@ class OptCritPotentialEnergy(OptCrit):
         return self.reshaping.cp.get_V_du(u)
 
 if __name__ == '__main__':
-    from reshaping import Initialization, Folding
+    from pipeline.reshaping import Initialization, Folding
     from crease_pattern import CreasePattern
-    from crease_pattern_view import CreasePatternView
+    from view import CreasePatternView
 
     cp = CreasePattern(X=[[0, 0, 0],
                           [0, 1, 0],

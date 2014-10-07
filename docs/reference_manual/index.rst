@@ -5,11 +5,14 @@
 	:linenothreshold: 5
 	
 .. toctree::
-   :maxdepth: 2
-
-   vector_angles
+   :maxdepth: 5
 
    crease_pattern_classes
 
-   opt_crit/index
+   transformation_steps
+
+   optimization_classes
+
+   geometric_operators
+   
 

@@ -20,8 +20,9 @@ from traits.api import HasStrictTraits, \
     Constant, DelegatesTo, Trait
 
 from traitsui.api import View
+
 from opt_crit import \
-    TargetFaces, \
+    OptCritTargetFaces, \
     OptCritPotentialEnergy
 
 from eq_cons import \
@@ -37,7 +38,7 @@ if platform.system() == 'Linux':
 elif platform.system() == 'Windows':
     sysclock = time.clock
 
-class FoldingSimulator(HasStrictTraits):
+class OptimizationProblem(HasStrictTraits):
     """Class implementing the simulation procedure of the folding process
     within a time range 0..1 or 0..1 for a given number of steps.
     """
@@ -53,7 +54,7 @@ class FoldingSimulator(HasStrictTraits):
     # type of the sampling of the random domain
     #===========================================================================
     goal_function_type = Trait('target_faces', {'none' : None,
-                                                'target_faces' : TargetFaces,
+                                                'target_faces' : OptCritTargetFaces,
                                                 'potential_energy' : OptCritPotentialEnergy
                                          },
                                input_change=True)
@@ -452,5 +453,5 @@ class FoldingSimulator(HasStrictTraits):
         return np.sqrt(np.sum(v, axis=2))
 
 if __name__ == '__main__':
-    fs = FoldingSimulator()
+    fs = OptimizationProblem()
     print fs.goal_function

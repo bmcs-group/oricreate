@@ -1,11 +1,16 @@
 
+===================================
 Classes defining the crease pattern
 ===================================
 
 .. currentmodule:: oricreate.crease_pattern
 
+-------------------------
+Crease pattern components
+-------------------------
+
 CreasePattern
--------------
+=============
 
 .. inheritance-diagram:: CreasePattern
 	:parts: 1
@@ -14,7 +19,7 @@ CreasePattern
 	:members:
 
 CreaseNodeOperators
--------------------
+===================
 
 .. inheritance-diagram:: CreaseNodeOperators
 	:parts: 1
@@ -23,7 +28,7 @@ CreaseNodeOperators
 	:members:
 
 CreaseLineOperators
--------------------
+===================
 
 .. inheritance-diagram:: CreaseLineOperators
 	:parts: 1
@@ -32,7 +37,7 @@ CreaseLineOperators
 	:members:
 
 CreaseFacetOperators
---------------------
+====================
 
 .. inheritance-diagram:: CreaseFacetOperators
 	:parts: 1
@@ -41,7 +46,7 @@ CreaseFacetOperators
 	:members:
 
 CreaseCummulativeOperators
---------------------------
+==========================
 
 .. inheritance-diagram:: CreaseCummulativeOperators
 	:parts: 1
@@ -49,11 +54,8 @@ CreaseCummulativeOperators
 .. autoclass:: CreaseCummulativeOperators
 	:members:
 
-Crease pattern exporters
-========================
-
 CreasePatternExport
--------------------
+===================
 
 .. inheritance-diagram:: CreasePatternExport
 	:parts: 1
@@ -62,11 +64,12 @@ CreasePatternExport
    :members:
    :undoc-members:
 
+------------------------
 Crease pattern factories
-========================
+------------------------
 
 YoshimuraCreasePattern
-----------------------
+======================
 
 .. inheritance-diagram:: YoshimuraCreasePattern
 	:parts: 1
@@ -76,7 +79,7 @@ YoshimuraCreasePattern
    :undoc-members:
 
 WaterBombCreasePattern
-----------------------
+======================
 
 .. inheritance-diagram:: WaterBombCreasePattern
 	:parts: 1
