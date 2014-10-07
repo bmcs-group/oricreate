@@ -9,7 +9,7 @@
 
    crease_pattern_classes
 
-   transformation_steps
+   reshaping_tasks
 
    optimization_classes
 

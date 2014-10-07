@@ -30,7 +30,7 @@ from traits.api import Instance, \
 from optimization_problem import OptimizationProblem
 import numpy as np
 from ori_node import OriNode
-from pipeline import IReshaping
+from pipeline import IReshapingTask
 
 class ReshapingTask(OriNode, OptimizationProblem):
     """Reshaping tasks use the crease pattern state
@@ -41,9 +41,9 @@ class ReshapingTask(OriNode, OptimizationProblem):
     of the OptimizationProblem with the goal to
     represent the.
     """
-    implements(IReshaping)
+    implements(IReshapingTask)
 
-    source = Instance(IReshaping)
+    source = Instance(IReshapingTask)
 
     cp = Property(depends_on='source')
     '''Instance of a crease pattern.

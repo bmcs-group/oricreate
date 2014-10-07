@@ -4,7 +4,7 @@
 Components of the design pipeline
 =================================
 
-Classes that can be part of the design pipeline.
+Classes that constituting the design pipeline.
 
 .. currentmodule:: oricreate.pipeline
 
@@ -12,6 +12,11 @@ Classes that can be part of the design pipeline.
 Reshaping tasks
 ---------------
 
+.. inheritance-diagram:: ReshapingTask
+	:parts: 1
+	
+.. autoclass:: ReshapingTask
+	:members:
 
 Initialization
 --------------

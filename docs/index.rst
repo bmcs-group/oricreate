@@ -11,22 +11,15 @@ Welcome to oricreate documentation!
 
 .. highlight:: python
 	:linenothreshold: 5
-	
+
 Tutorial
 ========
-	
-.. toctree::
-   :maxdepth: 2
-
-   front
-   intro
-
-Mathematical ingredients
-========================
 
 .. toctree::
    :maxdepth: 3
 
+   front
+   intro
    howtos/index
    
 Reference Manual

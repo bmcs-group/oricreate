@@ -7,7 +7,7 @@ from etsproxy.traits.api import HasStrictTraits, Range, Instance, on_trait_chang
     Event, Property, Constant, DelegatesTo, PrototypedFrom, cached_property, Str, Delegate, \
     Button, Int, Float, Array, Bool, List, Dict, Interface, implements, WeakRef, cached_property
 import numpy as np
-from reshaping import Reshaping
+from oricreate.pipeline.reshaping_task import Reshaping
 
 
 class Masking(Reshaping):
