@@ -24,11 +24,11 @@ class EqCons(HasStrictTraits):
 
     implements(IEqCons)
 
-    reshaping = WeakRef
-    '''Link to the reshaping tool.
+    FormingTask = WeakRef
+    '''Link to the FormingTask tool.
     '''
 
-    x_0 = DelegatesTo('reshaping')
+    x_0 = DelegatesTo('FormingTask')
     '''Nodal coordinates
     '''
 
@@ -37,22 +37,22 @@ class EqCons(HasStrictTraits):
     type of constraint.
     '''
 
-    def __init__(self, reshaping, *args, **kw):
-        '''Initialization requiring the reshaping tool.
+    def __init__(self, FormingTask, *args, **kw):
+        '''Initialization requiring the FormingTask tool.
         '''
-        self.reshaping = reshaping
+        self.FormingTask = FormingTask
         super(HasStrictTraits, self).__init__(*args, **kw)
 
 class GrabPoints(EqCons):
     '''Grab points are included in the nodes attribute of the crease pattern.
     Their position is constrained within a facet using triangle coordinates.
     '''
-    n_dofs = DelegatesTo('reshaping')
-    N = DelegatesTo('reshaping')
-    F = DelegatesTo('reshaping')
-    GP = DelegatesTo('reshaping')
-    n_GP = DelegatesTo('reshaping')
-    n_D = DelegatesTo('reshaping')
+    n_dofs = DelegatesTo('FormingTask')
+    N = DelegatesTo('FormingTask')
+    F = DelegatesTo('FormingTask')
+    GP = DelegatesTo('FormingTask')
+    n_GP = DelegatesTo('FormingTask')
+    n_D = DelegatesTo('FormingTask')
 
     #===========================================================================
     # Grab point specification
@@ -116,13 +116,13 @@ class PointsOnLine(EqCons):
     Their position is constrained within a creaseline-element and at least one other
     constraining Element.
     '''
-    LP = DelegatesTo('reshaping')
-    n_LP = DelegatesTo('reshaping')
-    n_N = DelegatesTo('reshaping')
-    n_D = DelegatesTo('reshaping')
-    n_dofs = DelegatesTo('reshaping')
-    L = DelegatesTo('reshaping')
-    N = DelegatesTo('reshaping')
+    LP = DelegatesTo('FormingTask')
+    n_LP = DelegatesTo('FormingTask')
+    n_N = DelegatesTo('FormingTask')
+    n_D = DelegatesTo('FormingTask')
+    n_dofs = DelegatesTo('FormingTask')
+    L = DelegatesTo('FormingTask')
+    N = DelegatesTo('FormingTask')
 
     def get_G(self, U, t):
 
@@ -264,13 +264,13 @@ class PointsOnLine(EqCons):
 class DofConstraints(EqCons):
     '''Explicit constraints for selected of freedom.
     '''
-    n_N = DelegatesTo('reshaping')
-    n_D = DelegatesTo('reshaping')
-    n_dofs = DelegatesTo('reshaping')
-    cnstr_lhs = DelegatesTo('reshaping')
-    cnstr_rhs = DelegatesTo('reshaping')
+    n_N = DelegatesTo('FormingTask')
+    n_D = DelegatesTo('FormingTask')
+    n_dofs = DelegatesTo('FormingTask')
+    cnstr_lhs = DelegatesTo('FormingTask')
+    cnstr_rhs = DelegatesTo('FormingTask')
 
-    dof_constraints = DelegatesTo('reshaping')
+    dof_constraints = DelegatesTo('FormingTask')
     '''Specification of explicit constraint for particular degrees of freedom.
 
     dof constraints are specified as a list of equations with values

@@ -22,22 +22,22 @@ class EqConsConstantLength(EqCons):
     '''Constant length constraint.
     '''
 
-    L = PrototypedFrom('reshaping')
+    L = PrototypedFrom('FormingTask')
     '''Node-to-node array specifying the lines.
     to be submitted to the equality constraint.
     by default, all crease lines are included.
     However, it is possible to redefine them.
     '''
 
-    n_N = DelegatesTo('reshaping')
+    n_N = DelegatesTo('FormingTask')
     '''Number of nodes
     '''
 
-    n_L = DelegatesTo('reshaping')
+    n_L = DelegatesTo('FormingTask')
     '''Number of crease lines
     '''
 
-    n_D = DelegatesTo('reshaping')
+    n_D = DelegatesTo('FormingTask')
     '''Number of dimensions
     '''
 
@@ -45,7 +45,7 @@ class EqConsConstantLength(EqCons):
         ''' Calculate the residuum for constant crease length
         given the fold vector dX.
         '''
-        v_0 = self.reshaping.cp.L_vectors
+        v_0 = self.FormingTask.cp.L_vectors
         u = U.reshape(self.n_N, self.n_D)
         u_i, u_j = u[self.L.T]
         v_u_i = np.sum(v_0 * u_i, axis=1)
@@ -65,7 +65,7 @@ class EqConsConstantLength(EqCons):
 
         # running crease line index
         if self.n_L > 0:
-            v_0 = self.reshaping.cp.L_vectors
+            v_0 = self.FormingTask.cp.L_vectors
             u = U.reshape(self.n_N, self.n_D)
             i, j = self.L.T
             u_i, u_j = u[self.L.T]
@@ -83,7 +83,7 @@ class EqConsConstantLength(EqCons):
 
 if __name__ == '__main__':
 
-    from reshaping import Reshaping
+    from FormingTask import FormingTask
     from crease_pattern import CreasePattern
 
     cp = CreasePattern(X=[[-4, -5, -3],
@@ -93,8 +93,8 @@ if __name__ == '__main__':
                        L=[[0, 1], [1, 2], [2, 0]],
                        )
 
-    reshaping = Reshaping(cp=cp)
-    constant_length = EqConsConstantLength(reshaping)
+    FormingTask = FormingTask(cp=cp)
+    constant_length = EqConsConstantLength(FormingTask)
 
     U = np.zeros_like(cp.X)
     U[2] += 1.0

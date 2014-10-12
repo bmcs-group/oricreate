@@ -21,13 +21,13 @@ import numpy as np
 class AngleEqCons(EqCons):
     '''Base class for angle equality constraints.
     '''
-    L = DelegatesTo('reshaping')
+    L = DelegatesTo('FormingTask')
 
-    cp = DelegatesTo('reshaping')
+    cp = DelegatesTo('FormingTask')
 
-    n_N = DelegatesTo('reshaping')
-    n_D = DelegatesTo('reshaping')
-    n_dofs = DelegatesTo('reshaping')
+    n_N = DelegatesTo('FormingTask')
+    n_D = DelegatesTo('FormingTask')
+    n_dofs = DelegatesTo('FormingTask')
 
     signs = Property
     @cached_property
@@ -180,7 +180,7 @@ class EqConsFlatFoldability(AngleEqCons):
 
 
 if __name__ == '__main__':
-    from oricrete.folding2 import Reshaping, CreasePattern
+    from oricrete.FoldRigidly2 import FormingTask, CreasePattern
 
     cp = CreasePattern(X=[[-4, -5, -3],
                           [0, 0.0, 0],
@@ -193,11 +193,11 @@ if __name__ == '__main__':
                        F=[[1, 2, 3], [1, 3, 4], [1, 4, 5], [1, 5, 2]]
                        )
 
-    reshaping = Reshaping(cp=cp)
+    FormingTask = FormingTask(cp=cp)
 
     print 'in_neighbors', cp.iN_neighbors
 
-    uf = EqConsDevelopability(reshaping)
+    uf = EqConsDevelopability(FormingTask)
 
     U = np.zeros_like(cp.X)
     U[3] = 0.1

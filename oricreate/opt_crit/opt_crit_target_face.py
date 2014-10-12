@@ -264,7 +264,7 @@ class OptCritTargetFaces(OptCrit):
     def get_f(self, u, t=0):
         '''Get the the norm of distances between the individual target faces and nodes.
         '''
-        x = self.reshaping.x_0 + u
+        x = self.FormingTask.x_0 + u
         d_arr = np.array([])
         for caf, nodes in self.tf_lst:
             caf.X_arr = x[nodes]
@@ -276,7 +276,7 @@ class OptCritTargetFaces(OptCrit):
     def get_f_du(self, u, t=0):
         '''Get the derivatives with respect to individual displacements.
         '''
-        x = self.reshaping.x_0 + u
+        x = self.FormingTask.x_0 + u
         d_xyz = np.zeros_like(x)
         dist_arr = np.array([])
         for caf, nodes in self.tf_lst:

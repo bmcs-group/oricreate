@@ -22,7 +22,7 @@ x_, y_, z_, r_, s_, t_ = sp.symbols('x,y,z,r,s,t')
 
 class ControlFace(HasTraits):
     '''
-     Folding level set function
+     FoldRigidly level set function
     '''
     name = Str('<noname>')
 
@@ -45,12 +45,12 @@ CF = ControlFace
 
 class EqConsPointsOnSurface(EqCons):
 
-    N = DelegatesTo('reshaping')
-    n_N = DelegatesTo('reshaping')
-    n_D = DelegatesTo('reshaping')
-    n_dofs = DelegatesTo('reshaping')
-    n_c_ff = DelegatesTo('reshaping')
-    cf_lst = DelegatesTo('reshaping')
+    N = DelegatesTo('FormingTask')
+    n_N = DelegatesTo('FormingTask')
+    n_D = DelegatesTo('FormingTask')
+    n_dofs = DelegatesTo('FormingTask')
+    n_c_ff = DelegatesTo('FormingTask')
+    cf_lst = DelegatesTo('FormingTask')
 
     def get_G(self, U, t=0.0):
         ''' Calculate the residuum for given constraint equations
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     print control_face.dRf(xx, yy, xx, 0)
     print control_face.dRf(xx, yy, xx, 1)
 
-    from reshaping import Reshaping
+    from FormingTask import FormingTask
     from crease_pattern import CreasePattern
 
     cp = CreasePattern(X=[[-4, -5, -3],
@@ -107,8 +107,8 @@ if __name__ == '__main__':
                        L=[[0, 1], [1, 2]],
                        )
 
-    reshaping = Reshaping(cp=cp, cf_lst=[(control_face, [2])])
-    sliding_face = EqConsPointsOnSurface(reshaping)
+    FormingTask = FormingTask(cp=cp, cf_lst=[(control_face, [2])])
+    sliding_face = EqConsPointsOnSurface(FormingTask)
     U = np.zeros_like(cp.X)
     U[2] += 1.0
 

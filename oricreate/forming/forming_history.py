@@ -14,49 +14,32 @@
 
 from traits.api import \
     Property, cached_property, \
-    Array
+    Array, List
 
 import numpy as np
 from crease_pattern import \
-    CreasePattern
+    CreasePatternState
 
 INPUT = '+cp_input'
 
-class CreasePatternState(CreasePattern):
+class FormingHistory(CreasePatternState):
     r'''
-    This class is used by the FormingTask tasks during the
-    iteration to realize the predictor-corrector steps.
-    It inherits from ``CreasePattern`` and possesses
-    its own copy of the displacement
-    vector :math:`\bm{u}` and provides this vector in a flattened
-    form ``cp_state.U`` as property trait so that it can enter
-    be directly transmitted to the
-    the linear algebra operators. At the same time, the result
-    of the calculation step obtained in a flattened form can be
-    updated within this class using the property setter method
-    ``cp_state.U = U``
+    This class is used to record the motion history
+    of a crease pattern during a FormingTask task.
+
+    It maintains an array :math:`\bm{u}_t` of displacement vectors
+    corresponding to each time step.
+
     '''
 
-    u = Array(value=[], dtype='float_', cp_input=True)
+    u_t = List(Array(value=[], dtype='float_'), cp_input=True)
     r'''Displacement array with ``(n_N,n_D)`` values.
     '''
-    def u_default(self):
+    def u_t_default(self):
         return np.zeros_like(self.x_0)
 
-    U = Property
-    r'''Array of initial coordinates ``(n_N,n_D)`` as ``[x1,x2,x3]``.
-    '''
-    def _get_U(self):
-        return self.u.flatten()
-    def _set_U(self, U):
-        self.u = U.reshape(self.n_N, self.n_D)
-
-    x = Property(depends_on=INPUT)
+    x_t = Property(depends_on=INPUT)
     r'''Interim coordinates of the crease pattern
-
-    ..  math::
-        \bm{x} = \bm{x}_0 + \bm{u}
-
     '''
     @cached_property
     def _get_x(self):
@@ -64,13 +47,6 @@ class CreasePatternState(CreasePattern):
             return self.x_0 + self.u
         else:
             return self.x_0
-
-    n_dofs = Property(depends_on=INPUT)
-    '''Total number of displacement degrees of freedom.
-    '''
-    @cached_property
-    def _get_n_dofs(self):
-        return self.n_N * self.n_D
 
 if __name__ == '__main__':
 

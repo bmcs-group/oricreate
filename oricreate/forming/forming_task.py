@@ -27,23 +27,23 @@ from eq_cons import \
 from traits.api import Instance, \
     Property, cached_property, Str, \
     Int, Float, Array, List, Dict, implements
-from optimization_problem import OptimizationProblem
+from oricreate.forming.forming_step import FormingStep
 import numpy as np
 from ori_node import OriNode
-from pipeline import IReshapingTask
+from i_forming_task import IFormingTask
 
-class ReshapingTask(OriNode, OptimizationProblem):
-    """Reshaping tasks use the crease pattern state
-    attained within the previous reshaping task
+class FormingTask(OriNode, FormingStep):
+    """FormingTask tasks use the crease pattern state
+    attained within the previous FormingTask task
     and bring it to the next stage.
 
     It is realized as a specialized configurations
-    of the OptimizationProblem with the goal to
+    of the FormingStep with the goal to
     represent the.
     """
-    implements(IReshapingTask)
+    implements(IFormingTask)
 
-    source = Instance(IReshapingTask)
+    source = Instance(IFormingTask)
 
     cp = Property(depends_on='source')
     '''Instance of a crease pattern.
@@ -59,7 +59,7 @@ class ReshapingTask(OriNode, OptimizationProblem):
 
     X_0 = Property(depends_on='source')
     '''Initial configuration given as the last
-    configuration of the previous reshaping step.
+    configuration of the previous FormingTask step.
     '''
     @cached_property
     def _get_X_0(self):
@@ -84,21 +84,21 @@ class ReshapingTask(OriNode, OptimizationProblem):
     U_0 = Property(Array(float))
     '''Attribute storing the optional user-supplied initial array.
     It is used as the trial vector of unknown displacements
-    for the current reshaping simulation.
+    for the current FormingTask simulation.
     '''
     def _get_U_0(self):
         return self.source.U_1
 
     X_1 = Property(Array(float))
-    '''Final state of the reshaping process that can be used
-    by further reshaping controller.
+    '''Final state of the FormingTask process that can be used
+    by further FormingTask controller.
     '''
     def _get_X_1(self):
         return self.X_0 + self.U_t[-1]
 
     U_1 = Property(Array(float))
-    '''Final state of the reshaping process that can be used
-    by further reshaping controller.
+    '''Final state of the FormingTask process that can be used
+    by further FormingTask controller.
     '''
     def _get_U_1(self):
         return np.zeros_like(self.X_0)
@@ -146,8 +146,8 @@ class ReshapingTask(OriNode, OptimizationProblem):
     '''Auxiliary facets used for visualization.
     '''
 
-class Initialization(OriNode, OptimizationProblem):
-    '''Initialization of the pattern for the reshaping control.
+class Initialization(OriNode, FormingStep):
+    '''Initialization of the pattern for the FormingTask control.
 
     The crease pattern object will be mapped on an target face, without any
     constraints. This will be done for time_step = 0.001, so theirs only
@@ -207,7 +207,7 @@ class Initialization(OriNode, OptimizationProblem):
         self.t_arr = np.linspace(0, self.t_init, self.n_steps + 1)
 
     n_steps = Int(1, auto_set=False, enter_set=True)
-    '''Number of time steps for the reshaping simulation.
+    '''Number of time steps for the FormingTask simulation.
     '''
     def _n_steps_changed(self):
         self.t_arr = np.linspace(0, self.t_init, self.n_steps + 1)
@@ -229,7 +229,7 @@ class Initialization(OriNode, OptimizationProblem):
     U_0 = Property(Array(float))
     '''Attribute storing the optional user-supplied initial array.
     It is used as the trial vector of unknown displacements
-    for the current reshaping simulation.
+    for the current FormingTask simulation.
     '''
     def _get_U_0(self):
         len_U_0 = len(self._U_0)
@@ -243,7 +243,7 @@ class Initialization(OriNode, OptimizationProblem):
     '''Result of the initialization.
     The ``U0`` vector is used as a first choice. If target
     faces for initialization are specified, the
-    folding simulator is used to get the projection of the nodes
+    rigid folding simulator is used to get the projection of the nodes
     to the target surface at the time (t_init).
     '''
     @cached_property
@@ -260,8 +260,8 @@ class Initialization(OriNode, OptimizationProblem):
     def _get_X_1(self):
         return self.X_0
 
-class FormFinding(ReshapingTask):
-    '''FormFinding forms the creasepattern, so flatfold conditions are fulfilled
+class FindFormForGeometry(FormingTask):
+    '''FindFormForGeometry forms the creasepattern, so flatfold conditions are fulfilled
 
     The creasepattern is iterabaly deformed, till every inner node fulfilles
     the condition, that the sum of the angels between the connecting
@@ -275,10 +275,10 @@ class FormFinding(ReshapingTask):
     eqcons = Dict(Str, IEqCons)
     def _eqcons_default(self):
         return {
-#                'ff' : EqConsFlatFoldability(reshaping=self),
-                'uf' : EqConsDevelopability(reshaping=self),
-                'ps' : EqConsPointsOnSurface(reshaping=self),
-                'dc' : DofConstraints(reshaping=self)
+#                'ff' : EqConsFlatFoldability(FormingTask=self),
+                'uf' : EqConsDevelopability(FormingTask=self),
+                'ps' : EqConsPointsOnSurface(FormingTask=self),
+                'dc' : DofConstraints(FormingTask=self)
                 }
 
     U_1 = Property(depends_on='source_config_changed, _U_0')
@@ -289,26 +289,26 @@ class FormFinding(ReshapingTask):
     def _get_U_1(self):
         return np.zeros_like(self.U_t[-1])
 
-class Folding(ReshapingTask):
-    '''Folding folds a crease pattern while using the classic constraints like
+class FoldRigidly(FormingTask):
+    '''FoldRigidly folds a crease pattern while using the classic constraints like
     constant length, dof constraints and surface constraints.
 
-    This class serves for the analysis of the folding process of a crease pattern.
+    This class serves for the analysis of the FoldRigidly process of a crease pattern.
     All classic constraints can be used. Only special elements, like GP and LP
     are not included. But sliding faces and target faces are supported.
     '''
 
-    name = Str('folding')
+    name = Str('fold to target surfaces')
 
     eqcons = Dict(Str, IEqCons)
     def _eqcons_default(self):
         return {
-                'cl' : EqConsConstantLength(reshaping=self),
-                'ps' : EqConsPointsOnSurface(reshaping=self),
-                'dc' : DofConstraints(reshaping=self)
+                'cl' : EqConsConstantLength(FormingTask=self),
+                'ps' : EqConsPointsOnSurface(FormingTask=self),
+                'dc' : DofConstraints(FormingTask=self)
                 }
 
-class Lifting(ReshapingTask):
+class Lift(FormingTask):
     ''' Lifting class is for lifting a crease pattern with a crane.
 
     Lifting takes all equality constraints and is used to simulate
@@ -319,23 +319,23 @@ class Lifting(ReshapingTask):
     Instead of this you can although put in your own pre-deformation.
     '''
 
-    name = Str('lifting')
+    name = Str('fold to displacement')
 
     goal_function_type = 'none'
 
     eqcons = Dict(Str, IEqCons)
     def _eqcons_default(self):
         return {
-                'cl' : EqConsConstantLength(reshaping=self),
-                'gp' : GrabPoints(reshaping=self),
-                'pl' : PointsOnLine(reshaping=self),
-                'ps' : EqConsPointsOnSurface(reshaping=self),
-                'dc' : DofConstraints(reshaping=self)
+                'cl' : EqConsConstantLength(FormingTask=self),
+                'gp' : GrabPoints(FormingTask=self),
+                'pl' : PointsOnLine(FormingTask=self),
+                'ps' : EqConsPointsOnSurface(FormingTask=self),
+                'dc' : DofConstraints(FormingTask=self)
                 }
 
 if __name__ == '__main__':
 
-    from view.crease_pattern_view import CreasePatternView
+    from view import FormingView
     from util import r_, s_, t_, x_, y_, z_
     from eq_cons import CF
 
@@ -357,7 +357,7 @@ if __name__ == '__main__':
     init = Initialization(cp=cp)
     init.U_0[5] = 0.05
 
-    lift = Lifting(source=init, n_steps=10)
+    lift = Lift(source=init, n_steps=10)
     print 'initial vector', lift.U_0
 
 #    lift.TS = [[r_ , s_, 0.01 + t_ * (0.5)]]
@@ -378,5 +378,5 @@ if __name__ == '__main__':
     lift.cnstr_rhs[0] = 0.9
     print lift.U_1
 #
-    v = CreasePatternView(reshaping_history=init)
+    v = FormingView(root=init)
     v.configure_traits()

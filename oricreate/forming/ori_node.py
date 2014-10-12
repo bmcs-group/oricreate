@@ -32,7 +32,7 @@ class OriNode(HasStrictTraits):
     node = Str('<unnamed>')
 
     source = Instance(IOriNode)
-    '''Previous reshaping simulation providing the source for the current one.
+    '''Previous FormingTask simulation providing the source for the current one.
     '''
     def _source_changed(self):
         self.source.followups.append(self)

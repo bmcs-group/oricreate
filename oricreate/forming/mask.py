@@ -7,10 +7,10 @@ from etsproxy.traits.api import HasStrictTraits, Range, Instance, on_trait_chang
     Event, Property, Constant, DelegatesTo, PrototypedFrom, cached_property, Str, Delegate, \
     Button, Int, Float, Array, Bool, List, Dict, Interface, implements, WeakRef, cached_property
 import numpy as np
-from oricreate.pipeline.reshaping_task import Reshaping
+from oricreate.forming.forming_task import FormingTask
 
 
-class Masking(Reshaping):
+class Masking(FormingTask):
     '''Use the source element as a base and define a mask for hidden
     deleted) facets.Nodes and lines without facet will be masked as well
     '''

@@ -46,7 +46,7 @@ class CreasePattern(CreaseNodeOperators,
     of the crease pattern are provided as property
     attributes calculated on demand using the input values.
     The mappings implemented in this class
-    are independent on the interim configuration of the reshaping
+    are independent on the interim configuration of the FormingTask
     process of the crease pattern.
     Recalculation of derived properties is initiated only upon a change
     of the mentioned input attributes.
@@ -70,7 +70,7 @@ class CreasePattern(CreaseNodeOperators,
 
     x_0 = Property(depends_on=INPUT)
     '''Array of initial coordinates ``(n_N,n_D)`` as ``[x1,x2,x3]``.
-    Serves as reshaping classes.
+    Serves as FormingTask classes.
     '''
     def _get_x_0(self):
         return self.X
@@ -298,14 +298,6 @@ class CreasePattern(CreaseNodeOperators,
         F_N = self.F_N[:, ix_arr]
         # use the NN_L map to get line numbers
         return self.NN_L[F_N[..., 0], F_N[..., 1]]
-
-    n_dofs = Property(depends_on=INPUT)
-    '''Total number of displacement degrees of freedom.
-    @todo: rename - n_u_dofs
-    '''
-    @cached_property
-    def _get_n_dofs(self):
-        return self.n_N * self.n_D
 
     def _get_nbr_cycle(self, neighbors):
         '''Auxiliary private methods identifying cycles around a node.

@@ -26,17 +26,17 @@ class OptCritPotentialEnergy(OptCrit):
     def get_f(self, u, t=0):
         '''Get the potential energy of gravity.
         '''
-        return self.reshaping.cp.get_V(u)
+        return self.FormingTask.cp.get_V(u)
 
     def get_f_du(self, u, t=0):
         '''Get the derivatives with respect to individual displacements.
         '''
-        return self.reshaping.cp.get_V_du(u)
+        return self.FormingTask.cp.get_V_du(u)
 
 if __name__ == '__main__':
-    from pipeline.reshaping import Initialization, Folding
+    from pipeline.FormingTask import Initialization, FoldRigidly
     from crease_pattern import CreasePattern
-    from view import CreasePatternView
+    from view import FormingView
 
     cp = CreasePattern(X=[[0, 0, 0],
                           [0, 1, 0],
@@ -60,17 +60,17 @@ if __name__ == '__main__':
     init.t_arr
     init.u_t[-1]
 
-    fold = Folding(source=init, n_steps=1,
+    fold = FoldRigidly(source=init, n_steps=1,
                    acc=1e-6, MAX_ITER=500,
                    )
 
     fold.u_t[-1]
 
-    oc = OptCritPotentialEnergy(reshaping=init)
+    oc = OptCritPotentialEnergy(FormingTask=init)
 
     u = np.zeros_like(cp.X)
     print 'f', oc.get_f(u)
     print 'f_du', oc.get_f_du(u)
 
-    cpw = CreasePatternView(root=init)
+    cpw = FormingView(root=init)
     cpw.configure_traits()

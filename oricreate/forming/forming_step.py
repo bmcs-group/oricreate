@@ -38,8 +38,8 @@ if platform.system() == 'Linux':
 elif platform.system() == 'Windows':
     sysclock = time.clock
 
-class OptimizationProblem(HasStrictTraits):
-    """Class implementing the simulation procedure of the folding process
+class FormingStep(HasStrictTraits):
+    """Class implementing the simulation procedure of the FoldRigidly process
     within a time range 0..1 or 0..1 for a given number of steps.
     """
     source_config_changed = Event
@@ -63,7 +63,7 @@ class OptimizationProblem(HasStrictTraits):
     @cached_property
     def _get_goal_function(self):
         if self.goal_function_type_:
-            return self.goal_function_type_(reshaping=self)
+            return self.goal_function_type_(FormingTask=self)
         else:
             return None
 
@@ -185,8 +185,8 @@ class OptimizationProblem(HasStrictTraits):
 
     unfold = Bool(False)
     '''Reverse the time array. So it's possible to unfold
-    a structure. If you optimize a pattern with FormFinding
-    you can unfold it at least with Folding to it's flatten
+    a structure. If you optimize a pattern with FindFormForGeometry
+    you can unfold it at least with FoldRigidly to it's flatten
     shape.
     '''
 
@@ -212,7 +212,7 @@ class OptimizationProblem(HasStrictTraits):
     acc = Float(1e-4, auto_set=False, enter_set=True)
 
     U_t = Property(depends_on='source_config_changed, unfold')
-    '''Displacement history for the current folding process.
+    '''Displacement history for the current FoldRigidly process.
     '''
     @cached_property
     def _get_U_t(self):
@@ -453,5 +453,5 @@ class OptimizationProblem(HasStrictTraits):
         return np.sqrt(np.sum(v, axis=2))
 
 if __name__ == '__main__':
-    fs = OptimizationProblem()
+    fs = FormingStep()
     print fs.goal_function

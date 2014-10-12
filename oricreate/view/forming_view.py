@@ -29,10 +29,10 @@ from traitsui.api import View, Item, Group, RangeEditor, \
     TreeNode, ListEditor, VSplit
 from face_view import FaceView
 import numpy as np
-from pipeline.ori_node import IOriNode, OriNode
-from pipeline.reshaping import IReshaping
+from forming.ori_node import IOriNode, OriNode
+from forming import IFormingTask
 
-reshaping_tree_editor = TreeEditor(
+FormingTask_tree_editor = TreeEditor(
     nodes=[
         TreeNode(node_for=[ CreasePattern ],
                   auto_open=True,
@@ -50,12 +50,12 @@ reshaping_tree_editor = TreeEditor(
         editable=False,
     )
 
-class CreasePatternView(HasTraits):
+class FormingView(HasTraits):
     '''Crease pattern view.
     '''
 
-    data = Instance(IReshaping)
-    '''Currently displayed data reshaping step
+    data = Instance(IFormingTask)
+    '''Currently displayed data FormingTask step
     '''
     def _data_changed(self):
         self.fold_step = 0
@@ -66,7 +66,7 @@ class CreasePatternView(HasTraits):
         self.fold_step = 0
 
     root = Instance(IOriNode)
-    '''All reshaping steps.
+    '''All FormingTask steps.
     '''
 
     x_t = DelegatesTo('data')  # node position in every time_step
@@ -742,7 +742,7 @@ class CreasePatternView(HasTraits):
         self.scene.disable_render = False
 
     #===========================================================================
-    # Export animation of the folding process
+    # Export animation of the FoldRigidly process
     #===========================================================================
     print_view = Button
 
@@ -829,8 +829,8 @@ class CreasePatternView(HasTraits):
     view1 = View(
            HSplit(VSplit(
                  Group(Item('root',
-#                           id='folding root',
-                           editor=reshaping_tree_editor,
+#                           id='FoldRigidly root',
+                           editor=FormingTask_tree_editor,
                            resizable=True,
                            show_label=False),
                        label='Design tree',
@@ -895,7 +895,8 @@ class CreasePatternView(HasTraits):
 if __name__ == '__main__':
     # little example with all visual elements
     # ToDo: surface missing
-    from oricrete.folding2 import CreasePattern, Lifting
+    from crease_pattern import CreasePattern
+    from forming import FoldRigidly
     cp = CreasePattern(X=[[0, 0, 0],
                           [1, 0, 0],
                           [1, 1, 0],
@@ -910,7 +911,7 @@ if __name__ == '__main__':
                        F=[[0, 1, 3],
                           [1, 2, 3]])
 
-    lift = Lifting(cp=cp, n_steps=10,
+    lift = FoldRigidly(cp=cp, n_steps=10,
                    cnstr_lhs=[[(1, 2, 1.0)],
                               [(0, 0, 1.0)],
                               [(0, 1, 1.0)],

@@ -24,7 +24,7 @@ import subprocess
 import sys
 import scipy as sp
 from oricreate.crease_pattern.crease_pattern import CreasePattern
-from oricreate.view.crease_pattern_view import CreasePatternView
+from oricreate.view.forming_view import FormingView
 
 import abaqus_shell_manager as asm
 
@@ -679,9 +679,9 @@ That's all you need to do.
 
 
 if __name__ == '__main__':
-    from oricrete.folding2.examples.yoshimuraCreasePattern import YoshimuraCreasePattern
-#    from oricrete.folding2.examples.YoshimuraCreasePattern.ex03_rhombus_ref_surface import create_cp_fc_03
-#    from oricrete.folding2.foldingphase import Lifting
+    from oricrete.FoldRigidly2.examples.yoshimuraCreasePattern import YoshimuraCreasePattern
+#    from oricrete.FoldRigidly2.examples.YoshimuraCreasePattern.ex03_rhombus_ref_surface import create_cp_fc_03
+#    from oricrete.FoldRigidly2.FoldRigidlyphase import Lifting
     cp = YoshimuraCreasePattern(L_x=4, L_y=2, n_x=4, n_y=4)
     al = AbaqusLink(data=cp, n_split=10)
     al.model_name = 'test_name'

@@ -18,6 +18,15 @@ CreasePattern
 .. autoclass:: CreasePattern
 	:members:
 
+CreasePatternState
+==================
+
+.. inheritance-diagram:: CreasePatternState
+	:parts: 1
+
+.. autoclass:: CreasePatternState
+	:members:
+
 CreaseNodeOperators
 ===================
 

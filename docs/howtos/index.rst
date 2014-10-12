@@ -15,7 +15,7 @@ in order to be rigid foldable.
 .. toctree::
    :maxdepth: 2
 
-   ex01_single_vertex/index
+   example_01/index
    
 Vector angles
 =============

@@ -30,7 +30,7 @@ class CreasePatternExport(HasStrictTraits):
         '''
          Get the coordinates of the constraints.
 
-        @todo this should be moved to Reshaping
+        @todo this should be moved to FormingTask
         '''
         print 'get position'
         u_t = self.fold_steps[iteration_step]

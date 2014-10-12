@@ -32,11 +32,11 @@ class OptCrit(HasStrictTraits):
 
     implements(IOptCrit)
 
-    reshaping = WeakRef
-    '''Link to the reshaping tool.
+    FormingTask = WeakRef
+    '''Link to the FormingTask tool.
     '''
 
-    x_0 = DelegatesTo('reshaping')
+    x_0 = DelegatesTo('FormingTask')
     '''Nodal coordinates
     '''
 
@@ -45,8 +45,8 @@ class OptCrit(HasStrictTraits):
     type of constraint.
     '''
 
-    def __init__(self, reshaping, *args, **kw):
-        '''Initialization requiring the reshaping tool.
+    def __init__(self, FormingTask, *args, **kw):
+        '''Initialization requiring the FormingTask tool.
         '''
-        self.reshaping = reshaping
+        self.FormingTask = FormingTask
         super(HasStrictTraits, self).__init__(*args, **kw)

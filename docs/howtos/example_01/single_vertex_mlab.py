@@ -5,10 +5,10 @@ Plot the results of single vertex example.
 '''
 
 if __name__ == '__main__':
-    from ex04_single_vertex import create_cp
+    from single_vertex import create_cp
     cp = create_cp()
     # begin
-    from oricreate.view.crease_pattern_view import CreasePatternView
-    v = CreasePatternView(cp=cp)
+    from oricreate.view.forming_view import FormingView
+    v = FormingView(cp=cp)
     v.configure_traits()
     # end

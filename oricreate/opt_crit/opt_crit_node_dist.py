@@ -24,7 +24,7 @@ class OptCritNodeDist(OptCrit):
     def get_f(self, u, t=0):
         '''Get the the norm of distances between the individual target faces and nodes.
         '''
-        x = self.reshaping.x_0 + u
+        x = self.FormingTask.x_0 + u
         L = self.L
         v_arr = x[L[:, 1], :] - x[L[:, 0], :]
         l_arr = np.sqrt(np.sum(v_arr ** 2, axis=1))
@@ -33,7 +33,7 @@ class OptCritNodeDist(OptCrit):
     def get_f_du(self, u, t=0):
         '''Get the derivatives with respect to individual displacements.
         '''
-        x = self.reshaping.x_0 + u
+        x = self.FormingTask.x_0 + u
         L = self.L
         v_arr = x[L[:, 1], :] - x[L[:, 0], :]
         l_arr = np.sqrt(np.sum(v_arr ** 2, axis=1))
@@ -48,7 +48,7 @@ class OptCritNodeDist(OptCrit):
         f_du_I = -(x_J - x_I) / L_total
         f_du_J = (x_J - x_I) / L_total
 
-        f_du = np.zeros((self.reshaping.n_N, self.reshaping.n_D), dtype='float_')
+        f_du = np.zeros((self.FormingTask.n_N, self.FormingTask.n_D), dtype='float_')
 
         if L.size > 0:
             f_du[ I, : ] += f_du_I
@@ -58,7 +58,7 @@ class OptCritNodeDist(OptCrit):
         return f_du
 
 if __name__ == '__main__':
-    from reshaping import Initialization
+    from FormingTask import Initialization
     from crease_pattern import CreasePattern
 
     cp = CreasePattern(X=[[0, 0, 0],
@@ -66,7 +66,7 @@ if __name__ == '__main__':
                           [10.0, 0, 0]],
                        L=[[0, 1], [1, 2], [2, 0]])
     init = Initialization(cp=cp)
-    oc = OptCritNodeDist(reshaping=init,
+    oc = OptCritNodeDist(FormingTask=init,
                          L=[[0, 1], [1, 2]])
 
     u = np.array([[0, 0, 0],

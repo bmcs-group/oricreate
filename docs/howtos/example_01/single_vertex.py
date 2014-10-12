@@ -3,7 +3,7 @@ r'''
 This example demonstrates the interface of a CreasePattern class
 using the depicted node-line-facet structure.
 
-.. image:: ex01_single_vertex.png
+.. image:: single_vertex.png
 
 '''
 

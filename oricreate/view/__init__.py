@@ -1,2 +1,2 @@
 
-from crease_pattern_view import CreasePatternView
+from oricreate.view.forming_view import FormingView

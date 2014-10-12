@@ -5,14 +5,11 @@ Created on Jun 20, 2013
 '''
 import math
 
-from etsproxy.traits.api import HasStrictTraits, Range, Instance, on_trait_change, \
-    Event, Property, Constant, DelegatesTo, PrototypedFrom, cached_property, Str, Delegate, \
-    Button, Int, Float, Array, Bool, List, Dict, Interface, implements, WeakRef, cached_property
+from traits.api import Property, Str, Int, Float, Array, cached_property
 import numpy as np
-from oricreate.pipeline.reshaping_task import Reshaping
+from forming_task import FormingTask
 
-
-class RotSymAssembly(Reshaping):
+class RostateCopy(FormingTask):
     ''' Replicate the source to form a structure.
 
     Given a number of segments and center of rotation,
@@ -183,7 +180,7 @@ def q_to_axis_angle(q):
     theta = np.arccos(w) * 2.0
     return theta, v_normalize(v)
 
-class MonoShapeAssembly(Reshaping):
+class MonoShapeAssembly(FormingTask):
     '''Use the source element to assemble a structure
     consisting of a singly prefabricated element.
 

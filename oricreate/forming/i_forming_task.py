@@ -8,12 +8,12 @@ from traits.api import Property, Array, Instance
 from oricreate import CreasePattern
 from i_ori_node import IOriNode
 
-class IReshapingTask(IOriNode):
-    '''Interface for reshaping process
+class IFormingTask(IOriNode):
+    '''Interface for FormingTask process
     simulation step within the origami design process.
     '''
 
-    # method required by subsequent reshaping steps
+    # method required by subsequent FormingTask steps
     U_1 = Property(Array)
     cp = Instance(CreasePattern)
 
