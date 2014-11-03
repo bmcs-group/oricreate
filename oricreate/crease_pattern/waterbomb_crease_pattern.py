@@ -16,11 +16,12 @@ from traits.api import \
     Float, Int, Property, cached_property, Array, Callable, Any
 
 from crease_pattern import CreasePattern
-
 import numpy as np
 import sympy as sp
 
+
 x_, y_ = sp.symbols('x, y')
+
 
 class WaterBombCreasePattern(CreasePattern):
     '''Structure of triangulated Crease-Patterns
@@ -36,6 +37,7 @@ class WaterBombCreasePattern(CreasePattern):
     new_crease_lines = Array(value=[], dtype=int)
 
     X = Property
+
     def _get_X(self):
         return self._geometry[0]
 
@@ -44,42 +46,52 @@ class WaterBombCreasePattern(CreasePattern):
         self.X[:, :] = values[:, :]
 
     L = Property
+
     def _get_L(self):
         return self._geometry[1]
 
     F = Property
+
     def _get_F(self):
         return self._geometry[2]
 
     N_h = Property
+
     def _get_N_h(self):
         return self._geometry[3]
 
     N_k = Property
+
     def _get_N_k(self):
         return self._geometry[4]
 
     N_i = Property
+
     def _get_N_i(self):
         return self._geometry[5]
 
     N_j = Property
+
     def _get_N_j(self):
         return self._geometry[6]
 
     X_h = Property
+
     def _get_X_h(self):
         return self._geometry[7]
 
     X_k = Property
+
     def _get_X_k(self):
         return self._geometry[8]
 
     X_i = Property
+
     def _get_X_i(self):
         return self._geometry[9]
 
     X_j = Property
+
     def _get_X_j(self):
         return self._geometry[10]
 
@@ -95,19 +107,25 @@ class WaterBombCreasePattern(CreasePattern):
 
     # geometric deformation
     _fx_expr = Any
+
     def __fx_expr_default(self):
         return x_
 
     _fy_expr = Any
+
     def __fy_expr_default(self):
         return y_
 
     fy = Property
+
     def _set_fy(self, ls_expr):
         self._fy_expr = ls_expr
+
     def _get_fy(self):
         return sp.lambdify([x_, y_], self._fy_expr)
+
     fx = Property
+
     def _set_fx(self, ls_expr):
         self._fx_expr = ls_expr
 
@@ -115,10 +133,12 @@ class WaterBombCreasePattern(CreasePattern):
         return sp.lambdify([x_, y_], self._fx_expr)
 
     geo_transform = Callable
+
     def _geo_transform_default(self):
         return lambda X_arr: X_arr
 
     _geometry = Property(depends_on='+geometry')
+
     @cached_property
     def _get__geometry(self):
 
@@ -132,29 +152,31 @@ class WaterBombCreasePattern(CreasePattern):
         n_bg_y = 2 * n_y
 
         # background grid of nodes
-        x_bg, y_bg = np.mgrid[0:L_x:complex(n_bg_x + 1), 0:L_y:complex(n_bg_y + 1)]
+        x_bg, y_bg = np.mgrid[0:L_x:complex(n_bg_x + 1),
+                              0:L_y:complex(n_bg_y + 1)]
 
         x_h = x_bg[::2, ::2]
         y_h = y_bg[::2, ::2]
-        X_h = np.c_[ x_h.flatten(), y_h.flatten() ]
+        X_h = np.c_[x_h.flatten(), y_h.flatten()]
 
         x_k = x_bg[1::2, ::2]
         y_k = y_bg[1::2, ::2]
-        X_k = np.c_[ x_k.flatten(), y_k.flatten() ]
+        X_k = np.c_[x_k.flatten(), y_k.flatten()]
 
         x_i = x_bg[::2, 3::4]
         y_i = y_bg[::2, 3::4]
-        X_i = np.c_[ x_i.flatten(), y_i.flatten() ]
+        X_i = np.c_[x_i.flatten(), y_i.flatten()]
 
         x_j = x_bg[1::2, 1::4]
         y_j = y_bg[1::2, 1::4]
-        X_j = np.c_[ x_j.flatten(), y_j.flatten() ]
+        X_j = np.c_[x_j.flatten(), y_j.flatten()]
 
         # node enumeration in grid form on
         N_h = np.arange(x_h.size).reshape(x_h.shape)
         N_k = N_h.size + np.arange(x_k.size).reshape(x_k.shape)
         N_i = N_h.size + N_k.size + np.arange(x_i.size).reshape(x_i.shape)
-        N_j = N_h.size + N_k.size + N_i.size + np.arange(x_j.size).reshape(x_j.shape)
+        N_j = (N_h.size + N_k.size + N_i.size +
+               np.arange(x_j.size).reshape(x_j.shape))
 
         # connectivity of nodes defining the crease pattern
 

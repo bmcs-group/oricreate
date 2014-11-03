@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 #
 # Copyright (c) 2009, IMB, RWTH Aachen.
 # All rights reserved.
@@ -16,13 +16,16 @@ from traits.api import \
     Property, cached_property, \
     Array, List
 
-import numpy as np
 from crease_pattern import \
     CreasePatternState
+import numpy as np
+
 
 INPUT = '+cp_input'
 
+
 class FormingHistory(CreasePatternState):
+
     r'''
     This class is used to record the motion history
     of a crease pattern during a FormingTask task.
@@ -35,6 +38,7 @@ class FormingHistory(CreasePatternState):
     u_t = List(Array(value=[], dtype='float_'), cp_input=True)
     r'''Displacement array with ``(n_N,n_D)`` values.
     '''
+
     def u_t_default(self):
         return np.zeros_like(self.x_0)
 
@@ -52,15 +56,15 @@ if __name__ == '__main__':
 
     # trivial example with a single triangle positioned
 
-    cp = CreasePatternState(x_0=[[ 0, 0, 0 ],
-                                 [ 1, 0, 0 ],
-                                 [ 1, 1, 0],
+    cp = CreasePatternState(x_0=[[0, 0, 0],
+                                 [1, 0, 0],
+                                 [1, 1, 0],
                                  [0.667, 0.333, 0],
                                  [0.1, 0.05, 0]],
-                            L=[[ 0, 1 ],
-                               [ 1, 2 ],
-                               [ 2, 0 ]],
-                            F=[[0, 1, 2 ]]
+                            L=[[0, 1],
+                               [1, 2],
+                               [2, 0]],
+                            F=[[0, 1, 2]]
                             )
 
     print 'vectors\n', cp.L_vectors

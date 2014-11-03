@@ -11,22 +11,14 @@
 #
 # Created on Jan 3, 2013 by:  schmerl
 
-from traits.api import HasTraits, Property, cached_property, Event, \
-    Array, Instance, Int, Directory, Range, on_trait_change, Bool, Trait, Constant, \
-    Str, Tuple, Interface, implements, Enum, List, Float, Dict, DelegatesTo, WeakRef
-
-from traits.ui.api import Item, View, HGroup, RangeEditor
 from copy import copy
-import numpy as np
-from scipy.optimize import fmin_slsqp
-from scipy.spatial import Delaunay
-import subprocess
-import sys
-import scipy as sp
-from oricreate.crease_pattern.crease_pattern import CreasePattern
-from oricreate.view.forming_view import FormingView
+from traits.api import HasTraits, Property, cached_property, \
+    Array, Int, \
+    Str, Float, Dict, WeakRef
 
 import abaqus_shell_manager as asm
+import numpy as np
+
 
 class AbaqusLink(HasTraits):
     # data source
@@ -37,6 +29,7 @@ class AbaqusLink(HasTraits):
     n_split = Int(2, geometry=True)
 
     _cp_node_index = Property(depends_on='data.nodes, data')
+
     @cached_property
     def _get__cp_node_index(self):
         ''' Indexlist of all Nodes in Creasepattern Plane.
@@ -44,7 +37,8 @@ class AbaqusLink(HasTraits):
         Identify all indexes of the crease pattern nodes laying in
         z = 0 plane (in t = 0) and aren't grab points or line points.
         '''
-        # @todo: modify this, the proper criterion is to test if a node is attached to a facet
+        # @todo: modify this, the proper criterion is to test if a node
+        # is attached to a facet
         #
         return self.data.cp.N
 #        index = np.ma.array(range(0, len(n)))
@@ -64,6 +58,7 @@ class AbaqusLink(HasTraits):
 
     _origin_nodes = Property(Array(value=[], dtype=float, geometry=True),
                              depends_on='data.N, data, iterationstep')
+
     @cached_property
     def _get__origin_nodes(self):
         '''
@@ -71,10 +66,9 @@ class AbaqusLink(HasTraits):
         '''
         return self.data.x_t[self.iterationstep][self._cp_node_index]
 
-
-
     _origin_facets = Property(Array(value=[], dtype='int_', geometry=True),
                               depends_on='data.F, data')
+
     @cached_property
     def _get__origin_facets(self):
         '''
@@ -83,24 +77,27 @@ class AbaqusLink(HasTraits):
         '''
         return self.data.cp.aligned_facets
 
-    _origin_cl = Property(Array(value=[], dtype='int_', geometry=True), depends_on='data.L, data')
+    _origin_cl = Property(Array(value=[], dtype='int_', geometry=True),
+                          depends_on='data.L, data')
+
     @cached_property
     def _get__origin_cl(self):
         '''
-            For meshrefinement only creaselines in the creasepatten are necessary!
-            They are laing on z=0 in t=0, so crane sticks etc. are rejected.
+        For meshrefinement only creaselines in the creasepatten are necessary!
+        They are laing on z=0 in t=0, so crane sticks etc. are rejected.
         '''
         cl = self.data.L
         o_n = self._cp_node_index
         final_cl = np.zeros((0, 2), dtype=int)
         for i in cl:
             test = np.in1d(o_n, i)
-            if(np.sum(test) == 2):  # 2 means both nodes of the cl are in the index table
+            # 2 means both nodes of the cl are in the index table
+            if(np.sum(test) == 2):
                 final_cl = np.vstack((final_cl, i))
         return final_cl
 
-
     nodes = Property
+
     def _get_nodes(self):
         '''
         Returns all nodes after mesh refinement
@@ -108,6 +105,7 @@ class AbaqusLink(HasTraits):
         return self._geometry[0]
 
     facets = Property
+
     def _get_facets(self):
         '''
         Returns all facets after mesh refinement
@@ -115,6 +113,7 @@ class AbaqusLink(HasTraits):
         return self._geometry[1]
 
     _n_origin_nodes = Property(depends_on='_origin_nodes')
+
     @cached_property
     def _get__n_origin_nodes(self):
         '''
@@ -122,16 +121,19 @@ class AbaqusLink(HasTraits):
         '''
         return len(self._origin_nodes)
 
-    _n_inner_nodes = Property(depends_on='_n_inner_nodes_pattern, _origin_facets')
+    _n_inner_nodes = Property(
+        depends_on='_n_inner_nodes_pattern, _origin_facets')
+
     @cached_property
     def _get__n_inner_nodes(self):
         '''
-        Number of all the nodes laying in an origin facet, after mesh refinement.
+        Number of all nodes laying in an origin facet, after mesh refinement.
         '''
         nodes = self._n_inner_nodes_pattern * len(self._origin_facets)
         return nodes
 
     _n_inner_nodes_pattern = Property(depends_on='n_split')
+
     @cached_property
     def _get__n_inner_nodes_pattern(self):
         '''
@@ -145,6 +147,7 @@ class AbaqusLink(HasTraits):
         return n_inner_nodes
 
     _n_cl_nodes = Property(depends_on='n_split')
+
     @cached_property
     def _get__n_cl_nodes(self):
         '''
@@ -152,27 +155,27 @@ class AbaqusLink(HasTraits):
         '''
         return self.n_split - 1
 
-
-
     _L_pattern = Property(depends_on='n_split')
+
     @cached_property
     def _get__L_pattern(self):
         '''
-        Pattern of the triangular coordinates of every node in one origin facet.
+        Pattern of the triangular coordinates of every node in origin facet.
         '''
         L = 1 / float(self.n_split)
         L2 = copy(L)
         L3 = copy(L)
         L_pattern = []
         for i in range(1, self.n_split - 1):
-                for j in range(1, self.n_split - i):
-                    L1 = 1 - (L2 * j + L3 * i)
-                    L_pattern.append([[L1 ],
-                                      [ L2 * j],
-                                      [ L3 * i]])
+            for j in range(1, self.n_split - i):
+                L1 = 1 - (L2 * j + L3 * i)
+                L_pattern.append([[L1],
+                                  [L2 * j],
+                                  [L3 * i]])
         return L_pattern
 
     _inner_f_pattern = Property(depends_on='_L_pattern')
+
     @cached_property
     def _get__inner_f_pattern(self):
         '''
@@ -193,13 +196,15 @@ class AbaqusLink(HasTraits):
                 temp_facet = [index, index + 1, index + l_line + 1]
                 inner_facets_pattern.append(temp_facet)
                 if(index + 1 < line_end):
-                    temp_facet = [index + 1, index + l_line + 2, index + l_line + 1]
+                    temp_facet = [
+                        index + 1, index + l_line + 2, index + l_line + 1]
                     inner_facets_pattern.append(temp_facet)
             index += 1
         inner_facets_pattern = np.array(inner_facets_pattern).reshape((-1, 3))
         return inner_facets_pattern
 
     _geometry = Property(depends_on='+geometry')
+
     @cached_property
     def _get__geometry(self):
         '''
@@ -242,61 +247,87 @@ class AbaqusLink(HasTraits):
                     cl_index[c] = self._origin_cl.tolist().index(cl[c])
                 except:
                     cl_dir[c] = False
-                    cl_index[c] = self._origin_cl.tolist().index([cl[c][1], cl[c][0]])
+                    cl_index[c] = self._origin_cl.tolist().index(
+                        [cl[c][1], cl[c][0]])
 
             step = range(self.n_split - 2)
 
-            if(cl_dir[0] == False):
+            if cl_dir[0] is False:
                 step = range(self.n_split - 2, 0, -1)
 
             counter_f = 0
             for counter in step:
-                node_index_cl = cl_index[0] * self._n_cl_nodes + counter + self._n_origin_nodes + self._n_inner_nodes
-                node_index_f = outer_counter * self._n_inner_nodes_pattern + counter_f + self._n_origin_nodes
+                node_index_cl = (cl_index[0] * self._n_cl_nodes + counter +
+                                 self._n_origin_nodes + self._n_inner_nodes)
+                node_index_f = outer_counter * self._n_inner_nodes_pattern + \
+                    counter_f + self._n_origin_nodes
                 dir_count = -1
                 if(cl_dir[0]):
                     dir_count = +1
-                temp_facet = [node_index_cl, node_index_cl + dir_count, node_index_f]
+                temp_facet_idx = (node_index_cl,
+                                  node_index_cl + dir_count, node_index_f)
+                temp_facet = [temp_facet_idx]
+
                 facets = np.vstack((facets, temp_facet))
                 if(counter != step[-1]):
-                    temp_facet = [node_index_cl + dir_count, node_index_f + 1, node_index_f]
+                    temp_facet_idx = (node_index_cl + dir_count,
+                                      node_index_f + 1, node_index_f)
+                    temp_facet = [temp_facet_idx]
                     facets = np.vstack((facets, temp_facet))
                 if(counter_f == 0):
-                    node_index_cl = cl_index[0] * self._n_cl_nodes + step[0] + self._n_origin_nodes + self._n_inner_nodes
+                    node_index_cl = (cl_index[0] * self._n_cl_nodes +
+                                     step[0] + self._n_origin_nodes +
+                                     self._n_inner_nodes)
                     pos2 = 0
                     if(cl_dir[2]):
                         pos2 = self.n_split - 2
-                    node_index_cl2 = cl_index[2] * self._n_cl_nodes + pos2 + self._n_origin_nodes + self._n_inner_nodes
-                    facets = np.vstack((facets, [f[0], node_index_cl, node_index_cl2]))
-                    facets = np.vstack((facets, [node_index_f, node_index_cl2, node_index_cl]))
+                    node_index_cl2 = cl_index[
+                        2] * (self._n_cl_nodes + pos2 + self._n_origin_nodes +
+                              self._n_inner_nodes)
+                    facets = np.vstack((facets,
+                                        [f[0], node_index_cl, node_index_cl2]))
+                    facets = np.vstack((facets,
+                                        [node_index_f, node_index_cl2,
+                                         node_index_cl]))
                 counter_f += 1
 
             step = range(self.n_split - 2)
-            if(cl_dir[1] == False):
+            if(cl_dir[1] is False):
                 step = range(self.n_split - 2, 0, -1)
             counter_f = 0
             f_pos = self.n_split - 3
             for counter in step:
-                node_index_cl = cl_index[1] * self._n_cl_nodes + counter + self._n_origin_nodes + self._n_inner_nodes
+                node_index_cl = (cl_index[1] * self._n_cl_nodes + counter +
+                                 self._n_origin_nodes + self._n_inner_nodes)
                 if(counter_f > 0):
                     f_pos += self.n_split - 2 - counter_f
-                node_index_f = outer_counter * self._n_inner_nodes_pattern + f_pos + self._n_origin_nodes
+                node_index_f = outer_counter * \
+                    self._n_inner_nodes_pattern + f_pos + self._n_origin_nodes
                 dir_count = -1
                 if(cl_dir[1]):
                     dir_count = +1
-                temp_facet = [node_index_cl, node_index_cl + dir_count, node_index_f]
+                temp_facet = [
+                    node_index_cl, node_index_cl + dir_count, node_index_f]
                 facets = np.vstack((facets, temp_facet))
                 if(counter != step[-1]):
-                    temp_facet = [node_index_cl + dir_count, node_index_f + self.n_split - 3 - counter_f, node_index_f]
+                    temp_facet = [node_index_cl + dir_count, node_index_f +
+                                  self.n_split - 3 - counter_f, node_index_f]
                     facets = np.vstack((facets, temp_facet))
                 if(counter_f == 0):
-                    node_index_cl = cl_index[1] * self._n_cl_nodes + step[0] + self._n_origin_nodes + self._n_inner_nodes
+                    node_index_cl = (cl_index[1] * self._n_cl_nodes + step[0] +
+                                     self._n_origin_nodes +
+                                     self._n_inner_nodes)
                     pos2 = 0
                     if(cl_dir[0]):
                         pos2 = self.n_split - 2
-                    node_index_cl2 = cl_index[0] * self._n_cl_nodes + pos2 + self._n_origin_nodes + self._n_inner_nodes
-                    facets = np.vstack((facets, [f[1], node_index_cl, node_index_cl2]))
-                    facets = np.vstack((facets, [node_index_f, node_index_cl2, node_index_cl]))
+                    node_index_cl2 = (cl_index[0] * self._n_cl_nodes + pos2 +
+                                      self._n_origin_nodes +
+                                      self._n_inner_nodes)
+                    facets = np.vstack(
+                        (facets, [f[1], node_index_cl, node_index_cl2]))
+                    facets = np.vstack((facets,
+                                        [node_index_f, node_index_cl2,
+                                         node_index_cl]))
                 counter_f += 1
 
             step = range(1, self.n_split - 1)
@@ -306,45 +337,52 @@ class AbaqusLink(HasTraits):
 
             counter_f = 0
             for counter in step:
-                node_index_cl = cl_index[2] * self._n_cl_nodes + counter + self._n_origin_nodes + self._n_inner_nodes
+                node_index_cl = cl_index[
+                    2] * self._n_cl_nodes + counter + self._n_origin_nodes + self._n_inner_nodes
                 f_pos = 0
                 for i in range(counter_f):
                     f_pos += (self.n_split - 2) - i
-                node_index_f = outer_counter * self._n_inner_nodes_pattern + f_pos + self._n_origin_nodes
+                node_index_f = outer_counter * \
+                    self._n_inner_nodes_pattern + f_pos + self._n_origin_nodes
                 dir_count = -1
                 if(cl_dir[2]):
                     dir_count = +1
-                temp_facet = [node_index_cl, node_index_cl + dir_count, node_index_f]
+                temp_facet = [
+                    node_index_cl, node_index_cl + dir_count, node_index_f]
                 facets = np.vstack((facets, temp_facet))
                 if(counter != step[-1]):
-                    temp_facet = [node_index_cl, node_index_f, node_index_f + self.n_split - 2 - counter_f]
+                    temp_facet = [
+                        node_index_cl, node_index_f, node_index_f + self.n_split - 2 - counter_f]
                     facets = np.vstack((facets, temp_facet))
                 if(counter == step[-1]):
-                    node_index_cl = cl_index[2] * self._n_cl_nodes + step[-1] + self._n_origin_nodes + self._n_inner_nodes
+                    node_index_cl = cl_index[
+                        2] * self._n_cl_nodes + step[-1] + self._n_origin_nodes + self._n_inner_nodes
                     pos2 = 0
                     if(cl_dir[1]):
                         pos2 = self.n_split - 2
-                    node_index_cl2 = cl_index[1] * self._n_cl_nodes + pos2 + self._n_origin_nodes + self._n_inner_nodes
-                    facets = np.vstack((facets, [f[2], node_index_cl, node_index_cl2]))
-                    facets = np.vstack((facets, [node_index_f, node_index_cl2, node_index_cl]))
+                    node_index_cl2 = cl_index[
+                        1] * self._n_cl_nodes + pos2 + self._n_origin_nodes + self._n_inner_nodes
+                    facets = np.vstack(
+                        (facets, [f[2], node_index_cl, node_index_cl2]))
+                    facets = np.vstack(
+                        (facets, [node_index_f, node_index_cl2, node_index_cl]))
                 counter_f += 1
             outer_counter += 1
         return [nodes, facets]
 
-
-    #------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     # Data for model building
-    #------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     element_type = Str('S3R')
     model_name = Str('Model-1')
     material_name = Str('concrete')
-    materials = Dict({"concrete":[3.0e10, 0.2, 2500],  # [Young's modulus in N/m3, poissions ratio, density in kg/m3]
-                      "steel":[21.0e10, 0.3, 7880]})
+    materials = Dict({"concrete": [3.0e10, 0.2, 2500],  # [Young's modulus in N/m3, poissions ratio, density in kg/m3]
+                      "steel": [21.0e10, 0.3, 7880]})
     thickness = Float(0.06)  # Thickness in meter
     bounded_nodes = Array(np.int, value=[1, 2, 3, 13, 14, 15])
 
-
     _inp_head = Property(Str, depends_on='model_name')
+
     @cached_property
     def _get__inp_head(self):
         '''
@@ -361,6 +399,7 @@ class AbaqusLink(HasTraits):
         return head
 
     _inp_nodes = Property(Str, depends_on='nodes')
+
     @cached_property
     def _get__inp_nodes(self):
         '''
@@ -369,11 +408,13 @@ class AbaqusLink(HasTraits):
         n = self.nodes
         nodes = "*Node,\t nset=node-1\n"
         for i in range(len(n)):
-            temp_node = ' %i,\t %.4f,\t %.4f,\t %.4f\n' % (i + 1, n[i][0], n[i][1], n[i][2])
+            temp_node = ' %i,\t %.4f,\t %.4f,\t %.4f\n' % (
+                i + 1, n[i][0], n[i][1], n[i][2])
             nodes += temp_node
         return nodes
 
     _inp_elements = Property(Str, depends_on='facets, element_type')
+
     @cached_property
     def _get__inp_elements(self):
         '''
@@ -382,11 +423,13 @@ class AbaqusLink(HasTraits):
         f = self.facets
         facets = "*Element,\t elset=STRUC,\t type=" + self.element_type + "\n"
         for i in range(len(f)):
-            temp_facet = ' %i,\t %i,\t %i,\t %i\t \n' % (i + 1, f[i][0] + 1, f[i][1] + 1, f[i][2] + 1)
+            temp_facet = ' %i,\t %i,\t %i,\t %i\t \n' % (
+                i + 1, f[i][0] + 1, f[i][1] + 1, f[i][2] + 1)
             facets += temp_facet
         return facets
 
     _inp_sets = Property(Str, depends_on='nodes, facets, bounded_nodes')
+
     @cached_property
     def _get__inp_sets(self):
         '''
@@ -402,9 +445,8 @@ class AbaqusLink(HasTraits):
         set_str += '\n'
         return set_str
 
-
-
     _inp_section = Property(Str, depends_on='thickness, material_name')
+
     @cached_property
     def _get__inp_section(self):
         '''
@@ -416,8 +458,9 @@ class AbaqusLink(HasTraits):
         section += '%f \n' % (self.thickness)
         return section
 
+    _inp_part = Property(
+        Str, depends_on='_inp_nodes, _inp_elements, _inp_section')
 
-    _inp_part = Property(Str, depends_on='_inp_nodes, _inp_elements, _inp_section')
     @cached_property
     def _get__inp_part(self):
         '''
@@ -431,6 +474,7 @@ class AbaqusLink(HasTraits):
         return part
 
     _inp_instance = Property(Str)
+
     @cached_property
     def _get__inp_instance(self):
         '''
@@ -441,6 +485,7 @@ class AbaqusLink(HasTraits):
         return instance
 
     _inp_surface = Property(Str)
+
     @cached_property
     def _get__inp_surface(self):
         '''
@@ -451,6 +496,7 @@ _Surf-1_SNEG, SNEG\n'
         return surf
 
     _inp_material = Property(Str, depends_on='material_name')
+
     @cached_property
     def _get__inp_material(self):
         '''
@@ -469,6 +515,7 @@ _Surf-1_SNEG, SNEG\n'
         return material
 
     _inp_assembly = Property(Str, depends_on='nodes, facets')
+
     @cached_property
     def _get__inp_assembly(self):
         '''
@@ -482,6 +529,7 @@ _Surf-1_SNEG, SNEG\n'
         return assembly
 
     _inp_loadcases = Property(Str)
+
     @cached_property
     def _get__inp_loadcases(self):
         '''
@@ -509,6 +557,7 @@ Struc, GRAV, 9.81, 0.0, 0.0, -1.0\n'
         return load
 
     _inp_output = Property(Str)
+
     @cached_property
     def _get__inp_output(self):
         '''
@@ -576,7 +625,6 @@ S,\n\
 
     tail = '\n'
 
-
     def abaqus_solve(self):
         ''' Solve FE with Abaqus on RWTH Cluster.
 
@@ -601,7 +649,8 @@ S,\n\
         # Initialise connection
         p = asm.open_shell()
         # establish connection
-        asm.connect_cluster(p, self.login, self.tail, cluster=self.cluster, options=self.options)
+        asm.connect_cluster(
+            p, self.login, self.tail, cluster=self.cluster, options=self.options)
         print asm.recv_some(p)
         # delete old files with same name
         asm.delete_old(p, self.model_name, self.tail)
@@ -616,28 +665,26 @@ S,\n\
         asm.close_connection(p, self.tail)
         # open new connection for downloading results
         p = asm.open_shell()
-        asm.download_file(p, self.login, self.model_name + '.dat', self.tail, self.model_name + '.dat')
+        asm.download_file(
+            p, self.login, self.model_name + '.dat', self.tail, self.model_name + '.dat')
         print asm.recv_some(p)
         p.kill()
-
 
     def abaqus_cae(self):
         # Initialise connection
         p = asm.open_shell()
         # establish connection
-        asm.connect_cluster(p, self.login, self.tail, cluster=self.cluster, options=self.options)
+        asm.connect_cluster(
+            p, self.login, self.tail, cluster=self.cluster, options=self.options)
         print asm.recv_some(p)
         asm.open_abaqus(p, self.tail)
         print asm.recv_some(p)
         asm.close_connection(p, self.tail)
 
 
-
-
-
-#===============================================================================
+#=========================================================================
 # Installation guide for a publickey for autoconnection on Unix Systems
-#===============================================================================
+#=========================================================================
 '''
 This guide is copied from:
 http://wp.uberdose.com/2006/10/16/ssh-automatic-login/
@@ -676,10 +723,8 @@ That's all you need to do.
 '''
 
 
-
-
 if __name__ == '__main__':
-    from oricrete.FoldRigidly2.examples.yoshimuraCreasePattern import YoshimuraCreasePattern
+    from oricreate import YoshimuraCreasePattern
 #    from oricrete.FoldRigidly2.examples.YoshimuraCreasePattern.ex03_rhombus_ref_surface import create_cp_fc_03
 #    from oricrete.FoldRigidly2.FoldRigidlyphase import Lifting
     cp = YoshimuraCreasePattern(L_x=4, L_y=2, n_x=4, n_y=4)
@@ -688,5 +733,3 @@ if __name__ == '__main__':
     al.build_inp()
     al.abaqus_solve()
 #    al.abaqus_cae()
-
-

@@ -6,6 +6,7 @@ Created on Oct 6, 2014
 
 from traits.api import Interface
 
+
 class IEqCons(Interface):
     '''Interface of an equality constraint.
     '''

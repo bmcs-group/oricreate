@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 #
 # Copyright (c) 2009-2013, IMB, RWTH Aachen.
 # All rights reserved.
@@ -12,13 +12,15 @@
 #
 # Created on Jan 3, 2013 by: rch, schmerl
 
-from eq_cons import EqCons
 from traits.api import \
     DelegatesTo, cached_property, Property
+
+from eq_cons import EqCons
 import numpy as np
 
 
 class AngleEqCons(EqCons):
+
     '''Base class for angle equality constraints.
     '''
     L = DelegatesTo('FormingTask')
@@ -30,15 +32,16 @@ class AngleEqCons(EqCons):
     n_dofs = DelegatesTo('FormingTask')
 
     signs = Property
+
     @cached_property
     def _get_signs(self):
         signs = np.ones((20,), dtype='f')
         signs[::2] = -1
         return signs
 
-    #===========================================================================
+    # =========================================================================
     # Constraint methods
-    #===========================================================================
+    # =========================================================================
 
     def _get_G(self, u, t):
         theta_arr = self.cp.get_iN_theta(u)
@@ -49,14 +52,16 @@ class AngleEqCons(EqCons):
     def _get_G_du(self, u, t):
         theta_du_arr = self.cp.get_iN_theta_du(u)
         signs = self.signs
-        sum_theta_du = np.array([np.einsum('i...,i...->...', signs[:theta_du.shape[0]], theta_du)
+        sum_theta_du = np.array([np.einsum('i...,i...->...',
+                                           signs[:theta_du.shape[0]], theta_du)
                                  for theta_du in theta_du_arr])
         return sum_theta_du.reshape(-1, self.n_dofs)
 
-    #===========================================================================
+    # =========================================================================
     # Subsidiary operators and arrays - constants
-    #===========================================================================
+    # =========================================================================
     partial_ab = Property
+
     @cached_property
     def _get_partial_ab(self):
         ones_arr = np.ones((3,), dtype='f')
@@ -66,11 +71,13 @@ class AngleEqCons(EqCons):
         return (partial_a, partial_b)
 
     partial_a = Property
+
     @cached_property
     def _get_partial_a(self):
         return self.partial_ab[0]
 
     partial_b = Property
+
     @cached_property
     def _get_partial_b(self):
         return self.partial_ab[1]
@@ -80,13 +87,13 @@ class AngleEqCons(EqCons):
         '''
         nbr_arr = np.arange(1, n_nbr + 2)
         nbr_arr[-1] = 1
-        j_node_ix = np.vstack([ np.repeat(0, n_nbr), nbr_arr[:-1], nbr_arr[1:]]).T
+        j_node_ix = np.vstack(
+            [np.repeat(0, n_nbr), nbr_arr[:-1], nbr_arr[1:]]).T
         j_dof_ix = (j_node_ix[:, :, None] * self.n_D +
                     np.arange(self.n_D)[None, None, :]).reshape(n_nbr, -1)
         i_dof_ix = (np.arange(n_nbr)[:, None] + np.zeros((3 * self.n_D,),
                                                          dtype='i')[None, :])
         return i_dof_ix.flatten(), j_dof_ix.flatten()
-
 
     def x_get_G_du(self, U, t):
         '''Implements the derivatives of theta with respect
@@ -99,7 +106,8 @@ class AngleEqCons(EqCons):
         n_fc = len(self.cp.iN)
         G_du = np.zeros((n_fc, self.n_dofs), dtype='float_')
 
-        for idx, (i, neighbors) in enumerate(zip(self.cp.iN, self.cp.iN_neighbors)):
+        cp = self.cp
+        for idx, (i, neighbors) in enumerate(zip(cp.iN, cp.iN_neighbors)):
 
             n_nbr = len(neighbors) - 1
             nvects = x[neighbors] - x[i]
@@ -116,7 +124,8 @@ class AngleEqCons(EqCons):
                 ix = np.where(gamma == 1)[0]
                 print 'Warning', 'Penetration occurred along the lines (%d, %d) and (%d, %d)' % \
                     (i, neighbors[ix], i, neighbors[ix + 1])
-                # raise ValueError, 'Penetration occurred along the lines (%d, %d) and (%d, %d)' % \
+                # raise ValueError, 'Penetration occurred
+                # along the lines (%d, %d) and (%d, %d)' % \
                 #    (i, neighbors[ix], i, neighbors[ix + 1])
 
             d_atb = np.dot(self.partial_a, b.T) + np.dot(self.partial_b, a.T)
@@ -135,18 +144,22 @@ class AngleEqCons(EqCons):
             theta_i_du = np.sum(theta_ij_du, axis=0)
 
             # add the values to the global arrays
-            node_ix = np.hstack([ [i], neighbors[:-1]])
-            k_dof_ix = (node_ix[:, None] * self.n_D + np.arange(self.n_D)[None, :])
+            node_ix = np.hstack([[i], neighbors[:-1]])
+            k_dof_ix = (
+                node_ix[:, None] * self.n_D + np.arange(self.n_D)[None, :])
             G_du[idx, k_dof_ix.flatten()] += theta_i_du
 
         return G_du
 
+
 class EqConsDevelopability(AngleEqCons):
+
     '''For the specified node associations require
     the sum of the angles between adjacent crease lines be 2Pi
     '''
 
     signs = Property
+
     @cached_property
     def _get_signs(self):
         signs = np.ones((20,), dtype='f')
@@ -158,12 +171,15 @@ class EqConsDevelopability(AngleEqCons):
     def get_G_du(self, U, t):
         return self._get_G_du(U, t)
 
+
 class EqConsFlatFoldability(AngleEqCons):
+
     '''For the specified node associations require
     the sum of alternating crease angles be zero.
     '''
 
     signs = Property
+
     @cached_property
     def _get_signs(self):
         signs = np.ones((20,), dtype='f')
@@ -180,7 +196,7 @@ class EqConsFlatFoldability(AngleEqCons):
 
 
 if __name__ == '__main__':
-    from oricrete.FoldRigidly2 import FormingTask, CreasePattern
+    from oricreate import FormingTask, CreasePattern
 
     cp = CreasePattern(X=[[-4, -5, -3],
                           [0, 0.0, 0],

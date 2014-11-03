@@ -3,11 +3,11 @@ Created on Jun 20, 2013
 
 @author: rch
 '''
-from etsproxy.traits.api import HasStrictTraits, Range, Instance, on_trait_change, \
-    Event, Property, Constant, DelegatesTo, PrototypedFrom, cached_property, Str, Delegate, \
-    Button, Int, Float, Array, Bool, List, Dict, Interface, implements, WeakRef, cached_property
+from traits.api import \
+    Property, Array, cached_property
+
+from oricreate.simulation_tasks.simulation_task import FormingTask
 import numpy as np
-from oricreate.forming.forming_task import FormingTask
 
 
 class Masking(FormingTask):
@@ -29,7 +29,8 @@ class Masking(FormingTask):
         return F[select_arr]
 
 if __name__ == '__main__':
-    from yoshimura_crease_pattern import YoshimuraCreasePattern
+    from crease_pattern.yoshimura_crease_pattern import \
+        YoshimuraCreasePattern
     cp = YoshimuraCreasePattern(n_x=4, n_y=4)
     print cp.F
 

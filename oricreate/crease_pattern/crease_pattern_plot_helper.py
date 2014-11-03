@@ -13,9 +13,10 @@
 # Created on Sep 7, 2011 by: rch
 
 from traits.api import \
-    HasStrictTraits, Property, Float
+    HasStrictTraits, Float
 
 import numpy as np
+
 
 class CreasePatternPlotHelper(HasStrictTraits):
     '''
@@ -35,7 +36,8 @@ class CreasePatternPlotHelper(HasStrictTraits):
 
         shift = np.array([-0.5, 0.5], dtype='f')
         padding = np.array([-pad, pad], dtype='f')
-        x_deltas = x_delta[:, np.newaxis] * shift[np.newaxis, :] + padding[np.newaxis, :]
+        x_deltas = (x_delta[:, np.newaxis] * shift[np.newaxis, :] +
+                    padding[np.newaxis, :])
         x_range = x_mid[:, np.newaxis] + x_deltas
 
         # plot lines
@@ -82,9 +84,9 @@ class CreasePatternPlotHelper(HasStrictTraits):
     def _get_line_width(self):
         return self._get_max_length() * self.line_with_factor
 
-    #===========================================================================
+    #=========================================================================
     # Garbage
-    #===========================================================================
+    #=========================================================================
     def plot_mlab(self, mlab, nodes=True, lines=True):
         r'''Visualize the crease pattern in a supplied mlab instance.
         '''
@@ -95,7 +97,8 @@ class CreasePatternPlotHelper(HasStrictTraits):
                                            color=(0.6, 0.6, 0.6))
             cp_pipe.mlab_source.dataset.lines = self.L
             if lines == True:
-                tube = mlab.pipeline.tube(cp_pipe, tube_radius=self._get_line_width())
+                tube = mlab.pipeline.tube(cp_pipe,
+                                          tube_radius=self._get_line_width())
                 mlab.pipeline.surface(tube, color=(1.0, 1.0, 1.0))
 
         else:
@@ -177,14 +180,16 @@ class CreasePatternPlotHelper(HasStrictTraits):
         f.write(' \\begin{pspicture}(0,%.3f)\n' % (y_l))
         for i in range(len(n)):
             if(n[i][2] == 0):
-                f.write('  \\cnodeput(%.3f,%.3f){%s}{\\footnotesize%s}\n' % (n[i][0], n[i][1], i, i))
+                f.write('  \\cnodeput(%.3f,%.3f){%s}{\\footnotesize%s}\n' %
+                        (n[i][0], n[i][1], i, i))
         for i in range(len(c)):
             if(n[c[i][0]][2] == 0 and n[c[i][1]][2] == 0):
                 f.write('  \\ncline{%s}{%s}\n' % (c[i][0], c[i][1]))
         f.write(' \\end{pspicture}' + '\n')
         f.close()
 
-    def create_3D_tex(self, name='standart3Doutput.tex', x=5, y=5, alpha=140, beta=30):
+    def create_3D_tex(self, name='standart3Doutput.tex', x=5, y=5,
+                      alpha=140, beta=30):
         r'''
         This method returns a .tex file with a 3D view of the
         creasepattern and the nodeindex of every node, as a sketch. This file
@@ -196,23 +201,29 @@ class CreasePatternPlotHelper(HasStrictTraits):
         f = open(name, 'w')
         # f.write('\\configure[pdfgraphic][width=%.3f,height=%.3f]\n' %(x, y))
         # f.write('\\begin{pdfdisplay}\n')
-        f.write('\\psset{xunit=%.3fcm,yunit=%.3fcm,Alpha=%.3f,Beta=%.3f}\n' % (x, y, alpha, beta))
+        f.write('\\psset{xunit=%.3fcm,yunit=%.3fcm,Alpha=%.3f,Beta=%.3f}\n' %
+                (x, y, alpha, beta))
         f.write(' \\begin{pspicture}(0,0)\n')
         f.write(' \\pstThreeDCoor\n')
         for i in range(len(n)):
-            f.write('  \\pstThreeDNode(%.3f,%.3f,%.3f){%s}\n' % (n[i][0], n[i][1], n[i][2], i))
+            f.write('  \\pstThreeDNode(%.3f,%.3f,%.3f){%s}\n' %
+                    (n[i][0], n[i][1], n[i][2], i))
         for i in range(len(c)):
             if(n[c[i][0]][2] == 0 and n[c[i][1]][2] == 0):
                 f.write(' \\psset{dotstyle=*,linecolor=gray}\n')
             else:
                 f.write(' \\psset{linecolor=black}\n')
-            f.write('  \\pstThreeDLine(%.3f,%.3f,%.3f)(%.3f,%.3f,%.3f)\n' % (n[c[i][0]][0], n[c[i][0]][1], n[c[i][0]][2], n[c[i][1]][0], n[c[i][1]][1], n[c[i][1]][2]))
+            f.write('  \\pstThreeDLine(%.3f,%.3f,%.3f)(%.3f,%.3f,%.3f)\n' %
+                    (n[c[i][0]][0], n[c[i][0]][1], n[c[i][0]][2],
+                     n[c[i][1]][0], n[c[i][1]][1], n[c[i][1]][2]))
         f.write(' \\psset{dotstyle=*,linecolor=gray}\n')
         for i in range(len(n)):
-            f.write('  \\pstThreeDDot(%.3f,%.3f,%.3f)\n' % (n[i][0], n[i][1], n[i][2]))
+            f.write('  \\pstThreeDDot(%.3f,%.3f,%.3f)\n' %
+                    (n[i][0], n[i][1], n[i][2]))
         f.write(' \\psset{linecolor=black}\n')
         for i in range(len(n)):
-            f.write('  \\pstThreeDPut(%.3f,%.3f,%.3f){%s}\n' % (n[i][0], n[i][1], n[i][2], i))
+            f.write('  \\pstThreeDPut(%.3f,%.3f,%.3f){%s}\n' %
+                    (n[i][0], n[i][1], n[i][2], i))
         f.write(' \\end{pspicture}' + '\n')
 #        f.write(' \\end{pdfdisplay}' + '\n')
         f.close()

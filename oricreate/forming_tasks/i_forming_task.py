@@ -14,5 +14,6 @@
 
 from traits.api import Interface
 
-class IOriNode(Interface):
+
+class IFormingTask(Interface):
     pass

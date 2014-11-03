@@ -4,11 +4,18 @@ Created on Oct 6, 2014
 @author: rch
 '''
 
-from traits.api import Property, Array, Instance
-from oricreate import CreasePattern
-from i_ori_node import IOriNode
+from traits.api import \
+    Property, Array, Instance
 
-class IFormingTask(IOriNode):
+from crease_pattern import \
+    CreasePattern
+
+from forming_tasks import \
+    IFormingTask  # @UnresolvedImport
+
+
+class ISimulationTask(IFormingTask):
+
     '''Interface for FormingTask process
     simulation step within the origami design process.
     '''

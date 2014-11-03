@@ -7,9 +7,11 @@ import math
 
 from traits.api import Property, Str, Int, Float, Array, cached_property
 import numpy as np
-from forming_task import FormingTask
+from oricreate.simulation_tasks.simulation_task import FormingTask
+
 
 class RostateCopy(FormingTask):
+
     ''' Replicate the source to form a structure.
 
     Given a number of segments and center of rotation,
@@ -23,15 +25,22 @@ class RostateCopy(FormingTask):
     center = Array(float, value=[0, 0, 0])
 
     x_0_segments = Property
+
     @cached_property
     def _get_x_0_segments(self):
         x_single = self.source.x_t[-1] - self.center[np.newaxis, :]
-        phi_arr = np.linspace(0, 2. * math.pi * (self.n_segments - 1) / self.n_segments, self.n_segments)
-        T_mtx = np.array([[np.cos(phi_arr), np.sin(phi_arr), np.zeros_like(phi_arr)],
-                          [-np.sin(phi_arr), np.cos(phi_arr), np.zeros_like(phi_arr)],
-                          [np.zeros_like(phi_arr), np.zeros_like(phi_arr), np.ones_like(phi_arr)],
+        phi_arr = np.linspace(
+            0, 2. * math.pi * (self.n_segments - 1) / self.n_segments,
+            self.n_segments)
+        T_mtx = np.array([[np.cos(phi_arr), np.sin(phi_arr),
+                           np.zeros_like(phi_arr)],
+                          [-np.sin(phi_arr), np.cos(phi_arr),
+                           np.zeros_like(phi_arr)],
+                          [np.zeros_like(phi_arr), np.zeros_like(
+                              phi_arr), np.ones_like(phi_arr)],
                           ], dtype='float_')
-        x_all = x_single[np.newaxis, :, :] + 0.0 * phi_arr[:, np.newaxis, np.newaxis]
+        x_all = x_single[np.newaxis, :, :] + 0.0 * \
+            phi_arr[:, np.newaxis, np.newaxis]
         return np.einsum('ijk,lki->ijl', x_all, T_mtx)
 
     node_match_threshold = Float(1e-5, auto_set=False, enter_set=True)
@@ -60,8 +69,10 @@ class RostateCopy(FormingTask):
         # take only the upper triangle indices
         upper_triangle = i_idx < j_idx
         # the lower indices will be replaced by the higher indices
-        i_idx_delete, j_idx_insert = i_idx[upper_triangle], j_idx[upper_triangle]
-        # construct a boolean array with True at valid and Falce at deleted indices
+        i_idx_delete, j_idx_insert = i_idx[
+            upper_triangle], j_idx[upper_triangle]
+        # construct a boolean array with True at valid and Falce at deleted
+        # indices
         idx_unique = np.ones((len(x_0),), dtype='bool')
         idx_unique[i_idx_delete] = False
         # enumerate the new compressed index range
@@ -70,7 +81,8 @@ class RostateCopy(FormingTask):
         idx_remap = np.zeros((len(x_0),), dtype='int')
         # put the compressed indexes at the valid index positions
         idx_remap[idx_unique] = remaped_range
-        # copy the identified higher indices at the position of the deleted ones.
+        # copy the identified higher indices at the position of the deleted
+        # ones.
         idx_remap[i_idx_delete] = idx_remap[j_idx_insert]
 
         return idx_unique, idx_remap
@@ -87,12 +99,13 @@ class RostateCopy(FormingTask):
     U_t = Property()
     '''Array of crease_lines defined by pairs of node numbers.
     '''
+
     def _get_U_t(self):
         return np.array([np.zeros_like(self.X_0)])
 
-    #===========================================================================
+    # =========================================================================
     # Geometric data
-    #===========================================================================
+    # =========================================================================
 
     L = Property()
     '''Array of crease_lines defined by pairs of node numbers.
@@ -102,7 +115,8 @@ class RostateCopy(FormingTask):
         L = self.source.L
         n_N = self.source.n_N
         n_L = self.source.n_L
-        L_arr = L[np.newaxis, :] + n_N * np.arange(0, self.n_segments)[:, np.newaxis, np.newaxis]
+        L_arr = L[np.newaxis, :] + n_N * \
+            np.arange(0, self.n_segments)[:, np.newaxis, np.newaxis]
         L_arr = L_arr.reshape(self.n_segments * n_L, -1)
         # return L_arr[:self.n_visible * n_L]
         node_idx_remap = self.unique_node_map[1]
@@ -111,26 +125,31 @@ class RostateCopy(FormingTask):
     F = Property()
     '''Array of crease facets defined by list of node numbers.
     '''
+
     def _get_F(self):
         F = self.source.F
         n_N = self.source.n_N
         n_F = len(F)
-        F_arr = F[np.newaxis, :] + n_N * np.arange(0, self.n_segments)[:, np.newaxis, np.newaxis]
+        F_arr = F[np.newaxis, :] + n_N * \
+            np.arange(0, self.n_segments)[:, np.newaxis, np.newaxis]
         F_arr = F_arr.reshape(self.n_segments * n_F, -1)
         F = np.vstack([F, F + self.source.n_N])
         # return F_arr[:self.n_visible * n_F]
         node_idx_remap = self.unique_node_map[1]
         return node_idx_remap[F_arr[:self.n_visible * n_F]]
 
+
 def q_normalize(q, axis=1):
     sq = np.sqrt(np.sum(q * q, axis=axis))
-    sq[ np.where(sq == 0) ] = 1.e-19
+    sq[np.where(sq == 0)] = 1.e-19
     return q / sq[:, np.newaxis]
+
 
 def v_normalize(q, axis=1):
     sq = np.sqrt(np.sum(q * q, axis=axis))
-    sq[ np.where(sq == 0) ] = 1.e-19
+    sq[np.where(sq == 0)] = 1.e-19
     return q / sq[:, np.newaxis]
+
 
 def q_mult(q1, q2):
     w1, x1, y1, z1 = q1
@@ -141,10 +160,12 @@ def q_mult(q1, q2):
     z = w1 * z2 + z1 * w2 + x1 * y2 - y1 * x2
     return np.array([w, x, y, z], dtype='f')
 
+
 def q_conjugate(q):
     qn = q_normalize(q.T).T
     w, x, y, z = qn
     return np.array([w, -x, -y, -z], dtype='f')
+
 
 def qv_mult(q1, u):
     print 'shapes'
@@ -165,6 +186,7 @@ def qv_mult(q1, u):
     print 'q', q.shape
     return q[:, :, 1:]
 
+
 def axis_angle_to_q(v, theta):
     v_ = v_normalize(v, axis=1)
     x, y, z = v_.T
@@ -175,12 +197,15 @@ def axis_angle_to_q(v, theta):
     z = z * np.sin(theta)
     return np.array([w, x, y, z], dtype='f')
 
+
 def q_to_axis_angle(q):
     w, v = q[0, :], q[1:, :]
     theta = np.arccos(w) * 2.0
     return theta, v_normalize(v)
 
+
 class MonoShapeAssembly(FormingTask):
+
     '''Use the source element to assemble a structure
     consisting of a singly prefabricated element.
 
@@ -198,6 +223,7 @@ class MonoShapeAssembly(FormingTask):
     rotation_angles = Array(dtype=float, value=[])
 
     n_segments = Property()
+
     def _get_n_segments(self):
         return len(self.rotation_axes)
 
@@ -217,32 +243,37 @@ class MonoShapeAssembly(FormingTask):
     U_t = Property()
     '''Array of crease_lines defined by pairs of node numbers.
     '''
+
     def _get_U_t(self):
         return np.array([np.zeros_like(self.X_0)])
 
-    #===========================================================================
+    # =========================================================================
     # Geometric data
-    #===========================================================================
+    # =========================================================================
 
     L = Property()
     '''Array of crease_lines defined by pairs of node numbers.
     '''
+
     def _get_L(self):
         L = self.source.L
         n_N = self.source.n_N
         n_L = self.source.n_L
-        L_arr = L[np.newaxis, :] + n_N * np.arange(0, self.n_segments)[:, np.newaxis, np.newaxis]
+        L_arr = L[np.newaxis, :] + n_N * \
+            np.arange(0, self.n_segments)[:, np.newaxis, np.newaxis]
         L_arr = L_arr.reshape(self.n_segments * n_L, -1)
         return L_arr
 
     F = Property()
     '''Array of crease facets defined by list of node numbers.
     '''
+
     def _get_F(self):
         F = self.source.F
         n_N = self.source.n_N
         n_F = len(F)
-        F_arr = F[np.newaxis, :] + n_N * np.arange(0, self.n_segments)[:, np.newaxis, np.newaxis]
+        F_arr = F[np.newaxis, :] + n_N * \
+            np.arange(0, self.n_segments)[:, np.newaxis, np.newaxis]
         F_arr = F_arr.reshape(self.n_segments * n_F, -1)
         F = np.vstack([F, F + self.source.n_N])
         return F_arr

@@ -17,9 +17,9 @@ from traits.api import \
 
 from crease_pattern import \
     CreasePattern
-
 import numpy as np
 import sympy as sp
+
 
 x_, y_ = sp.symbols('x, y')
 

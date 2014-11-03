@@ -12,13 +12,14 @@
 #
 # Created on Jan 3, 2013 by: rch, schmerl
 
-from i_eq_cons import IEqCons
-
 from traits.api import \
     HasStrictTraits, implements, WeakRef, \
     Array, DelegatesTo, cached_property, Property, \
     Bool
+
+from i_eq_cons import IEqCons
 import numpy as np
+
 
 class EqCons(HasStrictTraits):
 

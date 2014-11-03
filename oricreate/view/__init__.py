@@ -1,2 +1,3 @@
 
-from oricreate.view.forming_view import FormingView
+from oricreate.view.forming_view import \
+    FormingView

@@ -20,6 +20,7 @@ class FaceView(HasTraits):
     data = WeakRef
 
     name = Property
+
     @cached_property
     def _get_name(self):
         return self.ff.name
@@ -51,26 +52,33 @@ class FaceView(HasTraits):
         self.time_step = time_step
 
     ff_pipe = Property(Instance(PipelineBase))
+
     @cached_property
     def _get_ff_pipe(self):
         x, y, z = self.xyz_grid
-        ff_pipe = self.scene.mlab.contour3d(x, y, z, lambda x, y, z: self.ff.Rf(x, y, z, 0.0),
-                                                  contours=[0.0])
+        ff_pipe = self.scene.mlab.contour3d(x, y, z,
+                                            lambda x, y, z: self.ff.Rf(x, y, z,
+                                                                       0.0),
+                                            contours=[0.0])
         ff_pipe.visible = self.show_ff_pipe
         ff_pipe.module_manager.scalar_lut_manager.lut.table = self.lut
 
         return ff_pipe
 
     ff_nodes = Property(Instance(PipelineBase))
+
     @cached_property
     def _get_ff_nodes(self):
         x, y, z = self.x_t[0][self.nodes_id].T
-        ff_nodes = self.scene.mlab.points3d(x, y, z, scale_factor=self.scale_factor * 0.5, color=(0.5, 0., 0.))
+        ff_nodes = self.scene.mlab.points3d(x, y, z,
+                                            scale_factor=self.scale_factor * 0.5,
+                                            color=(0.5, 0., 0.))
         ff_nodes.visible = self.show_ff_nodes
         return ff_nodes
 
     # constrain colormap
     lut = Property(depends_on='opacity')
+
     @cached_property
     def _get_lut(self):
         lut = np.zeros((256, 4), dtype=Int)
@@ -105,10 +113,10 @@ class FaceView(HasTraits):
                 Item('show_ff_pipe'),
                 Item('show_ff_nodes'),
                 Item('opacity', editor=RangeEditor(low_name='opacity_min',
-                                                        high_name='opacity_max',
-                                                        format='(%s)',
-                                                        auto_set=False,
-                                                        enter_set=False,
-                                                        )),
-
-                   dock='vertical')
+                                                   high_name='opacity_max',
+                                                   format='(%s)',
+                                                   auto_set=False,
+                                                   enter_set=False,
+                                                   )
+                     ),
+                dock='vertical')

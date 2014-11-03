@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 #
 # Copyright (c) 2009, IMB, RWTH Aachen.
 # All rights reserved.
@@ -14,9 +14,15 @@
 
 from traits.api import \
     Property, cached_property, \
-    Array, Constant
+    Array, Constant, implements
+
+from traitsui.api import \
+    View, Item, TabularEditor
 
 import numpy as np
+
+from forming_tasks.i_formed_object import \
+    IFormedObject  # @UnresolvedImport
 
 from crease_pattern_export import \
     CreasePatternExport
@@ -28,12 +34,55 @@ from crease_pattern_operators import \
 
 INPUT = '+cp_input'
 
+from traitsui.tabular_adapter import TabularAdapter
+
+
+class XArrayAdapter(TabularAdapter):
+
+    columns = [('i', 'index'), ('x', 0), ('y', 1),  ('z', 2), ]
+
+    alignment = 'right'
+    format = '%.4f'
+
+    index_text = Property
+
+    def _get_index_text(self):
+        return str(self.row)
+
+
+class LArrayAdapter(TabularAdapter):
+
+    columns = [('i', 'index'), ('node 1', 0), ('node 2', 1), ]
+
+    alignment = 'right'
+    format = '%g'
+
+    index_text = Property
+
+    def _get_index_text(self):
+        return str(self.row)
+
+
+class FArrayAdapter(TabularAdapter):
+
+    columns = [('i', 'index'), ('node 1', 0), ('node 2', 1),  ('node 3', 2), ]
+
+    alignment = 'right'
+    format = '%g'
+
+    index_text = Property
+
+    def _get_index_text(self):
+        return str(self.row)
+
+
 class CreasePattern(CreaseNodeOperators,
                     CreaseLineOperators,
                     CreaseFacetOperators,
                     CreaseCummulativeOperators,
                     CreasePatternPlotHelper,
                     CreasePatternExport):
+
     '''
     Representation of a crease pattern.
     The input attributes of a crease pattern are
@@ -60,26 +109,32 @@ class CreasePattern(CreaseNodeOperators,
     of the crease pattern.
     '''
 
-    #===============================================================================
+    implements(IFormedObject)
+
+    # ==========================================================================
     # Node coordinates
-    #===============================================================================
+    # ==========================================================================
 
     X = Array(value=[], dtype='float_', cp_input=True)
-    '''Input array of node coordinates with rows specifying ``(n_N,n_D)`` values.
+    '''Input array of node coordinates with rows specifying
+    ``(n_N,n_D)`` values.
     '''
 
     x_0 = Property(depends_on=INPUT)
     '''Array of initial coordinates ``(n_N,n_D)`` as ``[x1,x2,x3]``.
     Serves as FormingTask classes.
     '''
+
     def _get_x_0(self):
         return self.X
+
     def _set_x_0(self, x_0):
         self.X = x_0
 
     x = Property
     '''Array of current coordinates :math:`(n_N, n_D)`.
     '''
+
     def _get_x(self):
         return self.x_0
 
@@ -87,9 +142,9 @@ class CreasePattern(CreaseNodeOperators,
     '''Dinensionality of the Euklidian space (constant = 3).
     '''
 
-    #===========================================================================
+    # ==========================================================================
     # Node mappings
-    #===========================================================================
+    # ==========================================================================
 
     N = Property(depends_on=INPUT)
     '''Array of all node numbers.
@@ -101,6 +156,7 @@ class CreasePattern(CreaseNodeOperators,
     n_N = Property
     '''Number of crease nodes.
     '''
+
     def _get_n_N(self):
         return self.X.shape[0]
 
@@ -111,8 +167,8 @@ class CreasePattern(CreaseNodeOperators,
     @cached_property
     def _get_NN_L(self):
         NN = np.zeros((self.n_N, self.n_N), dtype='int') - 1
-        NN[ self.L[:, 0], self.L[:, 1]] = np.arange(self.n_L)
-        NN[ self.L[:, 1], self.L[:, 0]] = np.arange(self.n_L)
+        NN[self.L[:, 0], self.L[:, 1]] = np.arange(self.n_L)
+        NN[self.L[:, 1], self.L[:, 0]] = np.arange(self.n_L)
         return NN
 
     N_nbr = Property(depends_on=INPUT)
@@ -171,19 +227,21 @@ class CreasePattern(CreaseNodeOperators,
         eN_bool[self.iN] = False
         return np.where(eN_bool)[0]
 
-    #===========================================================================
+    # ==========================================================================
     # Line mappings
-    #===========================================================================
+    # ==========================================================================
 
     L = Array(value=[], dtype='int_', cp_input=True)
     '''Array of crease line nodes ``(n_L,2)`` as index-table ``[n1, n2]``.
     '''
+
     def _L_default(self):
         return np.zeros((0, 2), dtype='int_')
 
     n_L = Property
     '''Number of crease lines.
     '''
+
     def _get_n_L(self):
         return self.L.shape[0]
 
@@ -195,12 +253,12 @@ class CreasePattern(CreaseNodeOperators,
     @cached_property
     def _get_LLL_F(self):
         LLL = np.zeros((self.n_L, self.n_L, self.n_L), dtype='int') - 1
-        LLL[ self.F[:, 0], self.F[:, 1], self.F[:, 2]] = np.arange(self.n_F)
-        LLL[ self.F[:, 1], self.F[:, 2], self.F[:, 0]] = np.arange(self.n_F)
-        LLL[ self.F[:, 2], self.F[:, 0], self.F[:, 1]] = np.arange(self.n_F)
-        LLL[ self.F[:, 2], self.F[:, 1], self.F[:, 0]] = np.arange(self.n_F)
-        LLL[ self.F[:, 0], self.F[:, 2], self.F[:, 1]] = np.arange(self.n_F)
-        LLL[ self.F[:, 1], self.F[:, 0], self.F[:, 2]] = np.arange(self.n_F)
+        LLL[self.F[:, 0], self.F[:, 1], self.F[:, 2]] = np.arange(self.n_F)
+        LLL[self.F[:, 1], self.F[:, 2], self.F[:, 0]] = np.arange(self.n_F)
+        LLL[self.F[:, 2], self.F[:, 0], self.F[:, 1]] = np.arange(self.n_F)
+        LLL[self.F[:, 2], self.F[:, 1], self.F[:, 0]] = np.arange(self.n_F)
+        LLL[self.F[:, 0], self.F[:, 2], self.F[:, 1]] = np.arange(self.n_F)
+        LLL[self.F[:, 1], self.F[:, 0], self.F[:, 2]] = np.arange(self.n_F)
         return LLL
 
     L_F_map = Property(depends_on=INPUT)
@@ -262,7 +320,7 @@ class CreasePattern(CreaseNodeOperators,
         el_ix = np.digitize(eL_vals, l) - 1
         # construct the mask hiding the edge lines in the original array
         l_map = np.zeros_like(l, dtype=bool)
-        l_map[ el_ix ] = True
+        l_map[el_ix] = True
         # use the masked array to filter out the edge nodes and lose
         # bars from the mapping.
         fm = np.ma.masked_array(f, mask=l_map)
@@ -270,25 +328,28 @@ class CreasePattern(CreaseNodeOperators,
         fm_compressed = np.ma.compressed(fm)
         return fm_compressed.reshape(-1, 2)
 
-    #===========================================================================
+    # ==========================================================================
     # Facet mappings
-    #===========================================================================
+    # ==========================================================================
 
     F = Array(value=[], dtype='int_', cp_input=True)
     '''Array of facet nodes ``(n_F,3)`` as an index-table ``[n1, n2, n3]``.
     '''
+
     def _F_default(self):
         return np.zeros((0, 3), dtype='int_')
 
     n_F = Property
     '''Number of facets.
     '''
+
     def _get_n_F(self):
         return self.F.shape[0]
 
     F_L = Property(depends_on=INPUT)
     '''Lines associated with facets.
-    Array with the shape ``(n_F, 3)`` associating each facet with three ``[l1,l2,l3]``.
+    Array with the shape ``(n_F, 3)`` associating each facet with three
+    ``[l1,l2,l3]``.
     '''
     @cached_property
     def _get_F_L(self):
@@ -303,7 +364,7 @@ class CreasePattern(CreaseNodeOperators,
         '''Auxiliary private methods identifying cycles around a node.
         '''
         n_neighbors = len(neighbors)
-        neighbor_mtx = self.NN_L[ np.ix_(neighbors, neighbors) ]
+        neighbor_mtx = self.NN_L[np.ix_(neighbors, neighbors)]
 
         neighbor_map = np.where(neighbor_mtx > -1)[1]
 
@@ -313,17 +374,17 @@ class CreasePattern(CreaseNodeOperators,
         cycle_map = neighbor_map.reshape(n_neighbors, 2)
 
         prev_idx = 0
-        next_idx1, next_idx = cycle_map[prev_idx]
+        next_idx1, next_idx = cycle_map[prev_idx]  # @UnusedVariable
 
         cycle = [0]
-        for neigh in range(n_neighbors):
+        for neigh in range(n_neighbors):  # @UnusedVariable
             next_row = cycle_map[next_idx]
             cycle.append(next_idx)
             prev_2idx = next_idx
-            next_idx = next_row[ np.where(next_row != prev_idx)[0][0] ]
+            next_idx = next_row[np.where(next_row != prev_idx)[0][0]]
             prev_idx = prev_2idx
 
-        return neighbors[ np.array(cycle) ]
+        return neighbors[np.array(cycle)]
 
     def _get_nbr_cycles(self):
         connectivity = []
@@ -337,7 +398,8 @@ class CreasePattern(CreaseNodeOperators,
 
     def _get_ordered_nbr_cycles(self):
         '''List of nodes having cycle of neighbors the format of the list is
-        ``[ (node, np.array([neighbor_node1, neighbor_node2, ... neighbor_node1)), ... ]``
+        ``[ (node, np.array([neighbor_node1, neighbor_node2, ...
+            neighbor_node1)), ... ]``
         '''
         oc = []
         iN, iN_nbr = self._get_nbr_cycles()
@@ -351,20 +413,34 @@ class CreasePattern(CreaseNodeOperators,
             oc.append(neighbors)
         return oc
 
+    view_traits = View(Item('X', show_label=False,
+                            style='readonly',
+                            editor=TabularEditor(adapter=XArrayAdapter())),
+                       Item('L', show_label=False,
+                            style='readonly',
+                            editor=TabularEditor(adapter=LArrayAdapter())),
+                       Item('F', show_label=False,
+                            style='readonly',
+                            editor=TabularEditor(adapter=FArrayAdapter())),
+                       buttons=['OK', 'Cancel'],
+                       resizable=True)
+
 if __name__ == '__main__':
 
     # trivial example with a single triangle positioned
 
-    cp = CreasePattern(X=[[ 0, 0, 0 ],
-                          [ 1, 0, 0 ],
-                          [ 1, 1, 0],
+    cp = CreasePattern(X=[[0, 0, 0],
+                          [1, 0, 0],
+                          [1, 1, 0],
                           [0.667, 0.333, 0],
                           [0.1, 0.05, 0]],
-                       L=[[ 0, 1 ],
-                          [ 1, 2 ],
-                          [ 2, 0 ]],
-                       F=[[0, 1, 2 ]]
+                       L=[[0, 1],
+                          [1, 2],
+                          [2, 0]],
+                       F=[[0, 1, 2]]
                        )
 
     print 'vectors\n', cp.L_vectors
     print 'lengths\n', cp.L_lengths
+
+    cp.configure_traits()

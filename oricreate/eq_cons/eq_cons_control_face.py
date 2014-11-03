@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 #
 # Copyright (c) 2009, IMB, RWTH Aachen.
 # All rights reserved.
@@ -12,15 +12,17 @@
 #
 # Created on Nov 18, 2011 by: matthias
 
-from eq_cons import EqCons
 from traits.api import HasTraits, Property, DelegatesTo, Str
+
+from eq_cons import EqCons
 import numpy as np
 import sympy as sp
 
-
 x_, y_, z_, r_, s_, t_ = sp.symbols('x,y,z,r,s,t')
 
+
 class ControlFace(HasTraits):
+
     '''
      FoldRigidly level set function
     '''
@@ -29,6 +31,7 @@ class ControlFace(HasTraits):
     _Rf_expr = None
 
     Rf = Property
+
     def _set_Rf(self, ls_expr):
         self._Rf_expr = ls_expr
 
@@ -36,12 +39,14 @@ class ControlFace(HasTraits):
         return sp.lambdify([x_, y_, z_, t_], self._Rf_expr)
 
     dRf = Property
+
     def _get_dRf(self):
         R = self._Rf_expr
         dRf = [sp.diff(R, x_), sp.diff(R, y_), sp.diff(R, z_)]
         return sp.lambdify([x_, y_, z_, t_], dRf)
 
 CF = ControlFace
+
 
 class EqConsPointsOnSurface(EqCons):
 
@@ -78,7 +83,7 @@ class EqConsPointsOnSurface(EqCons):
             for n in nodes:
                 x, y, z = x_t[n]
                 dof = 3 * n
-                G_du[i, (dof, dof + 1, dof + 2) ] = ff.dRf(x, y, z, t)
+                G_du[i, (dof, dof + 1, dof + 2)] = ff.dRf(x, y, z, t)
                 i += 1
 
         return G_du
@@ -97,8 +102,7 @@ if __name__ == '__main__':
     print control_face.dRf(xx, yy, xx, 0)
     print control_face.dRf(xx, yy, xx, 1)
 
-    from FormingTask import FormingTask
-    from crease_pattern import CreasePattern
+    from oricreate import FormingTask, CreasePattern
 
     cp = CreasePattern(X=[[-4, -5, -3],
                           [0, 0.0, 0],

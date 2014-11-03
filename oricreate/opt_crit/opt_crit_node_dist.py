@@ -13,8 +13,10 @@
 # Created on Nov 18, 2011 by: matthias
 
 from traits.api import Array
-import numpy as np
+
 from opt_crit import OptCrit
+import numpy as np
+
 
 class OptCritNodeDist(OptCrit):
     '''Optimization criteria based on the distance between specified nodes.

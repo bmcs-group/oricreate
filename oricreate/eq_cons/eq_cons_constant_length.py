@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 #
 # Copyright (c) 2009, IMB, RWTH Aachen.
 # All rights reserved.
@@ -14,11 +14,12 @@
 
 from traits.api import DelegatesTo, PrototypedFrom
 
+from eq_cons import EqCons
 import numpy as np
 
-from eq_cons import EqCons
 
 class EqConsConstantLength(EqCons):
+
     '''Constant length constraint.
     '''
 
@@ -70,8 +71,8 @@ class EqConsConstantLength(EqCons):
             i, j = self.L.T
             u_i, u_j = u[self.L.T]
             l = np.arange(self.n_L)
-            G_du[ l, i, : ] += -2 * v_0 + 2 * u_i - 2 * u_j
-            G_du[ l, j, : ] += 2 * v_0 - 2 * u_i + 2 * u_j
+            G_du[l, i, :] += -2 * v_0 + 2 * u_i - 2 * u_j
+            G_du[l, j, :] += 2 * v_0 - 2 * u_i + 2 * u_j
 
         # reshape the 3D matrix to a 2D matrix
         # with rows for crease lines and columns representing
@@ -83,8 +84,7 @@ class EqConsConstantLength(EqCons):
 
 if __name__ == '__main__':
 
-    from FormingTask import FormingTask
-    from crease_pattern import CreasePattern
+    from oricreate import FormingTask, CreasePattern
 
     cp = CreasePattern(X=[[-4, -5, -3],
                           [0, 0.0, 0],

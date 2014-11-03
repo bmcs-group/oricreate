@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 #
 # Copyright (c) 2009, IMB, RWTH Aachen.
 # All rights reserved.
@@ -22,7 +22,9 @@ from crease_pattern import \
 
 INPUT = '+cp_input'
 
+
 class CreasePatternState(CreasePattern):
+
     r'''
     This class is used by the FormingTask tasks during the
     iteration to realize the predictor-corrector steps.
@@ -40,14 +42,17 @@ class CreasePatternState(CreasePattern):
     u = Array(value=[], dtype='float_', cp_input=True)
     r'''Displacement array with ``(n_N,n_D)`` values.
     '''
+
     def u_default(self):
         return np.zeros_like(self.x_0)
 
     U = Property
     r'''Array of initial coordinates ``(n_N,n_D)`` as ``[x1,x2,x3]``.
     '''
+
     def _get_U(self):
         return self.u.flatten()
+
     def _set_U(self, U):
         self.u = U.reshape(self.n_N, self.n_D)
 
@@ -76,15 +81,15 @@ if __name__ == '__main__':
 
     # trivial example with a single triangle positioned
 
-    cp = CreasePatternState(x_0=[[ 0, 0, 0 ],
-                                 [ 1, 0, 0 ],
-                                 [ 1, 1, 0],
+    cp = CreasePatternState(x_0=[[0, 0, 0],
+                                 [1, 0, 0],
+                                 [1, 1, 0],
                                  [0.667, 0.333, 0],
                                  [0.1, 0.05, 0]],
-                            L=[[ 0, 1 ],
-                               [ 1, 2 ],
-                               [ 2, 0 ]],
-                            F=[[0, 1, 2 ]]
+                            L=[[0, 1],
+                               [1, 2],
+                               [2, 0]],
+                            F=[[0, 1, 2]]
                             )
 
     print 'vectors\n', cp.L_vectors
