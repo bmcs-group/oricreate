@@ -4,7 +4,7 @@
 # All rights reserved.
 #
 # This software is provided without warranty under the terms of the BSD
-# license included in simvisage/LICENSE.txt and may be redistributed only
+# license included in Simvisage/LICENSE.txt and may be redistributed only
 # under the conditions described in the aforementioned license.  The license
 # is also available online at http://www.simvisage.com/licenses/BSD.txt
 #
@@ -57,19 +57,15 @@ class FormingTask(HasStrictTraits):
     def _get_formed_object(self):
         raise NotImplementedError('No pre-fabrication for the object to form')
 
-    initial_task = Property
+    source_task = Property
     r'''The task without ``previous_task`` is the initial task.
     Recursive search.
     '''
 
-    def _get_initial_task(self):
+    def _get_source_task(self):
         if self.previous_task:
-            return self.previous_task.initial_task
-        return self
+            return self.previous_task
+        else:
+            return self
 
     traits_view = View()
-
-
-if __name__ == '__main__':
-    ft = FormingTask()
-    print ft.formed_object

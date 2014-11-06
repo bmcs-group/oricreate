@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 #
 # Copyright (c) 2009, IMB, RWTH Aachen.
 # All rights reserved.
@@ -12,8 +12,20 @@
 #
 # Created on Jan 29, 2013 by: rch
 
-from traits.api import Interface
+from traits.api import \
+    Interface, Property, Self, Instance
+
+from i_formed_object import IFormedObject
 
 
 class IFormingTask(Interface):
-    pass
+
+    r'''IFormingTask(s) constitute a FormingProcess.
+    They can be chained. Each FormingTask has a
+    previous forming task.
+    '''
+    previous_task = Instance(Self)
+
+    source_task = Instance(Self)
+
+    formed_object = Instance(IFormedObject)

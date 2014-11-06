@@ -8,7 +8,5 @@ from crease_pattern_operators import \
     CreaseCummulativeOperators
 from crease_pattern_state import \
     CreasePatternState
-from waterbomb_crease_pattern import \
-    WaterBombCreasePattern
-from yoshimura_crease_pattern import \
-    YoshimuraCreasePattern
+from factories import \
+    WaterBombCPFactory, YoshimuraCPFactory

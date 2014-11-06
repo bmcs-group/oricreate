@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 #
 # Copyright (c) 2009, IMB, RWTH Aachen.
 # All rights reserved.
@@ -13,28 +13,33 @@
 # Created on Sep 7, 2011 by: rch
 
 from traits.api import \
-    Float, Int, Property, cached_property, Array, Callable, Any
+    Float, Int, Property, cached_property, Callable, Any
 
 from crease_pattern import CreasePattern
 import numpy as np
 import sympy as sp
 
+from forming_tasks import \
+    DeliveryTask  # @UnresolvedImport
 
 x_, y_ = sp.symbols('x, y')
 
 
-class WaterBombCreasePattern(CreasePattern):
+class WaterBombCPFactory(DeliveryTask):
+
     '''Structure of triangulated Crease-Patterns
     '''
 
-    L_x = Float(4, geometry=True)
-    L_y = Float(2, geometry=True)
+    L_x = Float(4, input=True)
+    L_y = Float(2, input=True)
 
-    n_x = Int(2, geometry=True)
-    n_y = Int(2, geometry=True)
+    n_x = Int(2, input=True)
+    n_y = Int(2, input=True)
 
-    new_nodes = Array(value=[], dtype=float)
-    new_crease_lines = Array(value=[], dtype=int)
+    def _get_formed_object(self):
+        return CreasePattern(X=self.X,
+                             L=self.L,
+                             F=self.F)
 
     X = Property
 
@@ -98,6 +103,7 @@ class WaterBombCreasePattern(CreasePattern):
     XX = Property(depends_on='fx, +geometry')
     '''Position of the nodes after geo_transform.
     '''
+
     def _get_XX(self):
 
         XX = np.zeros(self.X.shape)
@@ -209,22 +215,34 @@ class WaterBombCreasePattern(CreasePattern):
                        L_v00, L_v01, L_v02, L_v10, L_v11, L_v12,
                        L_d00, L_d01, L_d02, L_d03, L_d10, L_d11, L_d12, L_d13])
 
-        #=======================================================================
+        # ======================================================================
         # Construct the facet mappings
-        #=======================================================================
-        F_00 = np.c_[N_h[:-1, :-1:2].flatten(), N_k[:, :-1:2].flatten(), N_j[:, :].flatten()]
-        F_01 = np.c_[N_k[:, :-1:2].flatten(), N_h[1:, :-1:2].flatten(), N_j[:, :].flatten()]
-        F_02 = np.c_[N_h[1:, :-1:2].flatten(), N_h[1:, 1::2].flatten(), N_j[:, :].flatten()]
-        F_03 = np.c_[N_h[1:, 1::2].flatten(), N_k[:, 1::2].flatten(), N_j[:, :].flatten(), ]
-        F_04 = np.c_[N_k[:, 1::2].flatten(), N_h[:-1, 1::2].flatten(), N_j[:, :].flatten(), ]
-        F_05 = np.c_[N_h[:-1, 1::2].flatten(), N_h[:-1, :-1:2].flatten(), N_j[:, :].flatten(), ]
+        # ======================================================================
+        F_00 = np.c_[
+            N_h[:-1, :-1:2].flatten(), N_k[:, :-1:2].flatten(), N_j[:, :].flatten()]
+        F_01 = np.c_[
+            N_k[:, :-1:2].flatten(), N_h[1:, :-1:2].flatten(), N_j[:, :].flatten()]
+        F_02 = np.c_[
+            N_h[1:, :-1:2].flatten(), N_h[1:, 1::2].flatten(), N_j[:, :].flatten()]
+        F_03 = np.c_[
+            N_h[1:, 1::2].flatten(), N_k[:, 1::2].flatten(), N_j[:, :].flatten(), ]
+        F_04 = np.c_[
+            N_k[:, 1::2].flatten(), N_h[:-1, 1::2].flatten(), N_j[:, :].flatten(), ]
+        F_05 = np.c_[
+            N_h[:-1, 1::2].flatten(), N_h[:-1, :-1:2].flatten(), N_j[:, :].flatten(), ]
 
-        F_10 = np.c_[N_h[:-1, 1:-1:2].flatten(), N_k[:, 1:-1:2].flatten(), N_i[:-1, :].flatten()]
-        F_11 = np.c_[N_k[:, 1:-1:2].flatten(), N_h[1:, 1:-1:2].flatten(), N_i[1:, :].flatten()]
-        F_12 = np.c_[N_i[1:, :].flatten(), N_k[:, 2::2].flatten(), N_k[:, 1:-1:2].flatten()]
-        F_13 = np.c_[N_h[1:, 2::2].flatten(), N_k[:, 2::2].flatten(), N_i[1:, :].flatten(), ]
-        F_14 = np.c_[N_k[:, 2::2].flatten(), N_h[:-1, 2::2].flatten(), N_i[:-1, :].flatten(), ]
-        F_15 = np.c_[N_i[:-1, :].flatten(), N_k[:, 1:-1:2].flatten(), N_k[:, 2::2].flatten(), ]
+        F_10 = np.c_[
+            N_h[:-1, 1:-1:2].flatten(), N_k[:, 1:-1:2].flatten(), N_i[:-1, :].flatten()]
+        F_11 = np.c_[
+            N_k[:, 1:-1:2].flatten(), N_h[1:, 1:-1:2].flatten(), N_i[1:, :].flatten()]
+        F_12 = np.c_[
+            N_i[1:, :].flatten(), N_k[:, 2::2].flatten(), N_k[:, 1:-1:2].flatten()]
+        F_13 = np.c_[
+            N_h[1:, 2::2].flatten(), N_k[:, 2::2].flatten(), N_i[1:, :].flatten(), ]
+        F_14 = np.c_[
+            N_k[:, 2::2].flatten(), N_h[:-1, 2::2].flatten(), N_i[:-1, :].flatten(), ]
+        F_15 = np.c_[
+            N_i[:-1, :].flatten(), N_k[:, 1:-1:2].flatten(), N_k[:, 2::2].flatten(), ]
 
         F = np.vstack([F_00, F_01, F_02, F_03, F_04, F_05,
                        F_10, F_11, F_12, F_13, F_14, F_15])
@@ -243,18 +261,16 @@ class WaterBombCreasePattern(CreasePattern):
 
 if __name__ == '__main__':
 
-    cp = WaterBombCreasePattern(L_x=7,
-                                L_y=4,
-                                n_x=7,
-                                n_y=4)
+    wbf = WaterBombCPFactory(L_x=7,
+                             L_y=4,
+                             n_x=7,
+                             n_y=4)
 
+    cp = wbf.formed_object
     print cp.X
 
-    print 'n_dofs', cp.n_dofs
     print 'n_crease_lines', cp.n_L
-    print 'required constraints', cp.n_dofs - cp.n_L
 
-    from mayavi import mlab
-    mlab.figure(fgcolor=(0, 0, 0), bgcolor=(1, 1, 1))
-    cp.add_to_mlab(mlab)
-    mlab.show()
+    import pylab as p
+    cp.plot_mpl(p.axes())
+    p.show()

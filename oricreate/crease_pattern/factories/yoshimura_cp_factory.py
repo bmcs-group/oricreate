@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 #
 # Copyright (c) 2009, IMB, RWTH Aachen.
 # All rights reserved.
@@ -23,7 +23,12 @@ import sympy as sp
 
 x_, y_ = sp.symbols('x, y')
 
-class YoshimuraCreasePattern(CreasePattern):
+from forming_tasks import \
+    DeliveryTask  # @UnresolvedImport
+
+
+class YoshimuraCPFactory(DeliveryTask):
+
     '''Structure of triangulated Crease-Patterns
     '''
 
@@ -33,10 +38,16 @@ class YoshimuraCreasePattern(CreasePattern):
     n_x = Int(2, geometry=True)
     n_y = Int(2, geometry=True)
 
+    def _get_formed_object(self):
+        return CreasePattern(X=self.X,
+                             L=self.L,
+                             F=self.F)
+
     new_nodes = Array(value=[], dtype=float)
     new_crease_lines = Array(value=[], dtype=int)
 
     X = Property
+
     def _get_X(self):
         return self._geometry[0]
 
@@ -45,59 +56,71 @@ class YoshimuraCreasePattern(CreasePattern):
         self.X[:, :] = values[:, :]
 
     L = Property
+
     def _get_L(self):
         return self._geometry[1]
 
     F = Property
+
     def _get_F(self):
         return self._geometry[2]
 
     N_h = Property
+
     def _get_N_h(self):
         return self._geometry[3]
 
     N_v = Property
+
     def _get_N_v(self):
         return self._geometry[4]
 
     N_i = Property
+
     def _get_N_i(self):
         return self._geometry[5]
 
     X_h = Property
+
     def _get_X_h(self):
         return self._geometry[6]
 
     X_v = Property
+
     def _get_X_v(self):
         return self._geometry[7]
 
     X_i = Property
+
     def _get_X_i(self):
         return self._geometry[8]
 
     interior_vertices = Property
+
     def _get_interior_vertices(self):
         return self._geometry[9]
 
     cycled_neighbors = Property
+
     def _get_cycled_neighbors(self):
         return self._geometry[10]
 
     connectivity = Property
-    def _get_connectivity(self):
-        '''
-        The connectivity represents all inner nodes [n] of the creasepattern and
-        their connected nodes [cn].
+    '''
+    The connectivity represents all inner nodes [n] of 
+    the crease pattern and their connected nodes [cn].
 
-        (n,[cn1,cn2,...,cni])
-        '''
+    (n,[cn1,cn2,...,cni])
+    '''
+
+    def _get_connectivity(self):
         con = [(vertex, neighbors) for vertex, neighbors in
-                    zip(self.interior_vertices, self.cycled_neighbors.T)]
+               zip(self.interior_vertices, self.cycled_neighbors.T)]
         return con
 
     # deformed nodes
     XX = Property(depends_on='fx, nodes')
+
     def _get_XX(self):
 
         XX = np.zeros(self.X.shape)
@@ -109,19 +132,24 @@ class YoshimuraCreasePattern(CreasePattern):
 
     # geometric deformation
     _fx_expr = Any
+
     def __fx_expr_default(self):
         return x_
 
     _fy_expr = Any
+
     def __fy_expr_default(self):
         return y_
 
     fy = Property
+
     def _set_fy(self, ls_expr):
         self._fy_expr = ls_expr
+
     def _get_fy(self):
         return sp.lambdify([x_, y_], self._fy_expr)
     fx = Property
+
     def _set_fx(self, ls_expr):
         self._fx_expr = ls_expr
 
@@ -129,10 +157,12 @@ class YoshimuraCreasePattern(CreasePattern):
         return sp.lambdify([x_, y_], self._fx_expr)
 
     geo_transform = Callable
+
     def _geo_transform_default(self):
         return lambda X_arr: X_arr
 
     _geometry = Property(depends_on='+geometry')
+
     @cached_property
     def _get__geometry(self):
 
@@ -148,26 +178,27 @@ class YoshimuraCreasePattern(CreasePattern):
 
         x_h = x_e[:, ::2]
         y_h = y_e[:, ::2]
-        X_h = np.c_[ x_h.flatten(), y_h.flatten() ]
+        X_h = np.c_[x_h.flatten(), y_h.flatten()]
 
         # nodes on vertical boundaries on odd horizontal crease lines
 
         x_v = x_e[(0, -1), 1::2]
         y_v = y_e[(0, -1), 1::2]
-        X_v = np.c_[ x_v.flatten(), y_v.flatten() ]
+        X_v = np.c_[x_v.flatten(), y_v.flatten()]
 
         # interior nodes on odd horizontal crease lines
 
         x_i = (x_e[1:, 1::2] + x_e[:-1, 1::2]) / 2.0
         y_i = (y_e[1:, 1::2] + y_e[:-1, 1::2]) / 2.0
-        X_i = np.c_[ x_i.flatten(), y_i.flatten() ]
+        X_i = np.c_[x_i.flatten(), y_i.flatten()]
 
         # node enumeration in grid form on
         # (1) the even horizontal crease lines
         # (2)
         # (3)
 
-        n_h = np.arange((n_x + 1) * (n_y / 2 + 1)).reshape((n_x + 1), (n_y / 2 + 1))
+        n_h = np.arange(
+            (n_x + 1) * (n_y / 2 + 1)).reshape((n_x + 1), (n_y / 2 + 1))
         n_v = np.arange((2 * n_y / 2)).reshape(2, n_y / 2) + n_h[-1, -1] + 1
         n_i = np.arange(n_x * n_y / 2).reshape(n_x, n_y / 2) + n_v[-1, -1] + 1
         n_viv = np.vstack([n_v[0, :], n_i, n_v[-1, :]])
@@ -188,11 +219,12 @@ class YoshimuraCreasePattern(CreasePattern):
         zero_z = np.zeros((nodes.shape[0], 1), dtype=float)
 
         nodes = np.hstack([nodes, zero_z])
-        crease_lines = np.vstack([e_h00, e_h90, e_v90, e_h45, e_i45, e_h135, e_i135, e_v00, e_i00])
+        crease_lines = np.vstack(
+            [e_h00, e_h90, e_v90, e_h45, e_i45, e_h135, e_i135, e_v00, e_i00])
 
-        #=======================================================================
+        # ======================================================================
         # Connectivity mepping - neighbours of each vertex - closed
-        #=======================================================================
+        # ======================================================================
 
         c_h = n_h[1:-1, 1:-1].flatten()
 
@@ -213,22 +245,31 @@ class YoshimuraCreasePattern(CreasePattern):
         c_viv135 = n_h[:-1, 1:].flatten()
         c_viv180 = n_viv[:-2, :].flatten()
 
-        conn_viv = np.vstack([c_viv235, c_viv315, c_viv000, c_viv045, c_viv135, c_viv180])
+        conn_viv = np.vstack(
+            [c_viv235, c_viv315, c_viv000, c_viv045, c_viv135, c_viv180])
 
         interior_vertices = np.hstack([c_h, c_viv])
         cycled_neighbors = np.hstack([conn_h, conn_viv])
 
-        #=======================================================================
+        # ======================================================================
         # Construct the facet mappings
-        #=======================================================================
-        f_h00 = np.c_[n_h[:-1, :-1].flatten(), n_h[1:, :-1].flatten(), n_i[:, :].flatten()]
-        f_hi90 = np.c_[n_h[1:-1, :-1].flatten(), n_i[1:, :].flatten(), n_i[:-1, :].flatten()]
-        f_hl90 = np.c_[n_h[0, :-1].flatten(), n_i[0, :].flatten(), n_v[0, :].flatten()]
-        f_hr90 = np.c_[n_h[-1, :-1].flatten(), n_i[-1, :].flatten(), n_v[-1, :].flatten()]
-        g_h00 = np.c_[n_h[:-1, 1:].flatten(), n_h[1:, 1:].flatten(), n_i[:, :].flatten()]
-        g_hi90 = np.c_[n_h[1:-1, 1:].flatten(), n_i[1:, :].flatten(), n_i[:-1, :].flatten()]
-        g_hl90 = np.c_[n_h[0, 1:].flatten(), n_i[0, :].flatten(), n_v[0, :].flatten()]
-        g_hr90 = np.c_[n_h[-1, 1:].flatten(), n_i[-1, :].flatten(), n_v[-1, :].flatten()]
+        # ======================================================================
+        f_h00 = np.c_[
+            n_h[:-1, :-1].flatten(), n_h[1:, :-1].flatten(), n_i[:, :].flatten()]
+        f_hi90 = np.c_[
+            n_h[1:-1, :-1].flatten(), n_i[1:, :].flatten(), n_i[:-1, :].flatten()]
+        f_hl90 = np.c_[
+            n_h[0, :-1].flatten(), n_i[0, :].flatten(), n_v[0, :].flatten()]
+        f_hr90 = np.c_[
+            n_h[-1, :-1].flatten(), n_i[-1, :].flatten(), n_v[-1, :].flatten()]
+        g_h00 = np.c_[
+            n_h[:-1, 1:].flatten(), n_h[1:, 1:].flatten(), n_i[:, :].flatten()]
+        g_hi90 = np.c_[
+            n_h[1:-1, 1:].flatten(), n_i[1:, :].flatten(), n_i[:-1, :].flatten()]
+        g_hl90 = np.c_[
+            n_h[0, 1:].flatten(), n_i[0, :].flatten(), n_v[0, :].flatten()]
+        g_hr90 = np.c_[
+            n_h[-1, 1:].flatten(), n_i[-1, :].flatten(), n_v[-1, :].flatten()]
 
         facets = np.vstack([f_h00, f_hi90, f_hl90, f_hr90,
                             g_h00, g_hi90, g_hl90, g_hr90])
@@ -250,30 +291,23 @@ class YoshimuraCreasePattern(CreasePattern):
             cp_pipe.mlab_source.dataset.lines = self.L
 
 
-
 if __name__ == '__main__':
 
-    cp = YoshimuraCreasePattern(L_x=3,
-                                L_y=3,
-                                n_x=3,
-                                n_y=4,
-                                fx=(x_) ** 2,
-                                fy=(y_) ** 2)
+    yf = YoshimuraCPFactory(L_x=3,
+                            L_y=3,
+                            n_x=3,
+                            n_y=4,
+                            fx=(x_) ** 2,
+                            fy=(y_) ** 2)
+
+    cp = yf.formed_object
 
     print cp.X
-    print cp.XX
 
     # cp.nodes = np.array([0, 0, 0])
 
-    print 'n_dofs', cp.n_dofs
     print 'n_crease_lines', cp.n_L
-    print 'required constraints', cp.n_dofs - cp.n_L
 
-    print cp.interior_vertices
-
-    print cp.cycled_neighbors
-
-    from mayavi import mlab
-    mlab.figure(fgcolor=(0, 0, 0), bgcolor=(1, 1, 1))
-    cp.add_to_mlab(mlab)
-    mlab.show()
+    import pylab as p
+    cp.plot_mpl(p.axes())
+    p.show()

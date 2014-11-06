@@ -22,13 +22,6 @@ from forming_tasks import \
     FormingTask  # @UnresolvedImport
 
 
-class InitialTask(FormingTask):
-
-    r'''Initial task with an explicitly assigned formed  object.
-    '''
-    formed_object = Instance(CreasePattern)
-
-
 class MappingTask(FormingTask):
 
     r'''Task mapping the initial state of the formed object
@@ -45,6 +38,6 @@ class MappingTask(FormingTask):
 
 if __name__ == '__main__':
     cp = CreasePattern(X=[[1, 2, 3]])
-    it = InitialTask(formed_object=cp)
+    it = CreasePatternGenerator(formed_object=cp)
     ft = MappingTask(previous_task=it)
     print ft.formed_object
