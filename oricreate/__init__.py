@@ -1,12 +1,14 @@
 
 from crease_pattern import \
-    CreasePattern, YoshimuraCPFactory, WaterBombCPFactory
+    CreasePattern, CreasePatternState, \
+    CustomCPFactory, \
+    YoshimuraCPFactory, WaterBombCPFactory
 
 from forming_tasks import \
     FormingTask, IFormingTask
 
 from simulation_tasks import \
-    SimulationTask, \
+    ISimulationTask, SimulationTask, \
     FoldRigidly
 
 from simulation_step import \
@@ -14,3 +16,6 @@ from simulation_step import \
 
 from mapping_tasks import \
     MapToSurface, MappingTask, RotateCopy
+
+from view import \
+    FormingView

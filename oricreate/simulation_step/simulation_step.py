@@ -23,7 +23,7 @@ from traits.api import \
 from simulation_config import \
     SimulationConfig
 
-from crease_pattern import \
+from oricreate import \
     CreasePatternState
 
 import time

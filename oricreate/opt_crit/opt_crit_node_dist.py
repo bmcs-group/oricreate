@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 #
 # Copyright (c) 2009, IMB, RWTH Aachen.
 # All rights reserved.
@@ -60,21 +60,3 @@ class OptCritNodeDist(OptCrit):
 
         f_du = f_du.flatten()
         return f_du
-
-if __name__ == '__main__':
-    from mapping_tasks import MapToSurface
-    from crease_pattern import CreasePattern
-
-    cp = CreasePattern(X=[[0, 0, 0],
-                          [0.5, 0, 0],
-                          [10.0, 0, 0]],
-                       L=[[0, 1], [1, 2], [2, 0]])
-    init = MapToSurface(cp=cp)
-    oc = OptCritNodeDist(FormingTask=init,
-                         L=[[0, 1], [1, 2]])
-
-    u = np.array([[0, 0, 0],
-                  [0, 0, 0],
-                  [0, 0, 0]], dtype='f')
-    print 'f', oc.get_f(u)
-    print 'f_du', oc.get_f_du(u)

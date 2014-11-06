@@ -21,12 +21,14 @@ Two vector pairs displayed in the Figure are defined as:
     \bm{a}_2 = \bm{x}_2 - \bm{x}_1, \;\; \bm{b}_2 = \bm{x}_4 - \bm{x}_1
 
 Considering current position :math:`\bm{x}_i` as a displaced configuration
-of an initial vector :math:`\bm{x}^0_i` by a displacement vector :math:`\bm{u}_i`
+of an initial vector :math:`\bm{x}^0_i`
+by a displacement vector :math:`\bm{u}_i`
 
 .. math::
     \bm{x}_i = \bm{x}^0_i + \bm{u}_i
 
-The derivatives of the vectors with respect to the node :math:`\bm{u}_1` are then
+The derivatives of the vectors with respect
+to the node :math:`\bm{u}_1` are then
 
 .. math::
 
@@ -83,8 +85,7 @@ if __name__ == '__main__':
 
     import numpy as np
     from oricreate.util import \
-        get_gamma, get_gamma_du, get_theta, get_theta_du, get_gamma_du2
-
+        get_gamma, get_gamma_du, get_theta, get_theta_du
 
     a = np.array([[1, 0], [1, 0]], dtype='f')
     b = np.array([[0, 1], [1, 1]], dtype='f')
@@ -93,28 +94,26 @@ if __name__ == '__main__':
     print get_theta(a, b)
 
     a_du = np.array([[
-                      [[-1, 0]],
-                      [[0, -1]]
-                      ],
-                     [
-                      [[-1, 0]],
-                      [[0, -1]]
-                      ]],
-                    dtype='f')
+        [[-1, 0]],
+        [[0, -1]]
+    ],
+        [
+        [[-1, 0]],
+        [[0, -1]]
+    ]],
+        dtype='f')
 
     b_du = np.array([[
-                      [[-1, 0]],
-                      [[0, -1]]
-                      ],
-                     [
-                      [[-1, 0]],
-                      [[0, -1]]
-                      ]],
-                    dtype='f')
+        [[-1, 0]],
+        [[0, -1]]
+    ],
+        [
+        [[-1, 0]],
+        [[0, -1]]
+    ]],
+        dtype='f')
 
     print 'gamma_du'
     print get_gamma_du(a, a_du, b, b_du)
-    print 'gamma_du2'
-    print get_gamma_du2(a, a_du, b, b_du)
 
     print(get_theta_du(a, a_du, b, b_du))

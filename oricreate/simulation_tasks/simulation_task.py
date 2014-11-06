@@ -14,10 +14,8 @@
 
 from traits.api import Instance, \
     Property, cached_property, Str, \
-    Array, List, Dict, implements, Int, Bool
+    Array, Dict, implements, Int, Bool
 
-from crease_pattern import \
-    CreasePattern
 from eq_cons import \
     EqConsConstantLength
 from eq_cons import \
@@ -28,13 +26,10 @@ from eq_cons import \
 from eq_cons import \
     IEqCons, GrabPoints, \
     PointsOnLine, DofConstraints
-from forming_tasks import \
-    FormingTask, IFormingTask
-from i_simulation_task import \
-    ISimulationTask
-from simulation_step import \
-    SimulationStep
-from mapping_tasks import \
+from oricreate import \
+    CreasePattern, \
+    FormingTask, IFormingTask, \
+    ISimulationTask, SimulationStep, \
     MapToSurface
 
 import numpy as np

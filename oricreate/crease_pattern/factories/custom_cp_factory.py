@@ -15,11 +15,11 @@
 from traits.api import \
     Instance
 
-from crease_pattern import \
+from oricreate.crease_pattern import \
     CreasePattern
 
-from forming_tasks import \
-    FactoryTask  # @UnresolvedImport
+from oricreate.forming_tasks import \
+    FactoryTask
 
 
 class CustomCPFactory(FactoryTask):
