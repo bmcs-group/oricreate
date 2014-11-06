@@ -6,11 +6,12 @@ Created on Jun 20, 2013
 from traits.api import \
     Property, Array, cached_property
 
-from oricreate.simulation_tasks.simulation_task import FormingTask
+from mapping_task import MappingTask
 import numpy as np
 
 
-class Masking(FormingTask):
+class MaskFacets(MappingTask):
+
     '''Use the source element as a base and define a mask for hidden
     deleted) facets.Nodes and lines without facet will be masked as well
     '''
@@ -29,10 +30,14 @@ class Masking(FormingTask):
         return F[select_arr]
 
 if __name__ == '__main__':
-    from crease_pattern.yoshimura_crease_pattern import \
-        YoshimuraCreasePattern
-    cp = YoshimuraCreasePattern(n_x=4, n_y=4)
-    print cp.F
+    from crease_pattern import \
+        YoshimuraCPFactory
+    yf = YoshimuraCPFactory(n_x=4, n_y=4)
+    print yf.formed_object.F
+    m = MaskFacets(previous_task=yf, F_mask=[20, 30, 23])
+    print yf.formed_object.F
 
-    m = Masking(cp=cp, F_mask=[20, 30, 23])
-    print cp.F
+    import pylab as p
+    ax = p.axes()
+    m.formed_object.plot_mpl(ax)
+    p.show()

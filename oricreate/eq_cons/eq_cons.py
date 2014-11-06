@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 #
 # Copyright (c) 2009-2013, IMB, RWTH Aachen.
 # All rights reserved.
@@ -23,13 +23,14 @@ import numpy as np
 
 class EqCons(HasStrictTraits):
 
-    implements(IEqCons)
-
-    FormingTask = WeakRef
-    '''Link to the FormingTask tool.
+    '''Base class of equality constraints.
     '''
 
-    x_0 = DelegatesTo('FormingTask')
+    forming_task = WeakRef
+    '''Link to the forming_task tool.
+    '''
+
+    x_0 = DelegatesTo('forming_task')
     '''Nodal coordinates
     '''
 
@@ -38,32 +39,38 @@ class EqCons(HasStrictTraits):
     type of constraint.
     '''
 
-    def __init__(self, FormingTask, *args, **kw):
-        '''Initialization requiring the FormingTask tool.
+    def __init__(self, forming_task, *args, **kw):
+        '''Initialization requiring the forming_task tool.
         '''
-        self.FormingTask = FormingTask
+        self.forming_task = forming_task
         super(HasStrictTraits, self).__init__(*args, **kw)
 
+
 class GrabPoints(EqCons):
+
     '''Grab points are included in the nodes attribute of the crease pattern.
     Their position is constrained within a facet using triangle coordinates.
     '''
-    n_dofs = DelegatesTo('FormingTask')
-    N = DelegatesTo('FormingTask')
-    F = DelegatesTo('FormingTask')
-    GP = DelegatesTo('FormingTask')
-    n_GP = DelegatesTo('FormingTask')
-    n_D = DelegatesTo('FormingTask')
+    implements(IEqCons)
 
-    #===========================================================================
+    n_dofs = DelegatesTo('forming_task')
+    N = DelegatesTo('forming_task')
+    F = DelegatesTo('forming_task')
+    GP = DelegatesTo('forming_task')
+    n_GP = DelegatesTo('forming_task')
+    n_D = DelegatesTo('forming_task')
+
+    # =========================================================================
     # Grab point specification
-    #===========================================================================
+    # =========================================================================
     grab_pts_L = Property(Array, depends_on='X, F, GP')
+
     @cached_property
     def _get_grab_pts_L(self):
         '''Calculates the L vector for the Barycentric coordinates
-           Trick: assuming a tetraheder with fourth point on [ 0, 0, -1],
-           if the grabpoint is choosen correctly (laying in the plane of the facet)
+           Trick: assuming a tetrahedron with fourth point on [ 0, 0, -1],
+           if the grab point is chosen correctly
+           (lying in the plane of the facet)
            L4 will be 0
         '''
         n = self.x_0
@@ -85,13 +92,13 @@ class GrabPoints(EqCons):
         L = L.reshape(-1, 3)  # gives L1,L2,L3 for each grabpoint
         return L
 
-    def get_G(self, U, t):
+    def get_G(self, U, t=0):
         ''' Calculate the residuum for constant crease length
         given the fold vector U.
         '''
         return np.zeros(self.n_GP * self.n_D,)
 
-    def get_G_du(self, U, t):
+    def get_G_du(self, U, t=0):
         ''' Calculate the residuum for constant crease length
         given the fold vector dX.
 
@@ -106,26 +113,32 @@ class GrabPoints(EqCons):
                 grab_lines[i * 3 + 2, q * 3 + 2] = self.grab_pts_L[i][c]
                 c += 1
 
-            grab_lines[i * 3, self.GP[i][0] * 3 ] = -1
-            grab_lines[i * 3 + 1, self.GP[i][0] * 3 + 1 ] = -1
-            grab_lines[i * 3 + 2, self.GP[i][0] * 3 + 2 ] = -1
+            grab_lines[i * 3, self.GP[i][0] * 3] = -1
+            grab_lines[i * 3 + 1, self.GP[i][0] * 3 + 1] = -1
+            grab_lines[i * 3 + 2, self.GP[i][0] * 3 + 2] = -1
 
         return grab_lines
 
+
 class PointsOnLine(EqCons):
-    '''PointsOnLine are included in the nodes attribute of the crease pattern.
-    Their position is constrained within a creaseline-element and at least one other
+
+    '''PointsOnLine are included in the nodes attribute
+    of the crease pattern.
+    Their position is constrained within a crease
+    line-element and at least one other
     constraining Element.
     '''
-    LP = DelegatesTo('FormingTask')
-    n_LP = DelegatesTo('FormingTask')
-    n_N = DelegatesTo('FormingTask')
-    n_D = DelegatesTo('FormingTask')
-    n_dofs = DelegatesTo('FormingTask')
-    L = DelegatesTo('FormingTask')
-    N = DelegatesTo('FormingTask')
+    implements(IEqCons)
 
-    def get_G(self, U, t):
+    LP = DelegatesTo('forming_task')
+    n_LP = DelegatesTo('forming_task')
+    n_N = DelegatesTo('forming_task')
+    n_D = DelegatesTo('forming_task')
+    n_dofs = DelegatesTo('forming_task')
+    L = DelegatesTo('forming_task')
+    N = DelegatesTo('forming_task')
+
+    def get_G(self, U, t=0):
 
         line = np.array(self.LP)
         if(len(line) == 0):
@@ -172,7 +185,7 @@ class PointsOnLine(EqCons):
 
         return R.reshape((-1,))
 
-    def get_G_du(self, U, t):
+    def get_G_du(self, U, t=0):
         ''' Calculate the jacobian of the residuum at the instantaneous
         configuration dR
         '''
@@ -191,14 +204,26 @@ class PointsOnLine(EqCons):
 
         for i in range(len(line)):
             if((p1[i][0] == p2[i][0])and(p1[i][2] == p2[i][2])):
-                dR1 = self.get_line_G_duf2(p0[i], p1[i], p2[i], dp0[i], dp1[i], dp2[i], line[i], cl[i])
-                dR2 = self.get_line_G_duf3(p0[i], p1[i], p2[i], dp0[i], dp1[i], dp2[i], line[i], cl[i])
+                dR1 = self.get_line_G_duf2(
+                    p0[i], p1[i], p2[i], dp0[i], dp1[i], dp2[i],
+                    line[i], cl[i])
+                dR2 = self.get_line_G_duf3(
+                    p0[i], p1[i], p2[i], dp0[i], dp1[i], dp2[i],
+                    line[i], cl[i])
             elif((p1[i][1] == p2[i][1])and(p1[i][2] == p2[i][2])):
-                dR1 = self.get_line_G_duf1(p0[i], p1[i], p2[i], dp0[i], dp1[i], dp2[i], line[i], cl[i])
-                dR2 = self.get_line_G_duf3(p0[i], p1[i], p2[i], dp0[i], dp1[i], dp2[i], line[i], cl[i])
+                dR1 = self.get_line_G_duf1(
+                    p0[i], p1[i], p2[i], dp0[i], dp1[i], dp2[i],
+                    line[i], cl[i])
+                dR2 = self.get_line_G_duf3(
+                    p0[i], p1[i], p2[i], dp0[i], dp1[i], dp2[i],
+                    line[i], cl[i])
             else:
-                dR1 = self.get_line_G_duf1(p0[i], p1[i], p2[i], dp0[i], dp1[i], dp2[i], line[i], cl[i])
-                dR2 = self.get_line_G_duf2(p0[i], p1[i], p2[i], dp0[i], dp1[i], dp2[i], line[i], cl[i])
+                dR1 = self.get_line_G_duf1(
+                    p0[i], p1[i], p2[i], dp0[i], dp1[i], dp2[i],
+                    line[i], cl[i])
+                dR2 = self.get_line_G_duf2(
+                    p0[i], p1[i], p2[i], dp0[i], dp1[i], dp2[i],
+                    line[i], cl[i])
             dR[i * 2] = dR1
             dR[i * 2 + 1] = dR2
 
@@ -262,16 +287,20 @@ class PointsOnLine(EqCons):
 
         return dR
 
+
 class DofConstraints(EqCons):
+
     '''Explicit constraints for selected of freedom.
     '''
-    n_N = DelegatesTo('FormingTask')
-    n_D = DelegatesTo('FormingTask')
-    n_dofs = DelegatesTo('FormingTask')
-    cnstr_lhs = DelegatesTo('FormingTask')
-    cnstr_rhs = DelegatesTo('FormingTask')
+    implements(IEqCons)
 
-    dof_constraints = DelegatesTo('FormingTask')
+    n_N = DelegatesTo('forming_task')
+    n_D = DelegatesTo('forming_task')
+    n_dofs = DelegatesTo('forming_task')
+    cnstr_lhs = DelegatesTo('forming_task')
+    cnstr_rhs = DelegatesTo('forming_task')
+
+    dof_constraints = DelegatesTo('forming_task')
     '''Specification of explicit constraint for particular degrees of freedom.
 
     dof constraints are specified as a list of equations with values
@@ -288,7 +317,7 @@ class DofConstraints(EqCons):
     :func:`oricrete.fix` and :func:`oricrete.link`.
     '''
 
-    def get_G(self, U, t):
+    def get_G(self, U, t=0):
         ''' Calculate the residuum for given constraint equations
         '''
         u = U.reshape(self.n_N, self.n_D)
@@ -307,9 +336,10 @@ class DofConstraints(EqCons):
         return G
 
     def get_G_du(self, U, t=0.0):
-        ''' Calculate the residuum for given constraint equations
+        ''' Calculate the residue for given constraint equations
         '''
-        G_du = np.zeros((len(self.cnstr_lhs) + len(self.dof_constraints), self.n_dofs))
+        G_du = np.zeros(
+            (len(self.cnstr_lhs) + len(self.dof_constraints), self.n_dofs))
         for i, cnstr in enumerate(self.cnstr_lhs):
             for n, d, c in cnstr:
                 dof = 3 * n + d
@@ -317,7 +347,7 @@ class DofConstraints(EqCons):
 
         for i, dof_cnstr in enumerate(self.dof_constraints):
             j = len(self.cnstr_lhs) + i
-            lhs, rhs = dof_cnstr
+            lhs, rhs = dof_cnstr  # @UnusedVariable
             for n, d, c in lhs:
                 dof = 3 * n + d
                 G_du[j, dof] += c

@@ -10,7 +10,7 @@ import numpy as np
 from oricreate.simulation_tasks.simulation_task import FormingTask
 
 
-class RostateCopy(FormingTask):
+class RotateCopy(FormingTask):
 
     ''' Replicate the source to form a structure.
 

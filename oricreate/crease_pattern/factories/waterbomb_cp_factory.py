@@ -20,12 +20,12 @@ import numpy as np
 import sympy as sp
 
 from forming_tasks import \
-    DeliveryTask  # @UnresolvedImport
+    FactoryTask  # @UnresolvedImport
 
 x_, y_ = sp.symbols('x, y')
 
 
-class WaterBombCPFactory(DeliveryTask):
+class WaterBombCPFactory(FactoryTask):
 
     '''Structure of triangulated Crease-Patterns
     '''

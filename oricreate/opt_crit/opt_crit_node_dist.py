@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 #
 # Copyright (c) 2009, IMB, RWTH Aachen.
 # All rights reserved.
@@ -19,6 +19,7 @@ import numpy as np
 
 
 class OptCritNodeDist(OptCrit):
+
     '''Optimization criteria based on the distance between specified nodes.
     '''
     L = Array(int)
@@ -50,24 +51,25 @@ class OptCritNodeDist(OptCrit):
         f_du_I = -(x_J - x_I) / L_total
         f_du_J = (x_J - x_I) / L_total
 
-        f_du = np.zeros((self.FormingTask.n_N, self.FormingTask.n_D), dtype='float_')
+        f_du = np.zeros(
+            (self.FormingTask.n_N, self.FormingTask.n_D), dtype='float_')
 
         if L.size > 0:
-            f_du[ I, : ] += f_du_I
-            f_du[ J, : ] += f_du_J
+            f_du[I, :] += f_du_I
+            f_du[J, :] += f_du_J
 
         f_du = f_du.flatten()
         return f_du
 
 if __name__ == '__main__':
-    from FormingTask import Initialization
+    from mapping_tasks import MapToSurface
     from crease_pattern import CreasePattern
 
     cp = CreasePattern(X=[[0, 0, 0],
                           [0.5, 0, 0],
                           [10.0, 0, 0]],
                        L=[[0, 1], [1, 2], [2, 0]])
-    init = Initialization(cp=cp)
+    init = MapToSurface(cp=cp)
     oc = OptCritNodeDist(FormingTask=init,
                          L=[[0, 1], [1, 2]])
 
@@ -76,4 +78,3 @@ if __name__ == '__main__':
                   [0, 0, 0]], dtype='f')
     print 'f', oc.get_f(u)
     print 'f_du', oc.get_f_du(u)
-

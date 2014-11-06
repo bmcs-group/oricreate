@@ -13,5 +13,3 @@ from eq_cons_dofs import \
     fix, link
 from i_eq_cons import \
     IEqCons
-
-

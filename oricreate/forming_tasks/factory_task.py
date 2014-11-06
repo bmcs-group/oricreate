@@ -14,9 +14,9 @@ from i_forming_task import \
     IFormingTask
 
 
-class DeliveryTask(FormingTask):
+class FactoryTask(FormingTask):
 
-    r'''Initial task with an explicitly assigned formed object.
+    r'''Factory task that generates a a formed_object as a pre-form.
     '''
     implements(IFormingTask)
 
@@ -30,6 +30,6 @@ class DeliveryTask(FormingTask):
     previous_task = None
 
 if __name__ == '__main__':
-    ft = DeliveryTask()
+    ft = FactoryTask()
     print ft.source_task
     print ft.formed_object

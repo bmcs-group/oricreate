@@ -24,12 +24,13 @@ import sympy as sp
 x_, y_ = sp.symbols('x, y')
 
 from forming_tasks import \
-    DeliveryTask  # @UnresolvedImport
+    FactoryTask  # @UnresolvedImport
 
 
-class YoshimuraCPFactory(DeliveryTask):
+class YoshimuraCPFactory(FactoryTask):
 
-    '''Structure of triangulated Crease-Patterns
+    '''Generate a Yoshimura crease pattern based
+    on the specification of its parameters.
     '''
 
     L_x = Float(4, geometry=True)

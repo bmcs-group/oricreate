@@ -30,11 +30,11 @@ from eq_cons import \
     PointsOnLine, DofConstraints
 from forming_tasks import \
     FormingTask, IFormingTask
-from simulation_task import \
+from i_simulation_task import \
     ISimulationTask
 from simulation_step import \
     SimulationStep
-from map_to_surface import \
+from mapping_tasks import \
     MapToSurface
 
 import numpy as np

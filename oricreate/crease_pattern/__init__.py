@@ -9,4 +9,4 @@ from crease_pattern_operators import \
 from crease_pattern_state import \
     CreasePatternState
 from factories import \
-    WaterBombCPFactory, YoshimuraCPFactory
+    WaterBombCPFactory, YoshimuraCPFactory, CustomCPFactory

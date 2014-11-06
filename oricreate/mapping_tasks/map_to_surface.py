@@ -10,13 +10,13 @@ from traits.api import \
 
 import numpy as np
 
-from oricreate.simulation_tasks.simulation_step import \
+from simulation_step.simulation_step import \
     SimulationStep
 
 from crease_pattern import \
     CreasePattern
 
-from forming_task import \
+from forming_tasks import \
     FormingTask
 
 

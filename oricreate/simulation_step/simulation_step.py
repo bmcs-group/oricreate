@@ -16,7 +16,6 @@ from scipy.optimize import \
     fmin_slsqp
 
 from traits.api import \
-    HasStrictTraits, \
     Event, Property, cached_property, \
     Int, Float, Bool, \
     Constant, Instance
@@ -41,7 +40,7 @@ elif platform.system() == 'Windows':
 
 class SimulationStep(CreasePatternState):
 
-    r"""Class implementing the transition 
+    r"""Class implementing the transition
     of the crease pattern state
     to the target time :math:`t`.
     """

@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 #
 # Copyright (c) 2009, IMB, RWTH Aachen.
 # All rights reserved.
@@ -12,11 +12,8 @@
 #
 # Created on Jan 29, 2013 by: rch
 
-from traits.api import \
-    Instance
-
 from crease_pattern import \
-    CreasePattern
+    CreasePattern, CustomCPFactory
 
 from forming_tasks import \
     FormingTask  # @UnresolvedImport
@@ -38,6 +35,6 @@ class MappingTask(FormingTask):
 
 if __name__ == '__main__':
     cp = CreasePattern(X=[[1, 2, 3]])
-    it = CreasePatternGenerator(formed_object=cp)
+    it = CustomCPFactory(formed_object=cp)
     ft = MappingTask(previous_task=it)
     print ft.formed_object

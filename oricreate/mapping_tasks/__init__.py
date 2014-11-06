@@ -1,3 +1,12 @@
 
 from mapping_task import \
-    InitialTask, MappingTask
+    MappingTask
+
+from map_to_surface import \
+    MapToSurface
+
+from rotate_copy import \
+    RotateCopy
+
+from mask_facets import \
+    MaskFacets

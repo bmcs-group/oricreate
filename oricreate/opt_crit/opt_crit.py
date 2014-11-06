@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 #
 # Copyright (c) 2009-2013, IMB, RWTH Aachen.
 # All rights reserved.
@@ -13,26 +13,13 @@
 # Created on Jan 3, 2013 by: rch, schmerl
 
 from traits.api import \
-    HasStrictTraits, Interface, implements, WeakRef, \
+    HasStrictTraits, WeakRef, \
     DelegatesTo, Bool
 
 
-class IOptCrit(Interface):
-    '''Interface of an equality constraint.
-    '''
-    def get_f(self, u, t):
-        '''Return the vector of equality constraint values.
-        '''
-
-    def get_f_du(self, u, t):
-        '''Return the jacobian of equality constraint values.
-        '''
-
 class OptCrit(HasStrictTraits):
 
-    implements(IOptCrit)
-
-    FormingTask = WeakRef
+    simulation_task = WeakRef
     '''Link to the FormingTask tool.
     '''
 

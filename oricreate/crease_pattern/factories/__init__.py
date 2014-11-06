@@ -4,3 +4,6 @@ from waterbomb_cp_factory import \
 
 from yoshimura_cp_factory import \
     YoshimuraCPFactory
+
+from custom_cp_factory import \
+    CustomCPFactory
