@@ -12,11 +12,12 @@
 #
 # Created on Jan 29, 2013 by: rch
 
-from crease_pattern import \
-    CreasePattern, CustomCPFactory
-
-from forming_tasks import \
-    FormingTask  # @UnresolvedImport
+from oricreate.crease_pattern import \
+    CreasePattern
+from oricreate.factories import \
+    CustomCPFactory
+from oricreate.forming_tasks import \
+    FormingTask
 
 
 class MappingTask(FormingTask):

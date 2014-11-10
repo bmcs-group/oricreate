@@ -7,11 +7,11 @@ Created on Oct 6, 2014
 from traits.api import \
     Property, Array, Instance
 
-from crease_pattern import \
+from oricreate.crease_pattern import \
     CreasePattern
 
-from forming_tasks import \
-    IFormingTask  # @UnresolvedImport
+from oricreate.forming_tasks import \
+    IFormingTask
 
 
 class ISimulationTask(IFormingTask):

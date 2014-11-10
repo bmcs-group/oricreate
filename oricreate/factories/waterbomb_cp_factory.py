@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 #
 # Copyright (c) 2009, IMB, RWTH Aachen.
 # All rights reserved.
@@ -13,14 +13,16 @@
 # Created on Sep 7, 2011 by: rch
 
 from traits.api import \
-    Float, Int, Property, cached_property, Callable, Any
+    Float, Int, Property, \
+    cached_property, Callable, Any
 
-from crease_pattern import CreasePattern
+from oricreate.crease_pattern import \
+    CreasePattern
+from oricreate.forming_tasks import \
+    FactoryTask
+
 import numpy as np
 import sympy as sp
-
-from forming_tasks import \
-    FactoryTask  # @UnresolvedImport
 
 x_, y_ = sp.symbols('x, y')
 
@@ -219,35 +221,48 @@ class WaterBombCPFactory(FactoryTask):
         # Construct the facet mappings
         # ======================================================================
         F_00 = np.c_[
-            N_h[:-1, :-1:2].flatten(), N_k[:, :-1:2].flatten(), N_j[:, :].flatten()]
+            N_h[:-1, :-1:2].flatten(), N_k[:, :-1:2].flatten(),
+            N_j[:, :].flatten()]
         F_01 = np.c_[
-            N_k[:, :-1:2].flatten(), N_h[1:, :-1:2].flatten(), N_j[:, :].flatten()]
+            N_k[:, :-1:2].flatten(), N_h[1:, :-1:2].flatten(),
+            N_j[:, :].flatten()]
         F_02 = np.c_[
-            N_h[1:, :-1:2].flatten(), N_h[1:, 1::2].flatten(), N_j[:, :].flatten()]
+            N_h[1:, :-1:2].flatten(), N_h[1:, 1::2].flatten(),
+            N_j[:, :].flatten()]
         F_03 = np.c_[
-            N_h[1:, 1::2].flatten(), N_k[:, 1::2].flatten(), N_j[:, :].flatten(), ]
+            N_h[1:, 1::2].flatten(), N_k[:, 1::2].flatten(),
+            N_j[:, :].flatten(), ]
         F_04 = np.c_[
-            N_k[:, 1::2].flatten(), N_h[:-1, 1::2].flatten(), N_j[:, :].flatten(), ]
+            N_k[:, 1::2].flatten(), N_h[:-1, 1::2].flatten(),
+            N_j[:, :].flatten(), ]
         F_05 = np.c_[
-            N_h[:-1, 1::2].flatten(), N_h[:-1, :-1:2].flatten(), N_j[:, :].flatten(), ]
+            N_h[:-1, 1::2].flatten(), N_h[:-1, :-1:2].flatten(),
+            N_j[:, :].flatten(), ]
 
         F_10 = np.c_[
-            N_h[:-1, 1:-1:2].flatten(), N_k[:, 1:-1:2].flatten(), N_i[:-1, :].flatten()]
+            N_h[:-1, 1:-1:2].flatten(), N_k[:, 1:-1:2].flatten(),
+            N_i[:-1, :].flatten()]
         F_11 = np.c_[
-            N_k[:, 1:-1:2].flatten(), N_h[1:, 1:-1:2].flatten(), N_i[1:, :].flatten()]
+            N_k[:, 1:-1:2].flatten(), N_h[1:, 1:-1:2].flatten(),
+            N_i[1:, :].flatten()]
         F_12 = np.c_[
-            N_i[1:, :].flatten(), N_k[:, 2::2].flatten(), N_k[:, 1:-1:2].flatten()]
+            N_i[1:, :].flatten(), N_k[:, 2::2].flatten(),
+            N_k[:, 1:-1:2].flatten()]
         F_13 = np.c_[
-            N_h[1:, 2::2].flatten(), N_k[:, 2::2].flatten(), N_i[1:, :].flatten(), ]
+            N_h[1:, 2::2].flatten(), N_k[:, 2::2].flatten(),
+            N_i[1:, :].flatten(), ]
         F_14 = np.c_[
-            N_k[:, 2::2].flatten(), N_h[:-1, 2::2].flatten(), N_i[:-1, :].flatten(), ]
+            N_k[:, 2::2].flatten(), N_h[:-1, 2::2].flatten(),
+            N_i[:-1, :].flatten(), ]
         F_15 = np.c_[
-            N_i[:-1, :].flatten(), N_k[:, 1:-1:2].flatten(), N_k[:, 2::2].flatten(), ]
+            N_i[:-1, :].flatten(), N_k[:, 1:-1:2].flatten(),
+            N_k[:, 2::2].flatten(), ]
 
         F = np.vstack([F_00, F_01, F_02, F_03, F_04, F_05,
                        F_10, F_11, F_12, F_13, F_14, F_15])
 
-        return (self.geo_transform(X), L, F, N_h, N_k, N_i, N_j, X_h, X_k, X_i, X_j)
+        return (self.geo_transform(X), L, F, N_h, N_k, N_i, N_j,
+                X_h, X_k, X_i, X_j)
 
     def show(self, mlab):
         x, y, z = self.XX.T

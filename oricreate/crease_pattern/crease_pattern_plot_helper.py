@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 #
 # Copyright (c) 2009, IMB, RWTH Aachen.
 # All rights reserved.
@@ -13,15 +13,21 @@
 # Created on Sep 7, 2011 by: rch
 
 from traits.api import \
-    HasStrictTraits, Float
+    HasStrictTraits, Float, Property
 
 import numpy as np
 
 
 class CreasePatternPlotHelper(HasStrictTraits):
+
     '''
     Methods exporting the crease pattern geometry into other formats.
     '''
+
+    x_t = Property
+
+    def _get_x_t(self):
+        return np.array([self.x], dtype='float_')
 
     def plot_mpl(self, ax, nodes=True, lines=True, facets=True):
         r'''Plot the crease pattern using mpl
@@ -47,7 +53,7 @@ class CreasePatternPlotHelper(HasStrictTraits):
         ax.set_ylim(*x_range[1, :])
         ax.set_aspect('equal')
         # plot node numbers
-        if nodes == True:
+        if nodes is True:
             xy_offset = (3, 3)
             for n, x_0 in enumerate(self.x_0):
                 xy = (x_0[0], x_0[1])
@@ -55,7 +61,7 @@ class CreasePatternPlotHelper(HasStrictTraits):
                             xytext=xy_offset, color='blue',
                             textcoords='offset points')
         # plot line numbers
-        if lines == True:
+        if lines is True:
             xy_offset = (1, 1)
             line_pos = 0.5 * np.sum(self.x_0[self.L], axis=1)
             for n, x_0 in enumerate(line_pos):
@@ -64,7 +70,7 @@ class CreasePatternPlotHelper(HasStrictTraits):
                             xytext=xy_offset, color='red',
                             textcoords='offset points')
         # plot facet numbers
-        if facets == True:
+        if facets is True:
             xy_offset = (0, 0)
             line_pos = 1 / 3.0 * np.sum(self.x_0[self.F], axis=1)
             for n, x_0 in enumerate(line_pos):
@@ -84,9 +90,9 @@ class CreasePatternPlotHelper(HasStrictTraits):
     def _get_line_width(self):
         return self._get_max_length() * self.line_with_factor
 
-    #=========================================================================
+    # =========================================================================
     # Garbage
-    #=========================================================================
+    # =========================================================================
     def plot_mlab(self, mlab, nodes=True, lines=True):
         r'''Visualize the crease pattern in a supplied mlab instance.
         '''
@@ -96,7 +102,7 @@ class CreasePatternPlotHelper(HasStrictTraits):
                                            line_width=3,
                                            color=(0.6, 0.6, 0.6))
             cp_pipe.mlab_source.dataset.lines = self.L
-            if lines == True:
+            if lines is True:
                 tube = mlab.pipeline.tube(cp_pipe,
                                           tube_radius=self._get_line_width())
                 mlab.pipeline.surface(tube, color=(1.0, 1.0, 1.0))

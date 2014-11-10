@@ -14,6 +14,7 @@ import numpy as np
 
 
 class FaceView(HasTraits):
+
     '''
      This class manages the visualization of CnstrControlFace constrains
     '''
@@ -70,8 +71,9 @@ class FaceView(HasTraits):
     @cached_property
     def _get_ff_nodes(self):
         x, y, z = self.x_t[0][self.nodes_id].T
+        sf = self.scale_factor * 0.5
         ff_nodes = self.scene.mlab.points3d(x, y, z,
-                                            scale_factor=self.scale_factor * 0.5,
+                                            scale_factor=sf,
                                             color=(0.5, 0., 0.))
         ff_nodes.visible = self.show_ff_nodes
         return ff_nodes
@@ -95,7 +97,8 @@ class FaceView(HasTraits):
     def update_ff_nodes_vis(self):
         self.ff_nodes.visible = self.show_ff_nodes
 
-    @on_trait_change('fold_step, time_step, show_ff_pipe, show_ff_nodes, lut, ff_pipe')
+    @on_trait_change('fold_step, time_step, show_ff_pipe,'
+                     'show_ff_nodes, lut, ff_pipe')
     def update_ff(self):
         if self.show_ff_pipe:
 

@@ -18,7 +18,7 @@ import os
 import string
 import tempfile
 
-from crease_pattern import \
+from oricreate.crease_pattern import \
     CreasePattern
 
 from mayavi.core.api import \
@@ -29,31 +29,32 @@ from mayavi.core.ui.api import \
 
 from traits.api import \
     HasTraits, Range, Instance, on_trait_change, \
-    Property, DelegatesTo, cached_property, Button, \
+    Property, cached_property, Button, \
     Int, Bool, File, Array, List, Float
 
 from traitsui.api import \
     View, Item, Group, RangeEditor, \
     VGroup, HSplit, TreeEditor, \
-    TreeNode, ListEditor, VSplit
+    TreeNode, VSplit
 
 from face_view import FaceView
 
 import numpy as np
 
-from forming_tasks import IFormingTask, FormingTask
+from oricreate.forming_tasks import \
+    IFormingTask, FormingTask
 
 FormingTask_tree_editor = TreeEditor(
     nodes=[
-        TreeNode(node_for=[CreasePattern],
-                 auto_open=True,
-                 label='=cp',
-                 children='followups',
-                 ),
         TreeNode(node_for=[FormingTask],
                  auto_open=True,
                  label='name',
-                 children='followups',
+                 children='following_tasks',
+                 ),
+        TreeNode(node_for=[FormingTask],
+                 auto_open=False,
+                 label='name',
+                 children='',
                  ),
     ],
     hide_root=False,
@@ -83,7 +84,10 @@ class FormingView(HasTraits):
     '''All FormingTask steps.
     '''
 
-    x_t = DelegatesTo('data')  # node position in every time_step
+    x_t = Property
+
+    def _get_x_t(self):
+        return self.data.formed_object.x_t
 
     # plotting stuff
     show_node_index = Bool(False)
@@ -135,7 +139,7 @@ class FormingView(HasTraits):
     '''
     @cached_property
     def _get_scale_factor_init(self):
-        min_length = np.min(self.data.l_t)
+        min_length = np.min(self.data.formed_object.L_lengths)
         faktor = min_length * 0.25
         return faktor
 
@@ -302,7 +306,7 @@ class FormingView(HasTraits):
         '''
         Setup a camera position
         '''
-        nodes = self.data.x_0
+        nodes = self.data.formed_object.x_0
 
         fx, fy = np.average(nodes[:, (0, 1)], axis=0)
         fz_arr = self.x_t[:, :, 2]
@@ -322,10 +326,10 @@ class FormingView(HasTraits):
         # new constrain visualization
         self.update_cp_pipeline()
         # auxiliary pipeline
-        self.update_aux_pipeline()
+        # self.update_aux_pipeline()
 
-        if len(self.data.x_aux) > 0:
-            self.aux_tube_pipeline
+        #         if len(self.data.x_aux) > 0:
+        #             self.aux_tube_pipeline
 
         self.tube_pipeline
         # self.update_face_view()
@@ -344,20 +348,21 @@ class FormingView(HasTraits):
 
         # get the current constrain information
 
-        nodes = self.data.x_0
+        nodes = self.data.formed_object.x_0
 
         # Arrays of Point Data in axis
         x, y, z = nodes.T
 
         # Visualize the data
 
-        if len(self.data.F) > 0:
-            cp_pipe = self.scene.mlab.triangular_mesh(x, y, z, self.data.F)
-            cp_pipe.mlab_source.dataset.lines = self.data.L
+        if len(self.data.formed_object.F) > 0:
+            cp_pipe = self.scene.mlab.triangular_mesh(
+                x, y, z, self.data.formed_object.F)
+            cp_pipe.mlab_source.dataset.lines = self.data.formed_object.L
             self.scene.mlab.pipeline.surface(cp_pipe, color=(0.6, 0.6, 0.6))
         else:
             cp_pipe = self.scene.mlab.points3d(x, y, z, scale_factor=0.2)
-            cp_pipe.mlab_source.dataset.lines = self.data.L
+            cp_pipe.mlab_source.dataset.lines = self.data.formed_object.L
 
         return cp_pipe
 
@@ -372,14 +377,14 @@ class FormingView(HasTraits):
 
         # get the current constrain information
 
-        nodes = self.data.x_aux
+        nodes = self.data.formed_object.x_aux
 
         # Arrays of Point Data in axis
         x, y, z = nodes.T
 
         # Visualize the data
 
-        if len(self.data.F_aux) > 0:
+        if len(self.data.formed_object.F_aux) > 0:
             aux_pipe = self.scene.mlab.triangular_mesh(
                 x, y, z, self.data.F_aux)
             aux_pipe.mlab_source.dataset.lines = self.data.L_aux
@@ -927,12 +932,12 @@ class FormingView(HasTraits):
                      label='Animation',
                      scrollable=True,
                      ),
-               Group(Item(name='ff_pipe_view',
-                          editor=ListEditor(style='custom',
-                                            rows=5)),
-                     label='Target faces',
-                     scrollable=True,
-                     ),
+               #                Group(Item(name='ff_pipe_view',
+               #                           editor=ListEditor(style='custom',
+               #                                             rows=5)),
+               #                      label='Target faces',
+               #                      scrollable=True,
+               #                      ),
                dock='tab'
                ),
                VGroup(
@@ -960,7 +965,7 @@ class FormingView(HasTraits):
 # =========================================================================
 
 if __name__ == '__main__':
-    from oricreate.forming_tasks import FoldRigidly
+    from oricreate import CustomCPFactory
     cp = CreasePattern(X=[[0, 0, 0],
                           [1, 0, 0],
                           [1, 1, 0],
@@ -975,18 +980,23 @@ if __name__ == '__main__':
                        F=[[0, 1, 3],
                           [1, 2, 3]])
 
-    lift = FoldRigidly(cp=cp, n_steps=10,
-                       cnstr_lhs=[[(1, 2, 1.0)],
-                                  [(0, 0, 1.0)],
-                                  [(0, 1, 1.0)],
-                                  [(0, 2, 1.0)],
-                                  [(3, 0, 1.0)],
-                                  [(3, 2, 1.0)],
-                                  [(2, 2, 1.0)],
-                                  [(5, 0, 1.0)]],
-                       GP=[[4, 0]],
-                       LP=[[5, 4]])
+    cpf = CustomCPFactory(formed_object=cp)
+#
+#     lift = FoldRigidly(previous_task=cpf, n_steps=10,
+#                        cnstr_lhs=[[(1, 2, 1.0)],
+#                                   [(0, 0, 1.0)],
+#                                   [(0, 1, 1.0)],
+#                                   [(0, 2, 1.0)],
+#                                   [(3, 0, 1.0)],
+#                                   [(3, 2, 1.0)],
+#                                   [(2, 2, 1.0)],
+#                                   [(5, 0, 1.0)]],
+#                        GP=[[4, 0]],
+#                        LP=[[5, 4]])
+#
+#     lift.cnstr_rhs[0] = 0.5
+#     lift.U_0[5] = 0.05
+#     lift.U_0[17] = 0.025
 
-    lift.cnstr_rhs[0] = 0.5
-    lift.U_0[5] = 0.05
-    lift.U_0[17] = 0.025
+    view = FormingView(root=cpf, data=cpf)
+    view.configure_traits()

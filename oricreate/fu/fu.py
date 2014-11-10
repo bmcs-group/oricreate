@@ -17,13 +17,13 @@ from traits.api import \
     DelegatesTo, Bool
 
 
-class OptCrit(HasStrictTraits):
+class Fu(HasStrictTraits):
 
     simulation_task = WeakRef
-    '''Link to the FormingTask tool.
+    '''Link to the simulation_task tool.
     '''
 
-    x_0 = DelegatesTo('FormingTask')
+    x_0 = DelegatesTo('simulation_task')
     '''Nodal coordinates
     '''
 
@@ -32,8 +32,8 @@ class OptCrit(HasStrictTraits):
     type of constraint.
     '''
 
-    def __init__(self, FormingTask, *args, **kw):
-        '''Initialization requiring the FormingTask tool.
+    def __init__(self, simulation_task, *args, **kw):
+        '''Initialization requiring the simulation_task tool.
         '''
-        self.FormingTask = FormingTask
+        self.simulation_task = simulation_task
         super(HasStrictTraits, self).__init__(*args, **kw)

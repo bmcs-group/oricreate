@@ -7,7 +7,8 @@ import math
 
 from traits.api import Property, Str, Int, Float, Array, cached_property
 import numpy as np
-from oricreate.simulation_tasks.simulation_task import FormingTask
+from oricreate.forming_tasks import \
+    FormingTask
 
 
 class RotateCopy(FormingTask):

@@ -7,15 +7,15 @@ Created on Oct 6, 2014
 from traits.api import Interface
 
 
-class IEqCons(Interface):
+class IHu(Interface):
 
-    '''Interface of an equality constraint.
+    '''Interface of an inequality constraint.
     '''
 
-    def get_G(self, U, t=0):
+    def get_H(self, U, t=0):
         '''Return the vector of equality constraint values.
         '''
 
-    def get_G_du(self, U, t=0):
+    def get_H_du(self, U, t=0):
         '''Return the jacobian of equality constraint values.
         '''

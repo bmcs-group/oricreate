@@ -10,26 +10,27 @@
 #
 # Thanks for using Simvisage open source!
 #
-# Created on Jan 29, 2013 by: matthias
+# Created on Jan 29, 2013 by: rch
 
 from traits.api import Instance, \
     Property, cached_property, Str, \
     Array, Dict, implements, Int, Bool
-
-from eq_cons import \
-    EqConsConstantLength
-from eq_cons import \
-    EqConsDevelopability, \
-    EqConsFlatFoldability
-from eq_cons import \
-    EqConsPointsOnSurface
-from eq_cons import \
-    IEqCons, GrabPoints, \
+from oricreate.gu import \
+    GuConstantLength, \
+    GuDevelopability, \
+    GuFlatFoldability, \
+    GuPointsOnSurface, \
+    IGu, GrabPoints, \
     PointsOnLine, DofConstraints
-from oricreate import \
-    CreasePattern, \
-    FormingTask, IFormingTask, \
-    ISimulationTask, SimulationStep, \
+from i_simulation_task import \
+    ISimulationTask
+from oricreate.crease_pattern import \
+    CreasePattern
+from oricreate.forming_tasks import \
+    FormingTask, IFormingTask
+from oricreate.simulation_step import \
+    SimulationStep
+from oricreate.mapping_tasks import \
     MapToSurface
 
 import numpy as np
@@ -239,14 +240,14 @@ class FindFormForGeometry(SimulationTask):
 
     name = Str('form finding')
 
-    eqcons = Dict(Str, IEqCons)
+    Gu = Dict(Str, IGu)
     '''Equality constraints.
     '''
 
-    def _eqcons_default(self):
-        return {'ff': EqConsFlatFoldability(FormingTask=self),
-                'uf': EqConsDevelopability(FormingTask=self),
-                'ps': EqConsPointsOnSurface(FormingTask=self),
+    def _Gu_default(self):
+        return {'ff': GuFlatFoldability(FormingTask=self),
+                'uf': GuDevelopability(FormingTask=self),
+                'ps': GuPointsOnSurface(FormingTask=self),
                 'dc': DofConstraints(FormingTask=self)
                 }
 
@@ -273,13 +274,13 @@ class FoldRigidly(SimulationTask):
 
     name = Str('fold to target surfaces')
 
-    eqcons = Dict(Str, IEqCons)
+    Gu = Dict(Str, IGu)
     '''Equality constraints.
     '''
 
-    def _eqcons_default(self):
-        return {'cl': EqConsConstantLength(FormingTask=self),
-                'ps': EqConsPointsOnSurface(FormingTask=self),
+    def _Gu_default(self):
+        return {'cl': GuConstantLength(FormingTask=self),
+                'ps': GuPointsOnSurface(FormingTask=self),
                 'dc': DofConstraints(FormingTask=self)
                 }
 
@@ -300,15 +301,15 @@ class Lift(SimulationTask):
 
     goal_function_type = 'none'
 
-    eqcons = Dict(Str, IEqCons)
+    Gu = Dict(Str, IGu)
     '''Equality constraints.
     '''
 
-    def _eqcons_default(self):
-        return {'cl': EqConsConstantLength(FormingTask=self),
+    def _Gu_default(self):
+        return {'cl': GuConstantLength(FormingTask=self),
                 'gp': GrabPoints(FormingTask=self),
                 'pl': PointsOnLine(FormingTask=self),
-                'ps': EqConsPointsOnSurface(FormingTask=self),
+                'ps': GuPointsOnSurface(FormingTask=self),
                 'dc': DofConstraints(FormingTask=self)
                 }
 
@@ -316,7 +317,6 @@ if __name__ == '__main__':
 
     from view import FormingView
     from util import t_, x_, z_
-    from eq_cons import CF
 
     cp = CreasePattern(X=[[0, 0, 0],
                           [1, 0, 0],
@@ -344,7 +344,6 @@ if __name__ == '__main__':
     lift.GP = [[4, 0]]
     lift.LP = [[5, 4],
                [6, 4]]
-    lift.cf_lst = [(CF(Rf=lift.CS[0][0]), [1])]
 
     lift.cnstr_lhs = [[(0, 0, 1.0)],
                       [(0, 1, 1.0)],

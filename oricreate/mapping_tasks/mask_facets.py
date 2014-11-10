@@ -6,7 +6,8 @@ Created on Jun 20, 2013
 from traits.api import \
     Property, Array, cached_property
 
-from mapping_task import MappingTask
+from mapping_task import \
+    MappingTask
 import numpy as np
 
 
@@ -30,7 +31,7 @@ class MaskFacets(MappingTask):
         return F[select_arr]
 
 if __name__ == '__main__':
-    from crease_pattern import \
+    from oricreate.factories import \
         YoshimuraCPFactory
     yf = YoshimuraCPFactory(n_x=4, n_y=4)
     print yf.formed_object.F

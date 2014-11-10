@@ -2,12 +2,12 @@ if __name__ == '__main__':
 
     import numpy as np
 
-    from oricreate import \
+    from oricreate.api import \
         CreasePattern, CustomCPFactory, \
         MapToSurface, FoldRigidly, FormingView
 
-    from oricreate.opt_crit import \
-        OptCritPotentialEnergy
+    from oricreate.fu import \
+        FuPotentialEnergy
 
     cp = CreasePattern(X=[[0, 0, 0],
                           [0, 1, 0],
@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
     fold.u_t[-1]
 
-    oc = OptCritPotentialEnergy(forming_task=init)
+    oc = FuPotentialEnergy(forming_task=init)
 
     u = np.zeros_like(cp.X)
     print 'f', oc.get_f(u)

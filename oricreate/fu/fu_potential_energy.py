@@ -17,13 +17,13 @@ from traits.api import \
 
 import numpy as np
 
-from i_opt_crit import \
-    IOptCrit
-from opt_crit import \
-    OptCrit
+from i_fu import \
+    IFu
+from fu import \
+    Fu
 
 
-class OptCritPotentialEnergy(OptCrit):
+class FuPotentialEnergy(Fu):
 
     '''Optimization criteria based on minimum potential energy of gravity.
 
@@ -31,7 +31,7 @@ class OptCritPotentialEnergy(OptCrit):
     integral over the spatial domain in an instantaneous configuration
     '''
 
-    implements(IOptCrit)
+    implements(IFu)
 
     def get_f(self, u, t=0):
         '''Get the potential energy of gravity.

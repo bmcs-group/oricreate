@@ -16,8 +16,9 @@ from traits.api import \
     Property, cached_property, \
     Array, List
 
-from crease_pattern import \
+from oricreate.crease_pattern import \
     CreasePatternState
+
 import numpy as np
 
 

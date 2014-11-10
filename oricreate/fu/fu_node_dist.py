@@ -14,11 +14,12 @@
 
 from traits.api import Array
 
-from opt_crit import OptCrit
+from fu import \
+    Fu
 import numpy as np
 
 
-class OptCritNodeDist(OptCrit):
+class FuNodeDist(Fu):
 
     '''Optimization criteria based on the distance between specified nodes.
     '''

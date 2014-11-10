@@ -15,11 +15,12 @@
 from traits.api import \
     DelegatesTo, cached_property, Property
 
-from eq_cons import EqCons
+from oricreate.gu.gu import \
+    Gu
 import numpy as np
 
 
-class AngleEqCons(EqCons):
+class AngleGu(Gu):
 
     '''Base class for angle equality constraints.
     '''
@@ -152,7 +153,7 @@ class AngleEqCons(EqCons):
         return G_du
 
 
-class EqConsDevelopability(AngleEqCons):
+class GuDevelopability(AngleGu):
 
     '''For the specified node associations require
     the sum of the angles between adjacent crease lines be 2Pi
@@ -172,7 +173,7 @@ class EqConsDevelopability(AngleEqCons):
         return self._get_G_du(U, t)
 
 
-class EqConsFlatFoldability(AngleEqCons):
+class GuFlatFoldability(AngleGu):
 
     '''For the specified node associations require
     the sum of alternating crease angles be zero.
@@ -213,7 +214,7 @@ if __name__ == '__main__':
 
     print 'in_neighbors', cp.iN_neighbors
 
-    uf = EqConsDevelopability(FormingTask)
+    uf = GuDevelopability(FormingTask)
 
     U = np.zeros_like(cp.X)
     U[3] = 0.1

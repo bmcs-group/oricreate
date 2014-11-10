@@ -7,7 +7,7 @@ from traits.api import \
     Interface
 
 
-class IOptCrit(Interface):
+class IFu(Interface):
 
     '''Interface of an equality constraint.
     '''

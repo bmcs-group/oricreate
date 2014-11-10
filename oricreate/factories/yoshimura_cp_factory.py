@@ -15,7 +15,7 @@
 from traits.api import \
     Float, Int, Property, cached_property, Bool, Array, Callable, Any
 
-from crease_pattern import \
+from oricreate.crease_pattern import \
     CreasePattern
 import numpy as np
 import sympy as sp

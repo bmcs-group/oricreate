@@ -5,14 +5,17 @@ Created on Oct 29, 2014
 '''
 
 from traits.api import \
-    HasStrictTraits, Property, cached_property, \
+    HasStrictTraits, Property, cached_property, implements, \
     Int, Trait, DelegatesTo, WeakRef, Dict, Str, Array, List
 
-from opt_crit import \
-    OptCritTargetFaces, OptCritPotentialEnergy
+from oricreate.opt import \
+    IOpt
 
-from eq_cons import \
-    IEqCons
+from oricreate.fu import \
+    FuTargetFaces, FuPotentialEnergy
+
+from oricreate.gu import \
+    IGu
 
 import numpy as np
 
@@ -22,12 +25,15 @@ class SimulationConfig(HasStrictTraits):
     '''Configuration of the optimization problem
     including the goal functions, and constraints.
     '''
+
+    implements(IOpt)
+
     debug_level = Int(0, label='Debug level', auto_set=False, enter_set=True)
 
     goal_function_type = Trait('target_faces',
                                {'none': None,
-                                'target_faces': OptCritTargetFaces,
-                                'potential_energy': OptCritPotentialEnergy
+                                'target_faces': FuTargetFaces,
+                                'potential_energy': FuPotentialEnergy
                                 },
                                input_change=True)
     '''Type of the sampling of the random domain
@@ -35,11 +41,11 @@ class SimulationConfig(HasStrictTraits):
 
     sim_step = WeakRef
 
-    goal_function = Property(depends_on='+input_change')
+    fu = Property(depends_on='+input_change')
 
     @cached_property
-    def _get_goal_function(self):
-        if self.goal_function_type_:
+    def _get_fu(self):
+        if self.fu_type_:
             return self.goal_function_type_(simulation_step=self.sim_step)
         else:
             return None
@@ -55,18 +61,35 @@ class SimulationConfig(HasStrictTraits):
     # Equality constraints
     # ==========================================================================
 
-    eqcons = Dict(Str, IEqCons)
+    gu = Dict(Str, IGu)
     '''Equality constraints
     '''
 
-    def _eqcons_default(self):
+    def _gu_default(self):
         return {}
 
-    eqcons_lst = Property(depends_on='eqcons')
+    gu_lst = Property(depends_on='gu')
 
     @cached_property
-    def _get_eqcons_lst(self):
-        return self.eqcons.values()
+    def _get_gu_lst(self):
+        return self.gu.values()
+
+    # ==========================================================================
+    # Inequality constraints
+    # ==========================================================================
+
+    hu = Dict(Str, IGu)
+    '''Equality constraints
+    '''
+
+    def _hu_default(self):
+        return {}
+
+    hu_lst = Property(depends_on='hu')
+
+    @cached_property
+    def _get_hu_lst(self):
+        return self.gu.values()
 
     # ===========================================================================
     # Kinematic constraints

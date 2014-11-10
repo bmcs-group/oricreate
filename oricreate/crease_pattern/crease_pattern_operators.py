@@ -17,9 +17,10 @@ from traits.api import \
     Property, cached_property, \
     Array
 
-from util import \
+from oricreate.util import \
     get_theta, get_theta_du
-from util.einsum_utils import DELTA, EPS
+from oricreate.util.einsum_utils import \
+    DELTA, EPS
 import numpy as np
 
 INPUT = '+cp_input'

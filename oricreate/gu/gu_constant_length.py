@@ -14,11 +14,12 @@
 
 from traits.api import DelegatesTo, PrototypedFrom
 
-from eq_cons import EqCons
+from oricreate.gu.gu import \
+    Gu
 import numpy as np
 
 
-class EqConsConstantLength(EqCons):
+class GuConstantLength(Gu):
 
     '''Constant length constraint.
     '''
@@ -94,7 +95,7 @@ if __name__ == '__main__':
                        )
 
     FormingTask = FormingTask(cp=cp)
-    constant_length = EqConsConstantLength(FormingTask)
+    constant_length = GuConstantLength(FormingTask)
 
     U = np.zeros_like(cp.X)
     U[2] += 1.0

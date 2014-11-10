@@ -14,7 +14,9 @@
 
 from traits.api import HasTraits, Property, DelegatesTo, Str
 
-from eq_cons import EqCons
+from oricreate.gu.gu import \
+    Gu
+
 import numpy as np
 import sympy as sp
 
@@ -48,7 +50,7 @@ class ControlFace(HasTraits):
 CF = ControlFace
 
 
-class EqConsPointsOnSurface(EqCons):
+class GuPointsOnSurface(Gu):
 
     N = DelegatesTo('FormingTask')
     n_N = DelegatesTo('FormingTask')
@@ -112,7 +114,7 @@ if __name__ == '__main__':
                        )
 
     FormingTask = FormingTask(cp=cp, cf_lst=[(control_face, [2])])
-    sliding_face = EqConsPointsOnSurface(FormingTask)
+    sliding_face = GuPointsOnSurface(FormingTask)
     U = np.zeros_like(cp.X)
     U[2] += 1.0
 

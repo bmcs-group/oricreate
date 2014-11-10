@@ -6,15 +6,12 @@ Created on Aug 14, 2014
 
 from traits.api import \
     Array, Property, cached_property, Instance, \
-    Float, Int, Str, List
+    Str, List
 
 import numpy as np
 
 from oricreate.simulation_step import \
     SimulationStep
-
-from oricreate.crease_pattern import \
-    CreasePattern
 
 from oricreate.forming_tasks import \
     FormingTask
@@ -22,36 +19,15 @@ from oricreate.forming_tasks import \
 
 class MapToSurface(FormingTask):
 
-    '''Initialization of the pattern for the FormingTask control.
-    The crease pattern object will be mapped on an target face, without any
-    constraints. This w`ill be done for time_step = 0.001, so theirs only
+    '''The nodes of the formed are  mapped on an target face, without any
+    constraints. This will be done for time_step = 0.001, so theirs only
     a little deformation.
 
     t_init (float): Time step which is used for the final mapping.
     default = 0.001
     '''
 
-    # ========================================================================
-    # Auxiliary elements that can be used interim steps of computation.
-    # They are not included in the crease pattern representation.
-    # ========================================================================
-    x_aux = Array(dtype=float, value=[])
-    '''Auxiliary nodes used for visualization.
-    '''
-
-    L_aux = Array(dtype=int, value=[])
-    '''Auxiliary lines used for visualization.
-    '''
-
-    F_aux = Array(dtype=int, value=[])
-    '''Auxiliary facets used for visualization.
-    '''
-
     name = Str('init')
-
-    cp = Instance(CreasePattern)
-    '''Instance of a crease pattern.
-    '''
 
     target_surfaces = List(None)
 
@@ -62,47 +38,21 @@ class MapToSurface(FormingTask):
     '''
 
     def _get_X_0(self):
-        return self.cp.X.flatten()
+        return self.formed_object.X.flatten()
 
     L = Property()
     '''Array of crease_lines defined by pairs of node numbers.
     '''
 
     def _get_L(self):
-        return self.cp.L
+        return self.formed_object.L
 
     F = Property()
     '''Array of crease facets defined by list of node numbers.
     '''
 
     def _get_F(self):
-        return self.cp.F
-
-    t_init = Float(0.05)
-    '''Time step which is used for the initialization mapping.
-    '''
-
-    def _t_init_changed(self):
-        self.t_arr = np.linspace(0, self.t_init, self.n_steps + 1)
-
-    n_steps = Int(1, auto_set=False, enter_set=True)
-    '''Number of time steps for the FormingTask simulation.
-    '''
-
-    def _n_steps_changed(self):
-        self.t_arr = np.linspace(0, self.t_init, self.n_steps + 1)
-
-    t_arr = Array(float)
-    '''Time array to the only given time step which is t_init.
-    '''
-
-    def _t_arr_default(self):
-        return np.linspace(0, self.t_init, self.n_steps + 1)
-
-    t_init = Float(0.01, auto_set=False, enter_set=True)
-    '''Factor defining the fraction of the target face z-coordinate
-    moving the nodes in the direction of the face.
-    '''
+        return self.formed_object.F
 
     # cached initial vector
     _U_0 = Array(float)

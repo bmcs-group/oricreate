@@ -17,15 +17,17 @@ from traits.api import \
     Property, cached_property, Any,\
     DelegatesTo, Float, Str, Array, \
     Instance
+
 import numpy as np
 from scipy.optimize import fsolve
-from i_opt_crit import \
-    IOptCrit
-from opt_crit import \
-    OptCrit
-
 import sympy as sm
-from util import x_, y_, z_, r_, s_, t_
+
+from i_fu import \
+    IFu
+from fu import \
+    Fu
+from oricreate.util import \
+    x_, y_, z_, r_, s_, t_
 
 
 class ParamFaceOperator(HasTraits):
@@ -288,12 +290,12 @@ class CnstrTargetFace(HasTraits):
 TF = CnstrTargetFace
 
 
-class OptCritTargetFaces(OptCrit):
+class FuTargetFaces(Fu):
 
     '''Container of target faces
     '''
 
-    implements(IOptCrit)
+    implements(IFu)
 
     tf_lst = List([])
 

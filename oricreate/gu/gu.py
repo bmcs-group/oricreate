@@ -17,11 +17,13 @@ from traits.api import \
     Array, DelegatesTo, cached_property, Property, \
     Bool
 
-from i_eq_cons import IEqCons
+from oricreate.gu.i_gu import \
+    IGu
+
 import numpy as np
 
 
-class EqCons(HasStrictTraits):
+class Gu(HasStrictTraits):
 
     '''Base class of equality constraints.
     '''
@@ -46,12 +48,12 @@ class EqCons(HasStrictTraits):
         super(HasStrictTraits, self).__init__(*args, **kw)
 
 
-class GrabPoints(EqCons):
+class GrabPoints(Gu):
 
     '''Grab points are included in the nodes attribute of the crease pattern.
     Their position is constrained within a facet using triangle coordinates.
     '''
-    implements(IEqCons)
+    implements(IGu)
 
     n_dofs = DelegatesTo('forming_task')
     N = DelegatesTo('forming_task')
@@ -120,7 +122,7 @@ class GrabPoints(EqCons):
         return grab_lines
 
 
-class PointsOnLine(EqCons):
+class PointsOnLine(Gu):
 
     '''PointsOnLine are included in the nodes attribute
     of the crease pattern.
@@ -128,7 +130,7 @@ class PointsOnLine(EqCons):
     line-element and at least one other
     constraining Element.
     '''
-    implements(IEqCons)
+    implements(IGu)
 
     LP = DelegatesTo('forming_task')
     n_LP = DelegatesTo('forming_task')
@@ -288,11 +290,11 @@ class PointsOnLine(EqCons):
         return dR
 
 
-class DofConstraints(EqCons):
+class DofConstraints(Gu):
 
     '''Explicit constraints for selected of freedom.
     '''
-    implements(IEqCons)
+    implements(IGu)
 
     n_N = DelegatesTo('forming_task')
     n_D = DelegatesTo('forming_task')

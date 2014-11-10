@@ -21,8 +21,8 @@ from traitsui.api import \
 
 import numpy as np
 
-from forming_tasks.i_formed_object import \
-    IFormedObject  # @UnresolvedImport
+from oricreate.forming_tasks import \
+    IFormedObject
 
 from crease_pattern_export import \
     CreasePatternExport

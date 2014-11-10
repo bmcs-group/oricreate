@@ -20,10 +20,9 @@ from traits.api import \
     Int, Float, Bool, \
     Constant, Instance
 
-from simulation_config import \
-    SimulationConfig
+import simulation_config
 
-from oricreate import \
+from oricreate.crease_pattern import \
     CreasePatternState
 
 import time
@@ -46,7 +45,7 @@ class SimulationStep(CreasePatternState):
     """
     source_config_changed = Event
 
-    sim_config = Instance(SimulationConfig)
+    sim_config = Instance(simulation_config.SimulationConfig)
 
     sim_config_ = Property(depends_on='sim_config')
 
@@ -135,8 +134,8 @@ class SimulationStep(CreasePatternState):
 
         info = fmin_slsqp(self.get_f_t, self.cp_state.U,
                           fprime=self.get_f_du_t,
-                          f_eqcons=self.get_G_t,
-                          fprime_eqcons=get_G_du_t,
+                          f_Gu=self.get_G_t,
+                          fprime_Gu=get_G_du_t,
                           acc=self.acc, iter=self.MAX_ITER,
                           iprint=0,
                           full_output=True,
@@ -175,7 +174,7 @@ class SimulationStep(CreasePatternState):
     # Equality constraints
     # ==========================================================================
     def get_G(self, u, t=0):
-        G_lst = [eqcons.get_G(u, t) for eqcons in self.eqcons_lst]
+        G_lst = [Gu.get_G(u, t) for Gu in self.Gu_lst]
         if(G_lst == []):
             return []
         return np.hstack(G_lst)
@@ -188,7 +187,7 @@ class SimulationStep(CreasePatternState):
         return G
 
     def get_G_du(self, u, t=0):
-        G_dx_lst = [eqcons.get_G_du(u, t) for eqcons in self.eqcons_lst]
+        G_dx_lst = [Gu.get_G_du(u, t) for Gu in self.Gu_lst]
         if(G_dx_lst == []):
             return []
         G_du = np.vstack(G_dx_lst)
