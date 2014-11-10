@@ -77,6 +77,8 @@ CreasePatternExport
 Crease pattern factories
 ------------------------
 
+.. currentmodule:: oricreate.factories
+
 YoshimuraCreasePattern
 ======================
 

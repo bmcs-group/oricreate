@@ -20,8 +20,12 @@ from oricreate.hu import \
 
 class IOpt(Interface):
 
-    '''Configuration of the optimization problem
+    r'''Configuration of the optimization problem
     including the goal functions, and constraints.
+
+    ... math::
+        \min f(\bm{u}), \; \bm{g}(\bm{u}) = 0, \; \bm{h}(\bm{h}) > 0
+
     '''
     fu = Instance(IFu)
     '''Goal function of the optimization problem.

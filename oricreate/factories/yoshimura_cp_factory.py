@@ -279,19 +279,6 @@ class YoshimuraCPFactory(FactoryTask):
                 n_h, n_v, n_i, X_h, X_v, X_i,
                 interior_vertices, cycled_neighbors)
 
-    def show(self, mlab):
-        '''X.
-        '''
-        x, y, z = self.XX.T
-        if len(self.F) > 0:
-            cp_pipe = mlab.triangular_mesh(x, y, z, self.F)
-            cp_pipe.mlab_source.dataset.lines = self.L
-            mlab.pipeline.surface(cp_pipe)
-        else:
-            cp_pipe = mlab.points3d(x, y, z, scale_factor=0.2)
-            cp_pipe.mlab_source.dataset.lines = self.L
-
-
 if __name__ == '__main__':
 
     yf = YoshimuraCPFactory(L_x=3,
@@ -302,12 +289,6 @@ if __name__ == '__main__':
                             fy=(y_) ** 2)
 
     cp = yf.formed_object
-
-    print cp.X
-
-    # cp.nodes = np.array([0, 0, 0])
-
-    print 'n_crease_lines', cp.n_L
 
     import pylab as p
     cp.plot_mpl(p.axes())

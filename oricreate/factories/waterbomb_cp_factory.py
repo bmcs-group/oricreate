@@ -278,8 +278,8 @@ if __name__ == '__main__':
 
     wbf = WaterBombCPFactory(L_x=7,
                              L_y=4,
-                             n_x=7,
-                             n_y=4)
+                             n_x=3,
+                             n_y=3)
 
     cp = wbf.formed_object
     print cp.X

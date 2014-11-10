@@ -10,6 +10,8 @@ from traits.api import \
 class IFu(Interface):
 
     '''Interface of an equality constraint.
+
+        :math::
     '''
 
     def get_f(self, u, t=0):

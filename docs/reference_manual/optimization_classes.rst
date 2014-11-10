@@ -2,7 +2,7 @@
 .. highlightlang:: python
 	:linenothreshold: 3
 
-.. currentmodule:: oricreate.opt_crit
+.. currentmodule:: oricreate.fu
 
 ======================================
 Components of the optimization problem
@@ -15,10 +15,10 @@ Goal functions for optimmization
 Potential energy of gravity
 ---------------------------
 
-.. inheritance-diagram:: OptCritPotentialEnergy
+.. inheritance-diagram:: FuPotentialEnergy
 	:parts: 1
 
-.. autoclass:: OptCritPotentialEnergy
+.. autoclass:: FuPotentialEnergy
 	:members:
 
 Distance to target face
@@ -30,18 +30,18 @@ Distance to target face
 .. autoclass:: CnstrTargetFace
 	:members:
 
-.. currentmodule:: oricreate.eq_cons
+.. currentmodule:: oricreate.gu
 
 --------------------
 Equality constraints
 --------------------
 
-EqCons
-------
+Gu
+--
 
-.. inheritance-diagram:: EqCons
+.. inheritance-diagram:: Gu
 	:parts: 1
 
-.. autoclass:: EqCons
+.. autoclass:: Gu
 	:members:
 

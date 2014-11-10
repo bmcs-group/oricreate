@@ -11,6 +11,8 @@
 
    reshaping_tasks
 
+   opt_problem
+   
    optimization_classes
 
    geometric_operators
