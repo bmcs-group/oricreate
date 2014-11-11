@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 #
 # Copyright (c) 2009-2013, IMB, RWTH Aachen.
 # All rights reserved.
@@ -20,7 +20,7 @@ from traits.api import \
 class Fu(HasStrictTraits):
 
     simulation_task = WeakRef
-    '''Link to the simulation_task tool.
+    '''Link to the simulation_task.
     '''
 
     x_0 = DelegatesTo('simulation_task')

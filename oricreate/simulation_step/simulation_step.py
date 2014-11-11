@@ -18,12 +18,16 @@ from scipy.optimize import \
 from traits.api import \
     Event, Property, cached_property, \
     Int, Float, Bool, \
-    Constant, Instance
+    Instance
 
-import simulation_config
+from simulation_config import \
+    SimulationConfig
 
 from oricreate.crease_pattern import \
     CreasePatternState
+
+from oricreate.opt.i_opt import \
+    IOpt
 
 import time
 
@@ -45,43 +49,16 @@ class SimulationStep(CreasePatternState):
     """
     source_config_changed = Event
 
-    sim_config = Instance(simulation_config.SimulationConfig)
+    opt = Instance(SimulationConfig)
 
-    sim_config_ = Property(depends_on='sim_config')
+    opt_ = Property(depends_on='sim_config')
 
     @cached_property
-    def _get_sim_config_(self):
-        self.sim_config.sim_step = self
-        return self.sim_config
+    def _get_opt_(self):
+        self.opt.sim_step = self
+        return self.opt
 
-    # =======================================================================
-    # Geometric data
-    # =======================================================================
-
-    n_L = Property()
-    '''Number of crease lines.
-    '''
-
-    def _get_n_L(self):
-        return len(self.L)
-
-    n_N = Property()
-    '''Number of crease nodes.
-    '''
-
-    def _get_n_N(self):
-        return len(self.x_0)
-
-    n_D = Constant(3)
-    '''Number of spatial dimensions.
-    '''
-
-    n_dofs = Property()
-    '''Number of degrees of freedom.
-    '''
-
-    def _get_n_dofs(self):
-        return self.n_N * self.n_D
+    t = Float(0.0, auto_set=False, enter_set=True)
 
     show_iter = Bool(False, auto_set=False, enter_set=True)
     '''Saves the first 10 iteration steps, so they can be analyzed
@@ -105,7 +82,7 @@ class SimulationStep(CreasePatternState):
                 break
             try:
                 d_U = np.linalg.solve(dR, -R)
-                self.cp_state.U += d_U
+                self.U += d_U
                 i += 1
             except Exception as inst:
                 print '=== Problems solving iteration step %d  ====' % i
@@ -113,18 +90,16 @@ class SimulationStep(CreasePatternState):
         else:
             print '==== did not converge in %d iterations ====' % i
 
-        return self.cp_state.U
+        return self.U
 
     use_G_du = Bool(True, auto_set=False, enter_set=True)
-
-    t = Float(0.0, auto_set=False, enter_set=True)
 
     def _solve_fmin(self):
         '''Solve the problem using the
         Sequential Least Square Quadratic Programming method.
         '''
         print '==== solving with SLSQP optimization ===='
-        d0 = self.get_f_t(self.cp_state.U)
+        d0 = self.get_f_t(self.U)
         eps = d0 * 1e-4
         get_G_du_t = None
 
@@ -132,7 +107,8 @@ class SimulationStep(CreasePatternState):
         if self.use_G_du:
             get_G_du_t = self.get_G_du_t
 
-        info = fmin_slsqp(self.get_f_t, self.cp_state.U,
+        info = fmin_slsqp(self.get_f_t,
+                          self.cp_state.U,
                           fprime=self.get_f_du_t,
                           f_Gu=self.get_G_t,
                           fprime_Gu=get_G_du_t,
@@ -154,8 +130,8 @@ class SimulationStep(CreasePatternState):
     def get_f_t(self, U):
         '''Get the goal function value.
         '''
-        u = U.reshape(self.n_N, self.n_D)
-        f = self.goal_function.get_f(u, self.t)
+        u = U.reshape(-1, self.n_D)
+        f = self.opt.fu.get_f(u, self.t)
         if self.debug_level > 0:
             print 'f:\n', f
         return f
@@ -163,8 +139,8 @@ class SimulationStep(CreasePatternState):
     def get_f_du_t(self, U):
         '''Get the goal function derivatives.
         '''
-        u = U.reshape(self.n_N, self.n_D)
-        f_du = self.goal_function.get_f_du(u, self.t)
+        u = U.reshape(-1, self.n_D)
+        f_du = self.opt.fu.get_f_du(u, self.t)
         if self.debug_level > 1:
             print 'f_du.shape:\n', f_du.shape
             print 'f_du:\n', f_du
@@ -173,32 +149,32 @@ class SimulationStep(CreasePatternState):
     # ==========================================================================
     # Equality constraints
     # ==========================================================================
-    def get_G(self, u, t=0):
-        G_lst = [Gu.get_G(u, t) for Gu in self.Gu_lst]
-        if(G_lst == []):
-            return []
-        return np.hstack(G_lst)
-
-    def get_G_t(self, U):
+    def get_g_t(self, U):
         u = U.reshape(-1, self.n_D)
-        G = self.get_G(u, self.t)
+        g = self.get_g(u, self.t)
         if self.debug_level > 0:
-            print 'G:\n', [G]
-        return G
+            print 'G:\n', [g]
+        return g
 
-    def get_G_du(self, u, t=0):
-        G_dx_lst = [Gu.get_G_du(u, t) for Gu in self.Gu_lst]
-        if(G_dx_lst == []):
+    def get_g(self, u, t=0):
+        g_lst = [gu.get_g(u, t) for gu in self.opt.gu_lst]
+        if(g_lst == []):
             return []
-        G_du = np.vstack(G_dx_lst)
-        if self.debug_level > 1:
-            print 'G_du.shape:\n', G_du.shape
-            print 'G_du:\n', [G_du]
-        return G_du
+        return np.hstack(g_lst)
 
-    def get_G_du_t(self, U):
+    def get_g_du_t(self, U):
         u = U.reshape(-1, self.n_D)
-        return self.get_G_du(u, self.t)
+        return self.get_g_du(u, self.t)
+
+    def get_g_du(self, u, t=0):
+        g_du_lst = [gu.get_G_du(u, t) for gu in self.opt.gu_lst]
+        if(g_du_lst == []):
+            return []
+        g_du = np.vstack(g_du_lst)
+        if self.debug_level > 1:
+            print 'G_du.shape:\n', g_du.shape
+            print 'G_du:\n', [g_du]
+        return g_du
 
     # =========================================================================
     # Output data

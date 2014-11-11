@@ -14,7 +14,7 @@ if __name__ == '__main__':
     cpf = CustomCPFactory(formed_object=cp)
     init = MapToSurface(previous_task=cpf)
     oc = FuNodeDist(forming_task=init,
-                         L=[[0, 1], [1, 2]])
+                    L=[[0, 1], [1, 2]])
 
     u = np.array([[0, 0, 0],
                   [0, 0, 0],
