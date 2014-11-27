@@ -14,7 +14,7 @@
 
 from traits.api import HasTraits, Property, DelegatesTo, Str
 
-from oricreate.gu.gu import \
+from gu import \
     Gu
 
 import numpy as np
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     print control_face.dRf(xx, yy, xx, 0)
     print control_face.dRf(xx, yy, xx, 1)
 
-    from oricreate import FormingTask, CreasePattern
+    from oricreate.api import FormingTask, CreasePattern
 
     cp = CreasePattern(X=[[-4, -5, -3],
                           [0, 0.0, 0],

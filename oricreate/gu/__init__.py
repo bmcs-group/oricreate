@@ -11,5 +11,3 @@ from gu_control_face import \
     GuPointsOnSurface, CF
 from gu_dofs import \
     fix, link
-from i_gu import \
-    IGu

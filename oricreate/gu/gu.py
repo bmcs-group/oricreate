@@ -17,7 +17,7 @@ from traits.api import \
     Array, DelegatesTo, cached_property, Property, \
     Bool
 
-from oricreate.gu.i_gu import \
+from oricreate.opt import \
     IGu
 
 import numpy as np

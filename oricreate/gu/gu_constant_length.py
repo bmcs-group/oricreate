@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 #
 # Copyright (c) 2009, IMB, RWTH Aachen.
 # All rights reserved.
@@ -14,7 +14,7 @@
 
 from traits.api import DelegatesTo, PrototypedFrom
 
-from oricreate.gu.gu import \
+from gu import \
     Gu
 import numpy as np
 
@@ -85,7 +85,7 @@ class GuConstantLength(Gu):
 
 if __name__ == '__main__':
 
-    from oricreate import FormingTask, CreasePattern
+    from oricreate.api import FormingTask, CreasePattern
 
     cp = CreasePattern(X=[[-4, -5, -3],
                           [0, 0.0, 0],

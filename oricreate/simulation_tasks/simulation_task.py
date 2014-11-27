@@ -20,7 +20,7 @@ from oricreate.gu import \
     GuDevelopability, \
     GuFlatFoldability, \
     GuPointsOnSurface, \
-    IGu, GrabPoints, \
+    GrabPoints, \
     PointsOnLine, DofConstraints
 from i_simulation_task import \
     ISimulationTask
@@ -32,7 +32,8 @@ from oricreate.simulation_step import \
     SimulationStep
 from oricreate.mapping_tasks import \
     MapToSurface
-
+from oricreate.opt import \
+    IGu
 import numpy as np
 import time
 import platform

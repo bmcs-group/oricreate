@@ -6,16 +6,13 @@ Created on Oct 29, 2014
 
 from traits.api import \
     HasStrictTraits, Property, cached_property, implements, \
-    Int, Trait, DelegatesTo, WeakRef, Dict, Str, Array, List
+    Int, Trait, Instance, DelegatesTo, WeakRef, Dict, Str, Array, List
 
 from oricreate.opt import \
-    IOpt
+    IOpt, IFu, IGu, IHu
 
 from oricreate.fu import \
     FuTargetFaces, FuPotentialEnergy
-
-from oricreate.gu import \
-    IGu
 
 import numpy as np
 
@@ -36,12 +33,12 @@ class SimulationConfig(HasStrictTraits):
                                 'potential_energy': FuPotentialEnergy
                                 },
                                input_change=True)
-    '''Type of the sampling of the random domain
+    '''Type of the goal function.
     '''
 
     sim_step = WeakRef
 
-    fu = Property(depends_on='+input_change')
+    fu = Property(Instance(IFu), depends_on='+input_change')
 
     @cached_property
     def _get_fu(self):
@@ -50,19 +47,8 @@ class SimulationConfig(HasStrictTraits):
         else:
             return None
 
-    tf_lst = DelegatesTo('goal_function')
-    '''List of target faces.
-
-    If target face is available, than use it for initialization.
-    The z component of the face is multiplied with a small init_factor
-    '''
-
-    # ==========================================================================
-    # Equality constraints
-    # ==========================================================================
-
     gu = Dict(Str, IGu)
-    '''Equality constraints
+    '''Equality constraints.
     '''
 
     def _gu_default(self):
@@ -74,12 +60,8 @@ class SimulationConfig(HasStrictTraits):
     def _get_gu_lst(self):
         return self.gu.values()
 
-    # ==========================================================================
-    # Inequality constraints
-    # ==========================================================================
-
-    hu = Dict(Str, IGu)
-    '''Equality constraints
+    hu = Dict(Str, IHu)
+    '''Inequality constraints
     '''
 
     def _hu_default(self):
@@ -90,6 +72,13 @@ class SimulationConfig(HasStrictTraits):
     @cached_property
     def _get_hu_lst(self):
         return self.gu.values()
+
+    tf_lst = DelegatesTo('goal_function')
+    '''List of target faces.
+
+    If target face is available, than use it for initialization.
+    The z component of the face is multiplied with a small init_factor
+    '''
 
     # ===========================================================================
     # Kinematic constraints

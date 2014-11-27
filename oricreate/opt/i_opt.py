@@ -8,13 +8,13 @@ from traits.api import \
     Interface, Property, Instance, \
     Dict, Str
 
-from oricreate.fu import \
+from i_fu import \
     IFu
 
-from oricreate.gu import \
+from i_gu import \
     IGu
 
-from oricreate.hu import \
+from i_hu import \
     IHu
 
 
