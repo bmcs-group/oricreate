@@ -164,8 +164,10 @@ class MiuraOriCPFactory(FactoryTask):
             (n_x + 1) * (n_y + 1) - n_y - 1), np.arange(n_y + 1, (n_x + 1) * (n_y + 1))))
         c_v = np.column_stack(
             (n_all[:, 0:-1].flatten('F'), n_all[:, 1:].flatten('F')))
+        c_d = np.column_stack(
+            (n_all[0:-1:1, 0:-1:1].flatten(), n_all[1::1, 1::1].flatten()))
 
-        crease_lines = np.vstack((c_h, c_v))
+        crease_lines = np.vstack((c_h, c_v, c_d))
 
         # ======================================================================
         # Construct the facet mappings
@@ -175,7 +177,10 @@ class MiuraOriCPFactory(FactoryTask):
         f_3 = n_all[1::1, 1::1].flatten()
         f_4 = n_all[1::1, 0:-1:1].flatten()
 
-        facets = np.column_stack((f_1, f_2, f_3, f_4))
+        facets_1 = np.column_stack((f_1, f_2, f_4))
+        facets_2 = np.column_stack((f_2, f_3, f_4))
+        facets = np.vstack((facets_1, facets_2))
+        print "facetten", facets_2
 
         return (nodes, crease_lines, facets,
                 )
@@ -193,10 +198,6 @@ if __name__ == '__main__':
 
     cp = yf.formed_object
 
-    print 'g', yf._geometry
-    print 'x_0', cp.x_0
-
-    print 'cp', cp.L
     import pylab as p
     cp.plot_mpl(p.axes())
     p.show()
