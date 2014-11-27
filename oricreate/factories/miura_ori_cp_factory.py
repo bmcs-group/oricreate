@@ -146,14 +146,13 @@ class MiuraOriCPFactory(FactoryTask):
         X_i = np.c_[x_i.flatten(), y_i.flatten()]
 
         n_all = np.arange((n_x + 1) * (n_y + 1)).reshape((n_x + 1), (n_y + 1))
-        print n_all
 
         nodes = X_h
 
         zero_z = np.zeros((nodes.shape[0], 1), dtype=float)
 
         nodes = np.hstack([nodes, zero_z])
-        print "nodes", nodes
+
         # connectivity of nodes defining the crease pattern
 
         # ======================================================================
@@ -177,10 +176,10 @@ class MiuraOriCPFactory(FactoryTask):
         f_3 = n_all[1::1, 1::1].flatten()
         f_4 = n_all[1::1, 0:-1:1].flatten()
 
-        facets_1 = np.column_stack((f_1, f_2, f_4))
-        facets_2 = np.column_stack((f_2, f_3, f_4))
+        facets_1 = np.column_stack((f_1, f_2, f_3))
+        facets_2 = np.column_stack((f_3, f_4, f_1))
         facets = np.vstack((facets_1, facets_2))
-        print "facetten", facets_2
+        print "facetten", facets
 
         return (nodes, crease_lines, facets,
                 )
