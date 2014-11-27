@@ -13,14 +13,16 @@
 # Created on Sep 7, 2011 by: rch
 
 from traits.api import \
-    Float, Int, Property, cached_property, Bool, Array, Callable, Any
-
-from oricreate.crease_pattern import \
-    CreasePattern
-from oricreate.forming_tasks import \
-    FactoryTask
+    Float, Int, Property, cached_property, Callable
 import numpy as np
 import sympy as sp
+
+from oricreate.crease_pattern import CreasePattern
+
+
+from oricreate.forming_tasks import \
+    FactoryTask
+
 x_, y_ = sp.symbols('x, y')
 
 
@@ -35,6 +37,7 @@ class MiuraOriCPFactory(FactoryTask):
 
     n_x = Int(2, geometry=True)
     n_y = Int(2, geometry=True)
+    d_x = Float(4)
 
     def _get_formed_object(self):
         return CreasePattern(X=self.X,
@@ -112,22 +115,28 @@ class MiuraOriCPFactory(FactoryTask):
 
         n_x = self.n_x
         n_y = self.n_y
+        d_x = self.d_x
 
         L_x = self.L_x
         L_y = self.L_y
 
         x_e, y_e = np.mgrid[0:L_x:complex(n_x + 1), 0:L_y:complex(n_y + 1)]
+        # print x_e
+        # print y_e
+        x_e[1:-1:1, 0::2] = x_e[1:-1:1, 0::2] + d_x
+        x_e[1:-1:1, 1::2] = x_e[1:-1:1, 1::2] - d_x
 
         # nodes on horizontal crease lines
 
-        x_h = x_e[:, ::2]
-        y_h = y_e[:, ::2]
+        x_h = x_e[:, ::1]
+
+        y_h = y_e[:, ::1]
         X_h = np.c_[x_h.flatten(), y_h.flatten()]
 
         # nodes on vertical boundaries on odd horizontal crease lines
 
-        x_v = x_e[(0, -1), 1::2]
-        y_v = y_e[(0, -1), 1::2]
+        x_v = x_e[(0, -1), 1::1]
+        y_v = y_e[(0, -1), 1::1]
         X_v = np.c_[x_v.flatten(), y_v.flatten()]
 
         # interior nodes on odd horizontal crease lines
@@ -136,92 +145,40 @@ class MiuraOriCPFactory(FactoryTask):
         y_i = (y_e[1:, 1::2] + y_e[:-1, 1::2]) / 2.0
         X_i = np.c_[x_i.flatten(), y_i.flatten()]
 
-        # node enumeration in grid form on
-        # (1) the even horizontal crease lines
-        # (2)
-        # (3)
+        n_all = np.arange((n_x + 1) * (n_y + 1)).reshape((n_x + 1), (n_y + 1))
+        print n_all
 
-        n_h = np.arange(
-            (n_x + 1) * (n_y / 2 + 1)).reshape((n_x + 1), (n_y / 2 + 1))
-        n_v = np.arange((2 * n_y / 2)).reshape(2, n_y / 2) + n_h[-1, -1] + 1
-        n_i = np.arange(n_x * n_y / 2).reshape(n_x, n_y / 2) + n_v[-1, -1] + 1
-        n_viv = np.vstack([n_v[0, :], n_i, n_v[-1,:]])
+        nodes = X_h
 
-        # connectivity of nodes defining the crease pattern
-
-        e_h00 = np.c_[n_h[:-1, :].flatten(), n_h[1:,:].flatten()]
-        e_h90 = np.c_[n_h[(0, -1), :-1].flatten(), n_v[:, :].flatten()]
-        e_v90 = np.c_[n_v[:, :].flatten(), n_h[(0, -1), 1:].flatten()]
-        e_h45 = np.c_[n_h[:-1, :-1].flatten(), n_i[:, :].flatten()]
-        e_i45 = np.c_[n_i[:, :].flatten(), n_h[1:, 1:].flatten()]
-        e_h135 = np.c_[n_h[1:, :-1].flatten(), n_i[:, :].flatten()]
-        e_i135 = np.c_[n_i[:, :].flatten(), n_h[:-1, 1:].flatten()]
-        e_v00 = np.c_[n_v[:, :].flatten(), n_i[(0, -1),:].flatten()]
-        e_i00 = np.c_[n_i[:-1, :].flatten(), n_i[1:,:].flatten()]
-
-        nodes = np.vstack([X_h, X_v, X_i])
         zero_z = np.zeros((nodes.shape[0], 1), dtype=float)
 
         nodes = np.hstack([nodes, zero_z])
-        crease_lines = np.vstack(
-            [e_h00, e_h90, e_v90, e_h45, e_i45, e_h135, e_i135, e_v00, e_i00])
+        print "nodes", nodes
+        # connectivity of nodes defining the crease pattern
 
         # ======================================================================
-        # Connectivity mepping - neighbours of each vertex - closed
+        # Construct the creaseline mappings
         # ======================================================================
 
-        c_h = n_h[1:-1, 1:-1].flatten()
+        c_h = np.column_stack((np.arange(
+            (n_x + 1) * (n_y + 1) - n_y - 1), np.arange(n_y + 1, (n_x + 1) * (n_y + 1))))
+        c_v = np.column_stack(
+            (n_all[:, 0:-1].flatten('F'), n_all[:, 1:].flatten('F')))
 
-        c_h235 = n_viv[1:-2, :-1].flatten()
-        c_h315 = n_viv[2:-1, :-1].flatten()
-        c_h000 = n_h[2:, 1:-1].flatten()
-        c_h045 = n_viv[2:-1, 1:].flatten()
-        c_h135 = n_viv[1:-2, 1:].flatten()
-        c_h180 = n_h[:-2, 1:-1].flatten()
-
-        conn_h = np.vstack([c_h235, c_h315, c_h000, c_h045, c_h135, c_h180])
-
-        c_viv = n_viv[1:-1, :].flatten()
-        c_viv235 = n_h[:-1, :-1].flatten()
-        c_viv315 = n_h[1:, :-1].flatten()
-        c_viv000 = n_viv[2:, :].flatten()
-        c_viv045 = n_h[1:, 1:].flatten()
-        c_viv135 = n_h[:-1, 1:].flatten()
-        c_viv180 = n_viv[:-2, :].flatten()
-
-        conn_viv = np.vstack(
-            [c_viv235, c_viv315, c_viv000, c_viv045, c_viv135, c_viv180])
-
-        interior_vertices = np.hstack([c_h, c_viv])
-        cycled_neighbors = np.hstack([conn_h, conn_viv])
+        crease_lines = np.vstack((c_h, c_v))
 
         # ======================================================================
         # Construct the facet mappings
         # ======================================================================
-        f_h00 = np.c_[
-            n_h[:-1, :-1].flatten(), n_h[1:, :-1].flatten(), n_i[:, :].flatten()]
-        f_hi90 = np.c_[
-            n_h[1:-1, :-1].flatten(), n_i[1:, :].flatten(), n_i[:-1,:].flatten()]
-        f_hl90 = np.c_[
-            n_h[0, :-1].flatten(), n_i[0, :].flatten(), n_v[0,:].flatten()]
-        f_hr90 = np.c_[
-            n_h[-1, :-1].flatten(), n_i[-1, :].flatten(), n_v[-1,:].flatten()]
-        g_h00 = np.c_[
-            n_h[:-1, 1:].flatten(), n_h[1:, 1:].flatten(), n_i[:, :].flatten()]
-        g_hi90 = np.c_[
-            n_h[1:-1, 1:].flatten(), n_i[1:, :].flatten(), n_i[:-1,:].flatten()]
-        g_hl90 = np.c_[
-            n_h[0, 1:].flatten(), n_i[0, :].flatten(), n_v[0,:].flatten()]
-        g_hr90 = np.c_[
-            n_h[-1, 1:].flatten(), n_i[-1, :].flatten(), n_v[-1,:].flatten()]
+        f_1 = n_all[0:-1:1, 0:-1:1].flatten()
+        f_2 = n_all[0:-1:1, 1::1].flatten()
+        f_3 = n_all[1::1, 1::1].flatten()
+        f_4 = n_all[1::1, 0:-1:1].flatten()
 
-        facets = np.vstack([f_h00, f_hi90, f_hl90, f_hr90,
-                            g_h00, g_hi90, g_hl90, g_hr90])
+        facets = np.column_stack((f_1, f_2, f_3, f_4))
 
-        return ([[0, 0, 0], [1, 1, 0], [0, 1, 0]],
-                [[0, 1], [1, 2], [2, 0]], [[0, 1, 2]],
-                n_h, n_v, n_i, X_h, X_v, X_i,
-                interior_vertices, cycled_neighbors)
+        return (nodes, crease_lines, facets,
+                )
 #         return (self.geo_transform(nodes), crease_lines, facets,
 #                 n_h, n_v, n_i, X_h, X_v, X_i,
 #                 interior_vertices, cycled_neighbors)
@@ -231,10 +188,15 @@ if __name__ == '__main__':
     yf = MiuraOriCPFactory(L_x=3,
                            L_y=3,
                            n_x=3,
-                           n_y=4)
+                           n_y=4,
+                           d_x=0.15)
 
     cp = yf.formed_object
 
+    print 'g', yf._geometry
+    print 'x_0', cp.x_0
+
+    print 'cp', cp.L
     import pylab as p
     cp.plot_mpl(p.axes())
     p.show()
