@@ -10,3 +10,6 @@ from i_gu import \
 
 from i_hu import \
     IHu
+
+from opt_component import \
+    OptComponent

@@ -13,23 +13,19 @@
 # Created on Jan 3, 2013 by: rch, schmerl
 
 from traits.api import \
-    HasStrictTraits, implements, WeakRef, \
+    HasStrictTraits, implements, \
     Array, DelegatesTo, cached_property, Property, \
     Bool
 
 from oricreate.opt import \
-    IGu
+    IGu, OptComponent
 
 import numpy as np
 
 
-class Gu(HasStrictTraits):
+class Gu(OptComponent):
 
     '''Base class of equality constraints.
-    '''
-
-    forming_task = WeakRef
-    '''Link to the forming_task tool.
     '''
 
     x_0 = DelegatesTo('forming_task')

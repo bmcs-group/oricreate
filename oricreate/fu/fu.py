@@ -13,15 +13,14 @@
 # Created on Jan 3, 2013 by: rch, schmerl
 
 from traits.api import \
-    HasStrictTraits, WeakRef, \
+    HasStrictTraits, \
     DelegatesTo, Bool
 
+from oricreate.opt import \
+    OptComponent
 
-class Fu(HasStrictTraits):
 
-    simulation_task = WeakRef
-    '''Link to the simulation_task.
-    '''
+class Fu(OptComponent):
 
     x_0 = DelegatesTo('simulation_task')
     '''Nodal coordinates
@@ -35,5 +34,5 @@ class Fu(HasStrictTraits):
     def __init__(self, simulation_task, *args, **kw):
         '''Initialization requiring the simulation_task tool.
         '''
-        self.simulation_task = simulation_task
+        self.forming_task = simulation_task
         super(HasStrictTraits, self).__init__(*args, **kw)

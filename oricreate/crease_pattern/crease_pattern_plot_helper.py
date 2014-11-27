@@ -72,8 +72,8 @@ class CreasePatternPlotHelper(HasStrictTraits):
         # plot facet numbers
         if facets is True:
             xy_offset = (0, 0)
-            line_pos = 1 / 3.0 * np.sum(self.x_0[self.F], axis=1)
-            for n, x_0 in enumerate(line_pos):
+            facet_pos = 1 / 3.0 * np.sum(self.x_0[self.F], axis=1)
+            for n, x_0 in enumerate(facet_pos):
                 xy = (x_0[0], x_0[1])
                 ax.annotate(xy=xy, s='%g' % n,
                             xytext=xy_offset, color='green',
