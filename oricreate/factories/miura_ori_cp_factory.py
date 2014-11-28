@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 #
 # Copyright (c) 2009, IMB, RWTH Aachen.
 # All rights reserved.
@@ -51,7 +51,7 @@ class MiuraOriCPFactory(FactoryTask):
 
     def _set_X(self, values):
         values = values.reshape(-1, 3)
-        self.X[:, :] = values[:,:]
+        self.X[:, :] = values[:, :]
 
     L = Property
 
@@ -133,17 +133,7 @@ class MiuraOriCPFactory(FactoryTask):
         y_h = y_e[:, ::1]
         X_h = np.c_[x_h.flatten(), y_h.flatten()]
 
-        # nodes on vertical boundaries on odd horizontal crease lines
-
-        x_v = x_e[(0, -1), 1::1]
-        y_v = y_e[(0, -1), 1::1]
-        X_v = np.c_[x_v.flatten(), y_v.flatten()]
-
         # interior nodes on odd horizontal crease lines
-
-        x_i = (x_e[1:, 1::2] + x_e[:-1, 1::2]) / 2.0
-        y_i = (y_e[1:, 1::2] + y_e[:-1, 1::2]) / 2.0
-        X_i = np.c_[x_i.flatten(), y_i.flatten()]
 
         n_all = np.arange((n_x + 1) * (n_y + 1)).reshape((n_x + 1), (n_y + 1))
 
@@ -160,7 +150,8 @@ class MiuraOriCPFactory(FactoryTask):
         # ======================================================================
 
         c_h = np.column_stack((np.arange(
-            (n_x + 1) * (n_y + 1) - n_y - 1), np.arange(n_y + 1, (n_x + 1) * (n_y + 1))))
+            (n_x + 1) * (n_y + 1) - n_y - 1),
+            np.arange(n_y + 1, (n_x + 1) * (n_y + 1))))
         c_v = np.column_stack(
             (n_all[:, 0:-1].flatten('F'), n_all[:, 1:].flatten('F')))
         c_d = np.column_stack(
@@ -179,13 +170,9 @@ class MiuraOriCPFactory(FactoryTask):
         facets_1 = np.column_stack((f_1, f_2, f_3))
         facets_2 = np.column_stack((f_3, f_4, f_1))
         facets = np.vstack((facets_1, facets_2))
-        print "facetten", facets
 
         return (nodes, crease_lines, facets,
                 )
-#         return (self.geo_transform(nodes), crease_lines, facets,
-#                 n_h, n_v, n_i, X_h, X_v, X_i,
-#                 interior_vertices, cycled_neighbors)
 
 if __name__ == '__main__':
 
