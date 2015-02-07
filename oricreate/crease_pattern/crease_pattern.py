@@ -231,12 +231,30 @@ class CreasePattern(CreaseNodeOperators,
     # Line mappings
     # ==========================================================================
 
-    L = Array(value=[], dtype='int_', cp_input=True)
-    '''Array of crease line nodes ``(n_L,2)`` as index-table ``[n1, n2]``.
+    L = Property(Array, depends_on='aL, gL')
+    '''Array of crease lines.
+    '''
+    @cached_property
+    def _get_L(self):
+        filter_arr = np.ones((len(self.aL),), dtype=bool)
+        return self.aL[filter_arr]
+
+    def _set_L(self, value):
+        self.aL = value
+
+    aL = Array(value=[], dtype='int_', cp_input=True)
+    '''Array of all crease lines including ghost lines ``gL``
+    defined by node pairs  ``(n_L,2)``
+    as index-table ``[n1, n2]``.
     '''
 
-    def _L_default(self):
+    def _aL_default(self):
         return np.zeros((0, 2), dtype='int_')
+
+    gL = Array(value=[], dtype='int_', cp_input=True)
+    '''Array of ghost lines within a plane facet specified by the line
+    index within aL array.
+    '''
 
     n_L = Property
     '''Number of crease lines.
@@ -275,7 +293,7 @@ class CreasePattern(CreaseNodeOperators,
         L = np.arange(self.n_L)
 
         # use broadcasting to identify the matching indexes in both arrays
-        L_F_bool = L[np.newaxis, np.newaxis, :] == self.F_L[:, :, np.newaxis]
+        L_F_bool = L[np.newaxis, np.newaxis,:] == self.F_L[:,:, np.newaxis]
 
         # within the facet any of the line numbers can match, merge the axis 1
         L_F_bool = np.any(L_F_bool, axis=1)

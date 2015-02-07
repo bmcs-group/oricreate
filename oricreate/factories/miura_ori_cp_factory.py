@@ -30,6 +30,9 @@ class MiuraOriCPFactory(FactoryTask):
 
     '''Generate a Yoshimura crease pattern based
     on the specification of its parameters.
+
+    .. todo::
+       Default parameters do not work. d_x not described.
     '''
 
     L_x = Float(4, geometry=True)

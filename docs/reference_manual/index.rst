@@ -1,4 +1,7 @@
 
+Reference manual
+================
+
 .. default-domain:: py
 
 .. highlight:: python

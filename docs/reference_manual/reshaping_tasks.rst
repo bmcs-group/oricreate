@@ -6,21 +6,26 @@ Components of the design pipeline
 
 Classes that constituting the design pipeline.
 
-.. currentmodule:: oricreate.pipeline
+.. currentmodule:: oricreate.forming_tasks
 
----------------
-Reshaping tasks
----------------
+-------------
+Forming tasks
+-------------
 
-.. inheritance-diagram:: ReshapingTask
+.. inheritance-diagram:: FormingTask
 	:parts: 1
 	
-.. autoclass:: ReshapingTask
+.. autoclass:: FormingTask
 	:members:
 
 Initialization
 --------------
 
+.. inheritance-diagram:: FactoryTask
+	:parts: 1
+	
+.. autoclass:: FactoryTask
+	:members:
 
 
 

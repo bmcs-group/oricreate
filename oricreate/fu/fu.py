@@ -14,13 +14,16 @@
 
 from traits.api import \
     HasStrictTraits, \
-    DelegatesTo, Bool
+    DelegatesTo, Bool, implements
 
 from oricreate.opt import \
     OptComponent
 
 
 class Fu(OptComponent):
+
+    '''Base class for goal functions.
+    '''
 
     x_0 = DelegatesTo('simulation_task')
     '''Nodal coordinates

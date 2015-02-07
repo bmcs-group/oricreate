@@ -23,8 +23,8 @@ class IOpt(Interface):
     r'''Configuration of the optimization problem
     including the goal functions, and constraints.
 
-    ... math::
-        \min f(\bm{u}), \; \bm{g}(\bm{u}) = 0, \; \bm{h}(\bm{h}) > 0
+    .. math::
+       \min f(\bm{u}), \; \bm{g}(\bm{u}) = 0, \; \bm{h}(\bm{h}) > 0
 
     '''
     fu = Instance(IFu)

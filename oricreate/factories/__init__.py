@@ -7,3 +7,9 @@ from yoshimura_cp_factory import \
 
 from custom_cp_factory import \
     CustomCPFactory
+
+from miura_ori_cp_factory import \
+    MiuraOriCPFactory
+
+from ron_resh_cp_factory import \
+    RonReshCPFactory

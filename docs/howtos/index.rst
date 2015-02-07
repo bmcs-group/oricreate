@@ -15,18 +15,8 @@ in order to be rigid foldable.
 .. toctree::
    :maxdepth: 2
 
-   example_01/index
-   
-Vector angles
-=============
+   ex01_single_vertex/index
 
-.. automodule:: docs.howtos.ex01_vector_angles
+   ex02_vector_angles/index
 
-.. include:: ex01_vector_angles.py
-   :literal:
-   :start-after: # end_doc
-
-The output of the script looks as follows:
-
-.. program-output:: python howtos/ex01_vector_angles.py
-
+   ex03_factories/index

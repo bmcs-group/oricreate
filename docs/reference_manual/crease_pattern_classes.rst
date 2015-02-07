@@ -79,23 +79,43 @@ Crease pattern factories
 
 .. currentmodule:: oricreate.factories
 
-YoshimuraCreasePattern
-======================
+YoshimuraCPFactory
+==================
 
-.. inheritance-diagram:: YoshimuraCreasePattern
+.. inheritance-diagram:: YoshimuraCPFactory
 	:parts: 1
 
-.. autoclass:: YoshimuraCreasePattern
+.. autoclass:: YoshimuraCPFactory
    :members:
    :undoc-members:
 
-WaterBombCreasePattern
-======================
+WaterBombCPFactory
+==================
 
-.. inheritance-diagram:: WaterBombCreasePattern
+.. inheritance-diagram:: WaterBombCPFactory
 	:parts: 1
 
-.. autoclass:: WaterBombCreasePattern
+.. autoclass:: WaterBombCPFactory
+   :members:
+   :undoc-members:
+
+MiuraOriCPFactory
+=================
+
+.. inheritance-diagram:: MiuraOriCPFactory
+	:parts: 1
+
+.. autoclass:: MiuraOriCPFactory
+   :members:
+   :undoc-members:
+
+RonReshCPFactory
+================
+
+.. inheritance-diagram:: RonReshCPFactory
+	:parts: 1
+
+.. autoclass:: RonReshCPFactory
    :members:
    :undoc-members:
 

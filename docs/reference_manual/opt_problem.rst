@@ -21,26 +21,26 @@ IOptCrit
 IFu
 ===
 
-.. inheritance-diagram:: fu.IFu
+.. inheritance-diagram:: opt.IFu
 	:parts: 1
 
-.. autoclass:: fu.IFu
+.. autoclass:: opt.IFu
 	:members:
 
 IGu
 ===
 
-.. inheritance-diagram:: gu.IGu
+.. inheritance-diagram:: opt.IGu
 	:parts: 1
 
-.. autoclass:: IGu
+.. autoclass:: opt.IGu
 	:members:
 
 IHu
 ===
 
-.. inheritance-diagram:: hu.IHu
+.. inheritance-diagram:: opt.IHu
 	:parts: 1
 
-.. autoclass:: hu.IHu
+.. autoclass:: opt.IHu
 	:members:

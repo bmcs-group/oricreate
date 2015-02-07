@@ -18,7 +18,7 @@ from traits.api import \
     Bool
 
 from oricreate.opt import \
-    IGu, OptComponent
+    OptComponent
 
 import numpy as np
 
@@ -42,6 +42,9 @@ class Gu(OptComponent):
         '''
         self.forming_task = forming_task
         super(HasStrictTraits, self).__init__(*args, **kw)
+
+from oricreate.opt import \
+    IGu
 
 
 class GrabPoints(Gu):

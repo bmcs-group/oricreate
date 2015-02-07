@@ -17,6 +17,10 @@ from i_forming_task import \
 class FactoryTask(FormingTask):
 
     r'''Factory task that generates a a formed_object as a pre-form.
+
+    The most simple example of the ForminingTask. It has no previous task.
+    It constructs the ``formed_object`` using the method ``deliver``.
+    that must be implemented by subclasses.
     '''
     implements(IFormingTask)
 

@@ -1,9 +1,4 @@
-'''
-Created on 09.12.2014
-
-@author: gilbe_000
-'''
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 #
 # Copyright (c) 2009, IMB, RWTH Aachen.
 # All rights reserved.
@@ -16,6 +11,11 @@ Created on 09.12.2014
 # Thanks for using Simvisage open source!
 #
 # Created on Sep 7, 2011 by: rch
+'''
+Created on 09.12.2014
+
+@author: gilbe_000
+'''
 
 from traits.api import \
     Float, Int, Property, cached_property, Callable
@@ -31,10 +31,13 @@ from oricreate.forming_tasks import \
 x_, y_ = sp.symbols('x, y')
 
 
-class MiuraOriCPFactory(FactoryTask):
+class RonReshCPFactory(FactoryTask):
 
     '''Generate a Yoshimura crease pattern based
     on the specification of its parameters.
+
+    .. todo::
+       redefine the factory to provide a hexagonal as an atomic unit.
     '''
 
     L_x = Float(4, geometry=True)
@@ -54,7 +57,7 @@ class MiuraOriCPFactory(FactoryTask):
 
     def _set_X(self, values):
         values = values.reshape(-1, 3)
-        self.X[:, :] = values[:,:]
+        self.X[:, :] = values[:, :]
 
     L = Property
 
@@ -137,22 +140,21 @@ class MiuraOriCPFactory(FactoryTask):
         x_1[3::4, 0::2] = x_1[3::4, 0::2] + (L_x * 1 / 12 / n_x)
 
         X_all = np.c_[x_1.flatten(), y_1.flatten()]
-        print X_all
 
         # nodes on vertical boundaries on odd horizontal crease lines
 
-        #X_v_1 = X_1[(0, 1, -2, -1), 0::1]
-        #X_v_2 = X_3[(0, 1, 2, -3, -2, -1), 0::1]
+        # X_v_1 = X_1[(0, 1, -2, -1), 0::1]
+        # X_v_2 = X_3[(0, 1, 2, -3, -2, -1), 0::1]
 
-        #X_v = np.vstack((X_v_1, X_v_2))
+        # X_v = np.vstack((X_v_1, X_v_2))
 
         # interior nodes on odd horizontal crease lines
 
-        #x_i = (x_e[1:, 1::2] + x_e[:-1, 1::2]) / 2.0
-        #y_i = (y_e[1:, 1::2] + y_e[:-1, 1::2]) / 2.0
-        #X_i = np.c_[x_i.flatten(), y_i.flatten()]
+        # x_i = (x_e[1:, 1::2] + x_e[:-1, 1::2]) / 2.0
+        # y_i = (y_e[1:, 1::2] + y_e[:-1, 1::2]) / 2.0
+        # X_i = np.c_[x_i.flatten(), y_i.flatten()]
 
-        n_all = np.arange((n_x + 1) * (n_y + 1)).reshape((n_x + 1), (n_y + 1))
+        # n_all = np.arange((n_x + 1) * (n_y + 1)).reshape((n_x + 1), (n_y + 1))
 
         nodes = X_all
 
@@ -161,7 +163,8 @@ class MiuraOriCPFactory(FactoryTask):
         nodes = np.hstack([nodes, zero_z])
 
         n_all = np.arange(
-            (n_x * 4 + 1) * (n_y * 4 + 1)).reshape((n_x * 4 + 1), (n_y * 4 + 1))
+            (n_x * 4 + 1) * (n_y * 4 + 1)).reshape((n_x * 4 + 1),
+                                                   (n_y * 4 + 1))
 
         # connectivity of nodes defining the crease pattern
 
@@ -170,7 +173,8 @@ class MiuraOriCPFactory(FactoryTask):
         # ======================================================================
 
         c_h = np.column_stack((np.arange(
-            (n_x * 4 + 1) * (n_y * 4 + 1) - (n_y * 4 + 1)), np.arange(n_y * 4 + 1, (n_x * 4 + 1) * (n_y * 4 + 1))))
+            (n_x * 4 + 1) * (n_y * 4 + 1) - (n_y * 4 + 1)),
+            np.arange(n_y * 4 + 1, (n_x * 4 + 1) * (n_y * 4 + 1))))
 
         c_v = np.column_stack(
             (n_all[:, 0:-1].flatten('F'), n_all[:, 1:].flatten('F')))
@@ -191,24 +195,33 @@ class MiuraOriCPFactory(FactoryTask):
         # ======================================================================
         # print "facetten", n_all[1::4, 1::1].flatten()
         facets_1 = np.column_stack(
-            (n_all[0:-1:4, 0:-1:1].flatten(), n_all[0:-1:4, 1::1].flatten(), n_all[1::4, 1::1].flatten()))
+            (n_all[0:-1:4, 0:-1:1].flatten(), n_all[0:-1:4, 1::1].flatten(),
+             n_all[1::4, 1::1].flatten()))
         facets_2 = np.column_stack(
-            (n_all[0:-1:4, 0:-1:1].flatten(), n_all[1::4, 1::1].flatten(), n_all[1::4, 0:-1:1].flatten()))
+            (n_all[0:-1:4, 0:-1:1].flatten(), n_all[1::4, 1::1].flatten(),
+             n_all[1::4, 0:-1:1].flatten()))
         facets_3 = np.column_stack(
-            (n_all[1::4, 0:-1:1].flatten(), n_all[1::4, 1::1].flatten(), n_all[2::4, 1::1].flatten()))
+            (n_all[1::4, 0:-1:1].flatten(), n_all[1::4, 1::1].flatten(),
+             n_all[2::4, 1::1].flatten()))
         facets_4 = np.column_stack(
-            (n_all[1::4, 0:-1:1].flatten(), n_all[2::4, 1::1].flatten(), n_all[2::4, 0:-1:1].flatten()))
+            (n_all[1::4, 0:-1:1].flatten(), n_all[2::4, 1::1].flatten(),
+             n_all[2::4, 0:-1:1].flatten()))
         facets_5 = np.column_stack(
-            (n_all[2::4, 0:-1:1].flatten(), n_all[2::4, 1::1].flatten(), n_all[3::4, 0:-1:1].flatten()))
+            (n_all[2::4, 0:-1:1].flatten(), n_all[2::4, 1::1].flatten(),
+             n_all[3::4, 0:-1:1].flatten()))
         facets_6 = np.column_stack(
-            (n_all[2::4, 1::1].flatten(), n_all[3::4, 1::1].flatten(), n_all[3::4, 0:-1:1].flatten()))
+            (n_all[2::4, 1::1].flatten(), n_all[3::4, 1::1].flatten(),
+             n_all[3::4, 0:-1:1].flatten()))
         facets_7 = np.column_stack(
-            (n_all[3::4, 0:-1:1].flatten(), n_all[3::4, 1::1].flatten(), n_all[4::4, 0:-1:1].flatten()))
+            (n_all[3::4, 0:-1:1].flatten(), n_all[3::4, 1::1].flatten(),
+             n_all[4::4, 0:-1:1].flatten()))
         facets_8 = np.column_stack(
-            (n_all[3::4, 1::1].flatten(), n_all[4::4, 1::1].flatten(), n_all[4::4, 0:-1:1].flatten()))
+            (n_all[3::4, 1::1].flatten(), n_all[4::4, 1::1].flatten(),
+             n_all[4::4, 0:-1:1].flatten()))
 
         facets = np.vstack(
-            (facets_1, facets_2, facets_3, facets_4, facets_5, facets_6, facets_7, facets_8))
+            (facets_1, facets_2, facets_3, facets_4,
+             facets_5, facets_6, facets_7, facets_8))
 
         return (nodes, crease_lines, facets,
                 )
@@ -218,10 +231,10 @@ class MiuraOriCPFactory(FactoryTask):
 
 if __name__ == '__main__':
 
-    yf = MiuraOriCPFactory(n_x=3,
-                           n_y=4,
-                           L_x=1,
-                           )
+    yf = RonReshCPFactory(n_x=1,
+                          n_y=1,
+                          L_x=1,
+                          )
 
     cp = yf.formed_object
 

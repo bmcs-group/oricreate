@@ -7,7 +7,7 @@ shows how to obtain the basic characteristics including angles,
 facet areas, normals to the facets. Extraction of derivatives
 is provided as well. 
 
-.. automodule:: docs.howtos.example_01.single_vertex
+.. automodule:: docs.howtos.ex01_single_vertex.single_vertex
 
 .. include:: single_vertex.py
    :literal:
@@ -16,9 +16,9 @@ is provided as well.
 
 The output of the script looks as follows:
 
-.. program-output:: python howtos/example_01/single_vertex.py
+.. program-output:: python howtos/ex01_single_vertex/single_vertex.py
 
 The ``plot_mpl`` commands renders the crease pattern in the base
 plane. 
 
-.. plot:: howtos/example_01/single_vertex_mpl.py
+.. plot:: howtos/ex01_single_vertex/single_vertex_mpl.py

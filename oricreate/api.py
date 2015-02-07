@@ -3,7 +3,8 @@ from crease_pattern import \
     CreasePattern, CreasePatternState
 
 from factories import \
-    WaterBombCPFactory, YoshimuraCPFactory, CustomCPFactory
+    WaterBombCPFactory, YoshimuraCPFactory, CustomCPFactory, \
+    MiuraOriCPFactory, RonReshCPFactory
 
 from forming_tasks import \
     FormingTask, IFormingTask
