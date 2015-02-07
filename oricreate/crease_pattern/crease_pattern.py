@@ -237,6 +237,7 @@ class CreasePattern(CreaseNodeOperators,
     @cached_property
     def _get_L(self):
         filter_arr = np.ones((len(self.aL),), dtype=bool)
+        filter_arr[self.gL] = False
         return self.aL[filter_arr]
 
     def _set_L(self, value):

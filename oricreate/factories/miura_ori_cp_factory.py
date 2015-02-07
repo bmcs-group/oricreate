@@ -54,7 +54,7 @@ class MiuraOriCPFactory(FactoryTask):
 
     def _set_X(self, values):
         values = values.reshape(-1, 3)
-        self.X[:, :] = values[:, :]
+        self.X[:,:] = values[:,:]
 
     L = Property
 
@@ -181,11 +181,18 @@ if __name__ == '__main__':
 
     yf = MiuraOriCPFactory(L_x=3,
                            L_y=3,
-                           n_x=3,
-                           n_y=4,
-                           d_x=0.15)
+                           n_x=2,
+                           n_y=2,
+                           d_x=0.5)
 
     cp = yf.formed_object
+    cp.gL = [12, 13, 14, 15]
+
+    print cp.gL
+
+    print cp.aL
+
+    print cp.L
 
     import pylab as p
     cp.plot_mpl(p.axes())
