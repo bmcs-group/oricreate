@@ -262,22 +262,12 @@ class CreaseFacetOperators(HasStrictTraits):
         F_N[turn_facets, :] = self.F[turn_facets, ::-1]
         return F_N
 
-    F0_area = Property(Array, depends_on='X, L, F')
-    r'''Facet areas.
-    '''
-    @cached_property
-    def _get_F0_area(self):
-        return self.get_F0_area(np.zeros_like(self.x_0))
-
     F_normals = Property(Array, depends_on=INPUT)
     r'''Get the normals of the facets.
     '''
     @cached_property
     def _get_F_normals(self):
-        return self.get_F_normals(self.x)
-
-    def get_F_normals(self, x):
-        n = self._get_Fa_normals(x)
+        n = self.Fa_normals
         return np.sum(n, axis=1)
 
     norm_F_normals = Property(Array, depends_on=INPUT)
@@ -285,10 +275,7 @@ class CreaseFacetOperators(HasStrictTraits):
     '''
     @cached_property
     def _get_norm_F_normals(self):
-        return self.get_F_normals(self.x)
-
-    def get_norm_F_normals(self, x):
-        n = self.get_F_normals(x)
+        n = self.F_normals
         mag_n = np.sqrt(np.einsum('...i,...i', n, n))
         return n / mag_n[:, np.newaxis]
 
@@ -297,10 +284,7 @@ class CreaseFacetOperators(HasStrictTraits):
     '''
     @cached_property
     def _get_F_normals_du(self):
-        return self.get_F_normals_du(self.x)
-
-    def get_F_normals_du(self, x):
-        n_du = self._get_Fa_normals_du(x)
+        n_du = self.Fa_normals_du
         return np.sum(n_du, axis=1)
 
     F_area = Property(Array, depends_on=INPUT)
@@ -308,7 +292,7 @@ class CreaseFacetOperators(HasStrictTraits):
     '''
     @cached_property
     def _get_F_area(self):
-        a = self._get_Fa_area(self.x)
+        a = self.Fa_area
         A = np.einsum('a,Ia->I', self.eta_w, a)
         return A
 
@@ -319,10 +303,10 @@ class CreaseFacetOperators(HasStrictTraits):
     r'''Get the total potential energy of gravity for each facet
     '''
     @cached_property
-    def _get_F_V(self, u):
+    def _get_F_V(self):
         eta_w = self.eta_w
-        a = self._get_Fa_area(self.x)
-        ra = self._get_Fa_r(self.x)
+        a = self.Fa_area
+        ra = self.Fa_r
         F_V = np.einsum('a,Ia,Ia->I', eta_w, ra[..., 2], a)
         return F_V
 
@@ -332,9 +316,9 @@ class CreaseFacetOperators(HasStrictTraits):
     '''
     @cached_property
     def _get_F_V_du(self):
-        r = self._get_Fa_r(self.x)
-        a = self._get_Fa_area(self.x)
-        a_dx = self._get_Fa_area_du(self.x)
+        r = self.Fa_r
+        a = self.Fa_area
+        a_dx = self.Fa_area_du
         r3_a_dx = np.einsum('Ia,IaJj->IaJj', r[..., 2], a_dx)
         N_eta_ip = self.Na
         r3_dx = np.einsum('aK,KJ,j->aJj', N_eta_ip, DELTA, DELTA[2, :])
@@ -409,14 +393,14 @@ class CreaseFacetOperators(HasStrictTraits):
     '''
     @cached_property
     def _get_norm_F_L_vectors(self):
-        v = self.get_F_L_vectors
+        v = self.F_L_vectors
         mag_v = np.sqrt(np.einsum('...i,...i', v, v))
         return v / mag_v[..., np.newaxis]
 
     norm_F_L_vectors_du = Property(Array, depends_on=INPUT)
     '''Get the derivatives of cycled line vectors around the facet
     '''
-
+    @cached_property
     def _get_norm_F_L_vectors_du(self):
         v = self.F_L_vectors
         v_du = self.F_L_vectors_du  # @UnusedVariable
@@ -430,10 +414,10 @@ class CreaseFacetOperators(HasStrictTraits):
     F_L_bases = Property(Array, depends_on=INPUT)
     r'''Line bases around a facet.
     '''
-
+    @cached_property
     def _get_F_L_bases(self):
-        l = self.get_norm_F_L_vectors
-        n = self.get_norm_F_normals
+        l = self.norm_F_L_vectors
+        n = self.norm_F_normals
         lxn = np.einsum('...li,...j,...kij->...lk', l, n, EPS)
         n_ = n[:, np.newaxis, :] * np.ones((1, 3, 1), dtype='float_')
         T = np.concatenate([l[:, :, np.newaxis, :],
@@ -444,7 +428,7 @@ class CreaseFacetOperators(HasStrictTraits):
     F_L_bases = Property(Array, depends_on=INPUT)
     r'''Derivatives of the line bases around a facet.
     '''
-
+    @cached_property
     def _get_F_L_bases_du(self):
         '''Derivatives of line bases'''
         raise NotImplemented
@@ -455,7 +439,7 @@ class CreaseFacetOperators(HasStrictTraits):
     F_theta = Property(Array, depends_on=INPUT)
     '''Get the sector angles :math:`\theta`  within a facet.
     '''
-
+    @cached_property
     def _get_F_theta(self):
         v = self.F_L_vectors
         a = -v[..., (2, 0, 1)]
@@ -465,7 +449,7 @@ class CreaseFacetOperators(HasStrictTraits):
     F_theta_du = Property(Array, depends_on=INPUT)
     r'''Get the derivatives of sector angles :math:`\theta` within a facet.
     '''
-
+    @cached_property
     def _get_F_theta_du(self):
         v = self.F_L_vectors
         v_du = self.F_L_vectors_du
@@ -512,11 +496,13 @@ class CreaseFacetOperators(HasStrictTraits):
                           [0, 1, -1]],
                          ], dtype='f')
 
-    def _get_Fa_normals_du(self, x):
-        '''Get the derivatives of the normals with respect
-        to the node displacements.
-        '''
-        x_F = x[self.F_N]
+    Fa_normals_du = Property
+    '''Get the derivatives of the normals with respect
+    to the node displacements.
+    '''
+
+    def _get_Fa_normals_du(self):
+        x_F = self.x[self.F_N]
         N_deta_ip = self.Na_deta
         NN_delta_eps_x1 = np.einsum('aK,aL,KJ,jli,ILl->IaJji',
                                     N_deta_ip[:, 0, :], N_deta_ip[:, 1, :],
@@ -527,36 +513,44 @@ class CreaseFacetOperators(HasStrictTraits):
         n_du = NN_delta_eps_x1 + NN_delta_eps_x2
         return n_du
 
-    def _get_Fa_area_du(self, x):
-        '''Get the derivatives of the facet area with respect
-        to node displacements.
-        '''
-        a = self._get_Fa_area(x)
-        n = self._get_Fa_normals(x)
-        n_du = self._get_Fa_normals_du(x)
+    Fa_area_du = Property
+    '''Get the derivatives of the facet area with respect
+    to node displacements.
+    '''
+
+    def _get_Fa_area_du(self):
+        a = self.Fa_area
+        n = self.Fa_normals
+        n_du = self.Fa_normals_du
         a_du = np.einsum('Ia,Iak,IaJjk->IaJj', 1 / a, n, n_du)
         return a_du
 
-    def _get_Fa_normals(self, x):
-        '''Get normals of the facets.
-        '''
-        x_F = x[self.F_N]
+    Fa_normals = Property
+    '''Get normals of the facets.
+    '''
+
+    def _get_Fa_normals(self):
+        x_F = self.x[self.F_N]
         N_deta_ip = self.Na_deta
         r_deta = np.einsum('ajK,IKi->Iaij', N_deta_ip, x_F)
         return np.einsum('Iai,Iaj,ijk->Iak',
                          r_deta[..., 0], r_deta[..., 1], EPS)
 
-    def _get_Fa_area(self, x):
-        '''Get the surface area of the facets.
-        '''
-        n = self._get_Fa_normals(x)
+    Fa_area = Property
+    '''Get the surface area of the facets.
+    '''
+
+    def _get_Fa_area(self):
+        n = self.Fa_normals
         a = np.sqrt(np.einsum('Iai,Iai->Ia', n, n))
         return a
 
-    def _get_Fa_r(self, x):
-        '''Get the reference vector to integrations point in each facet.
-        '''
-        x_F = x[self.F_N]
+    Fa_r = Property
+    '''Get the reference vector to integrations point in each facet.
+    '''
+
+    def _get_Fa_r(self):
+        x_F = self.x[self.F_N]
         N_eta_ip = self.Na
         r = np.einsum('aK,IKi->Iai', N_eta_ip, x_F)
         return r
