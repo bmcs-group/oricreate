@@ -425,7 +425,7 @@ class CreaseFacetOperators(HasStrictTraits):
         raise NotImplemented
 
     # =========================================================================
-    # Orthonormal basis of each fact.
+    # Orthonormal basis of each facet.
     # =========================================================================
     F_L_bases = Property(Array, depends_on=INPUT)
     r'''Line bases around a facet.

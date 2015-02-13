@@ -17,8 +17,8 @@ from traits.api import \
 import numpy as np
 import sympy as sp
 
-from oricreate.crease_pattern import CreasePattern
-
+from oricreate.crease_pattern import \
+    CreasePattern
 
 from oricreate.forming_tasks import \
     FactoryTask
@@ -54,7 +54,7 @@ class MiuraOriCPFactory(FactoryTask):
 
     def _set_X(self, values):
         values = values.reshape(-1, 3)
-        self.X[:,:] = values[:,:]
+        self.X[...] = values[...]
 
     L = Property
 
@@ -190,7 +190,7 @@ if __name__ == '__main__':
 
     print cp.gL
 
-    print cp.aL
+    print cp.cL
 
     print cp.L
 

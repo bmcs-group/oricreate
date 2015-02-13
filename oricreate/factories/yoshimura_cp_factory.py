@@ -16,7 +16,7 @@ from traits.api import \
     Float, Int, Property, cached_property, Bool, Array, Callable, Any
 
 from oricreate.crease_pattern import \
-    CreasePattern
+    CreasePatternState
 import numpy as np
 import sympy as sp
 
@@ -40,9 +40,9 @@ class YoshimuraCPFactory(FactoryTask):
     n_y = Int(2, geometry=True)
 
     def _get_formed_object(self):
-        return CreasePattern(X=self.X,
-                             L=self.L,
-                             F=self.F)
+        return CreasePatternState(X=self.X,
+                                  L=self.L,
+                                  F=self.F)
 
     new_nodes = Array(value=[], dtype=float)
     new_crease_lines = Array(value=[], dtype=int)

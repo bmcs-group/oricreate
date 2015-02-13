@@ -47,8 +47,9 @@ class CreasePatternPlotHelper(HasStrictTraits):
         x_range = x_mid[:, np.newaxis] + x_deltas
 
         # plot lines
-        line_pos = self.x_0[:, (0, 1)][self.L]
-        ax.plot(line_pos[:, :, 0].T, line_pos[:, :, 1].T, color='black')
+        crease_line_pos = self.x_0[:, (0, 1)][self.cL_N]
+        ax.plot(crease_line_pos[:, :, 0].T,
+                crease_line_pos[:, :, 1].T, color='black')
         ax.set_xlim(*x_range[0, :])
         ax.set_ylim(*x_range[1, :])
         ax.set_aspect('equal')
@@ -63,8 +64,8 @@ class CreasePatternPlotHelper(HasStrictTraits):
         # plot line numbers
         if lines is True:
             xy_offset = (1, 1)
-            line_pos = 0.5 * np.sum(self.x_0[self.L], axis=1)
-            for n, x_0 in enumerate(line_pos):
+            crease_line_pos = 0.5 * np.sum(self.x_0[self.cL_N], axis=1)
+            for n, x_0 in zip(self.cL, crease_line_pos):
                 xy = (x_0[0], x_0[1])
                 ax.annotate(xy=xy, s='%g' % n,
                             xytext=xy_offset, color='red',

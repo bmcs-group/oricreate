@@ -48,14 +48,15 @@ class SimulationConfig(HasStrictTraits):
             return None
 
     gu = Dict(Str, IGu)
-    '''Equality constraints.
+    '''Dictionary of equality constraints.
     '''
 
     def _gu_default(self):
         return {}
 
     gu_lst = Property(depends_on='gu')
-
+    '''List of equality constraints.
+    '''
     @cached_property
     def _get_gu_lst(self):
         return self.gu.values()
@@ -68,7 +69,8 @@ class SimulationConfig(HasStrictTraits):
         return {}
 
     hu_lst = Property(depends_on='hu')
-
+    '''List of inequality constraints.
+    '''
     @cached_property
     def _get_hu_lst(self):
         return self.gu.values()

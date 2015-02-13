@@ -26,9 +26,6 @@ from simulation_config import \
 from oricreate.crease_pattern import \
     CreasePatternState
 
-from oricreate.opt.i_opt import \
-    IOpt
-
 import time
 
 import numpy as np
@@ -43,30 +40,42 @@ elif platform.system() == 'Windows':
 
 class SimulationStep(CreasePatternState):
 
-    r"""Class implementing the transition
-    of the crease pattern state
+    r"""Class implementing the transition of the crease pattern state
     to the target time :math:`t`.
     """
+
     source_config_changed = Event
+    r'''Notification event for changes in the configuration
+    of the optimization problem.
+    '''
 
     opt = Instance(SimulationConfig)
+    r'''Configuration of the optimization problem.
+    '''
 
     opt_ = Property(depends_on='sim_config')
-
+    r'''Configuration of the optimization problem including the backward link.
+    '''
     @cached_property
     def _get_opt_(self):
         self.opt.sim_step = self
         return self.opt
 
     t = Float(0.0, auto_set=False, enter_set=True)
+    r'''Current time within the step in the range (0,1).
+    '''
 
     show_iter = Bool(False, auto_set=False, enter_set=True)
-    '''Saves the first 10 iteration steps, so they can be analyzed
+    r'''Saves the first 10 iteration steps, so they can be analyzed
     '''
 
     MAX_ITER = Int(100, auto_set=False, enter_set=True)
+    r'''Maximum number of iterations.
+    '''
 
     acc = Float(1e-4, auto_set=False, enter_set=True)
+    r'''Required accuracy.
+    '''
 
     def _solve_nr(self, t):
         '''Find the solution using the Newton-Raphson procedure.

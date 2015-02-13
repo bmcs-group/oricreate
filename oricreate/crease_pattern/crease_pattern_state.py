@@ -14,16 +14,26 @@
 
 from traits.api import \
     Property, cached_property, \
-    Array
+    Array, on_trait_change, NO_COMPARE
 
-import numpy as np
 from crease_pattern import \
     CreasePattern
+
+from crease_pattern_operators import \
+    CreaseNodeOperators, CreaseLineOperators, CreaseFacetOperators, \
+    CreaseCummulativeOperators
+
+import numpy as np
 
 INPUT = '+cp_input'
 
 
-class CreasePatternState(CreasePattern):
+class CreasePatternState(CreasePattern,
+                         CreaseNodeOperators,
+                         CreaseLineOperators,
+                         CreaseFacetOperators,
+                         CreaseCummulativeOperators,
+                         ):
 
     r'''
     This class is used by the FormingTask tasks during the
@@ -39,12 +49,17 @@ class CreasePatternState(CreasePattern):
     ``cp_state.U = U``
     '''
 
-    u = Array(value=[], dtype='float_', cp_input=True)
+    u = Array(value=[], dtype='float_', cp_input=True,
+              comparison_mode=NO_COMPARE)
     r'''Displacement array with ``(n_N,n_D)`` values.
     '''
 
     def u_default(self):
         return np.zeros_like(self.x_0)
+
+    @on_trait_change('X')
+    def _reset_u(self):
+        self.u = np.zeros_like(self.x_0)
 
     U = Property
     r'''Array of initial coordinates ``(n_N,n_D)`` as ``[x1,x2,x3]``.

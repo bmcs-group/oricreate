@@ -28,9 +28,6 @@ from crease_pattern_export import \
     CreasePatternExport
 from crease_pattern_plot_helper import \
     CreasePatternPlotHelper
-from crease_pattern_operators import \
-    CreaseNodeOperators, CreaseLineOperators, CreaseFacetOperators, \
-    CreaseCummulativeOperators
 
 INPUT = '+cp_input'
 
@@ -76,11 +73,7 @@ class FArrayAdapter(TabularAdapter):
         return str(self.row)
 
 
-class CreasePattern(CreaseNodeOperators,
-                    CreaseLineOperators,
-                    CreaseFacetOperators,
-                    CreaseCummulativeOperators,
-                    CreasePatternPlotHelper,
+class CreasePattern(CreasePatternPlotHelper,
                     CreasePatternExport):
 
     '''
@@ -231,31 +224,50 @@ class CreasePattern(CreaseNodeOperators,
     # Line mappings
     # ==========================================================================
 
-    L = Property(Array, depends_on='aL, gL')
-    '''Array of crease lines.
-    '''
-    @cached_property
-    def _get_L(self):
-        filter_arr = np.ones((len(self.aL),), dtype=bool)
-        filter_arr[self.gL] = False
-        return self.aL[filter_arr]
-
-    def _set_L(self, value):
-        self.aL = value
-
-    aL = Array(value=[], dtype='int_', cp_input=True)
+    L = Array(value=[], dtype='int_', cp_input=True)
     '''Array of all crease lines including ghost lines ``gL``
     defined by node pairs  ``(n_L,2)``
     as index-table ``[n1, n2]``.
     '''
 
-    def _aL_default(self):
+    def _L_default(self):
         return np.zeros((0, 2), dtype='int_')
+
+    cL_N = Property(Array, depends_on='L, gL')
+    '''Array of crease lines end nodes.
+    '''
+    @cached_property
+    def _get_cL_N(self):
+        return self.L_N[self.cL]
+
+    cL = Property(Array, depends_on='L, gL')
+    '''Indexes of crease lines
+    '''
+    @cached_property
+    def _get_cL(self):
+        L = np.arange(len(self.L_N,), dtype='int_')
+        filter_arr = np.ones((len(self.L_N),), dtype=bool)
+        filter_arr[self.gL] = False
+        return L[filter_arr]
 
     gL = Array(value=[], dtype='int_', cp_input=True)
     '''Array of ghost lines within a plane facet specified by the line
     index within aL array.
     '''
+
+    gL_N = Property(depends_on=INPUT)
+    '''End nodes of a ghost lines.
+    '''
+    @cached_property
+    def _get_gL_N(self):
+        return self.L_N[self.gL]
+
+    L_N = Property(depends_on=INPUT)
+    '''End nodes of a line.
+    '''
+    @cached_property
+    def _get_L_N(self):
+        return self.L
 
     n_L = Property
     '''Number of crease lines.
@@ -294,7 +306,7 @@ class CreasePattern(CreaseNodeOperators,
         L = np.arange(self.n_L)
 
         # use broadcasting to identify the matching indexes in both arrays
-        L_F_bool = L[np.newaxis, np.newaxis,:] == self.F_L[:,:, np.newaxis]
+        L_F_bool = L[np.newaxis, np.newaxis, :] == self.F_L[:,:, np.newaxis]
 
         # within the facet any of the line numbers can match, merge the axis 1
         L_F_bool = np.any(L_F_bool, axis=1)
