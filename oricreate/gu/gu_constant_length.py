@@ -10,9 +10,6 @@
 #
 # Thanks for using Simvisage open source!
 #
-# Created on Nov 18, 2011 by: matthias
-
-from traits.api import DelegatesTo, PrototypedFrom
 
 from gu import \
     Gu
@@ -24,32 +21,14 @@ class GuConstantLength(Gu):
     '''Constant length constraint.
     '''
 
-    L = PrototypedFrom('FormingTask')
-    '''Node-to-node array specifying the lines.
-    to be submitted to the equality constraint.
-    by default, all crease lines are included.
-    However, it is possible to redefine them.
-    '''
-
-    n_N = DelegatesTo('FormingTask')
-    '''Number of nodes
-    '''
-
-    n_L = DelegatesTo('FormingTask')
-    '''Number of crease lines
-    '''
-
-    n_D = DelegatesTo('FormingTask')
-    '''Number of dimensions
-    '''
-
-    def get_G(self, U, t):
-        ''' Calculate the residuum for constant crease length
+    def get_G(self, U, t=0.0):
+        '''Calculate the residue for constant crease length
         given the fold vector dX.
         '''
-        v_0 = self.FormingTask.cp.L_vectors
-        u = U.reshape(self.n_N, self.n_D)
-        u_i, u_j = u[self.L.T]
+        cp = self.forming_task.formed_object
+        v_0 = cp.L_vectors
+        u = U.reshape(cp.n_N, cp.n_D)
+        u_i, u_j = u[cp.L.T]
         v_u_i = np.sum(v_0 * u_i, axis=1)
         v_u_j = np.sum(v_0 * u_j, axis=1)
         u_ij = np.sum(u_i * u_j, axis=1)
@@ -59,19 +38,20 @@ class GuConstantLength(Gu):
 
         return G
 
-    def get_G_du(self, U, t):
-        ''' Calculate the residuum for constant crease length
+    def get_G_du(self, U, t=0.0):
+        '''Calculate the residue for constant crease length
         given the fold vector dX.
         '''
-        G_du = np.zeros((self.n_L, self.n_N, self.n_D), dtype='float_')
+        cp = self.forming_task.formed_object
+        G_du = np.zeros((cp.n_L, cp.n_N, cp.n_D), dtype='float_')
 
         # running crease line index
-        if self.n_L > 0:
-            v_0 = self.FormingTask.cp.L_vectors
-            u = U.reshape(self.n_N, self.n_D)
-            i, j = self.L.T
-            u_i, u_j = u[self.L.T]
-            l = np.arange(self.n_L)
+        if cp.n_L > 0:
+            v_0 = cp.L_vectors
+            u = U.reshape(cp.n_N, cp.n_D)
+            i, j = cp.L.T
+            u_i, u_j = u[cp.L.T]
+            l = np.arange(cp.n_L)
             G_du[l, i, :] += -2 * v_0 + 2 * u_i - 2 * u_j
             G_du[l, j, :] += 2 * v_0 - 2 * u_i + 2 * u_j
 
@@ -80,22 +60,22 @@ class GuConstantLength(Gu):
         # the derivatives with respect to the node displacements
         # in 3d.
         #
-        G_du = G_du.reshape(self.n_L, self.n_N * self.n_D)
+        G_du = G_du.reshape(cp.n_L, cp.n_N * cp.n_D)
         return G_du
 
 if __name__ == '__main__':
 
-    from oricreate.api import FormingTask, CreasePattern
+    from oricreate.api import CreasePatternState, CustomCPFactory
 
-    cp = CreasePattern(X=[[-4, -5, -3],
-                          [0, 0.0, 0],
-                          [1.0, 0.1, 0],
-                          ],
-                       L=[[0, 1], [1, 2], [2, 0]],
-                       )
+    cp = CreasePatternState(X=[[-4, -5, -3],
+                               [0, 0.0, 0],
+                               [1.0, 0.1, 0],
+                               ],
+                            L=[[0, 1], [1, 2], [2, 0]],
+                            )
 
-    FormingTask = FormingTask(cp=cp)
-    constant_length = GuConstantLength(FormingTask)
+    forming_task = CustomCPFactory(formed_object=cp)
+    constant_length = GuConstantLength(forming_task)
 
     U = np.zeros_like(cp.X)
     U[2] += 1.0

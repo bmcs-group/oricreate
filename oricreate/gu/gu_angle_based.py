@@ -24,14 +24,6 @@ class GuAngle(Gu):
 
     '''Base class for angle equality constraints.
     '''
-    L = DelegatesTo('FormingTask')
-
-    cp = DelegatesTo('FormingTask')
-
-    n_N = DelegatesTo('FormingTask')
-    n_D = DelegatesTo('FormingTask')
-    n_dofs = DelegatesTo('FormingTask')
-
     signs = Property
 
     @cached_property
@@ -44,19 +36,21 @@ class GuAngle(Gu):
     # Constraint methods
     # =========================================================================
 
-    def _get_G(self, u, t):
-        theta_arr = self.cp.get_iN_theta(u)
+    def _get_G(self, u, t=0.0):
+        cp = self.forming_task.formed_object
+        theta_arr = cp.iN_theta
         signs = self.signs
         return np.array([np.sum(signs[:theta.shape[0]] * theta)
                          for theta in theta_arr])
 
-    def _get_G_du(self, u, t):
-        theta_du_arr = self.cp.get_iN_theta_du(u)
+    def _get_G_du(self, u, t=0.0):
+        cp = self.forming_task.formed_object
+        theta_du_arr = cp.iN_theta_du
         signs = self.signs
         sum_theta_du = np.array([np.einsum('i...,i...->...',
                                            signs[:theta_du.shape[0]], theta_du)
                                  for theta_du in theta_du_arr])
-        return sum_theta_du.reshape(-1, self.n_dofs)
+        return sum_theta_du.reshape(-1, cp.n_dofs)
 
     # =========================================================================
     # Subsidiary operators and arrays - constants
@@ -166,10 +160,10 @@ class GuDevelopability(GuAngle):
         signs = np.ones((20,), dtype='f')
         return signs
 
-    def get_G(self, U, t):
+    def get_G(self, U, t=0.0):
         return self._get_G(U, t) - 2 * np.pi
 
-    def get_G_du(self, U, t):
+    def get_G_du(self, U, t=0.0):
         return self._get_G_du(U, t)
 
 

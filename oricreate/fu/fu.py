@@ -25,10 +25,6 @@ class Fu(OptComponent):
     '''Base class for goal functions.
     '''
 
-    x_0 = DelegatesTo('simulation_task')
-    '''Nodal coordinates
-    '''
-
     has_f_du = Bool(True)
     '''Indicates the derivatives are unavailable for a given
     type of constraint.

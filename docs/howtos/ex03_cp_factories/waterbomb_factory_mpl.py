@@ -5,7 +5,7 @@ Plot the results of single vertex example.
 '''
 
 if __name__ == '__main__':
-    from docs.howtos.ex03_factories.ron_resh_factory import create_cp
+    from docs.howtos.ex03_cp_factories.waterbomb_factory import create_cp
     cp = create_cp()
     # begin
     import matplotlib.pyplot as plt

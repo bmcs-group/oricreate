@@ -50,7 +50,8 @@ class FormingTask(HasStrictTraits):
     '''Tasks using referring to this task as a source.
     '''
 
-    formed_object = Property(Instance(IFormedObject), depends_on='source')
+    formed_object = Property(Instance(IFormedObject),
+                             depends_on='source_config_changed')
     r'''Subject of forming.
     '''
     @cached_property

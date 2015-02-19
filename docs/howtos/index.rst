@@ -19,4 +19,9 @@ in order to be rigid foldable.
 
    ex02_vector_angles/index
 
-   ex03_factories/index
+   ex03_cp_factories/index
+   
+   ex04_cp_operators/index
+   
+   ex05_opt_components/index
+   

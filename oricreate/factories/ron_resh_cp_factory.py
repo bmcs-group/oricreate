@@ -22,7 +22,8 @@ from traits.api import \
 import numpy as np
 import sympy as sp
 
-from oricreate.crease_pattern import CreasePattern
+from oricreate.crease_pattern import \
+    CreasePatternState
 
 
 from oricreate.forming_tasks import \
@@ -45,10 +46,10 @@ class RonReshCPFactory(FactoryTask):
     n_x = Int(2, geometry=True)
     n_y = Int(2, geometry=True)
 
-    def _get_formed_object(self):
-        return CreasePattern(X=self.X,
-                             L=self.L,
-                             F=self.F)
+    def deliver(self):
+        return CreasePatternState(X=self.X,
+                                  L=self.L,
+                                  F=self.F)
 
     X = Property
 

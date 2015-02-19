@@ -5,13 +5,16 @@ Created on Nov 6, 2014
 '''
 
 from traits.api import \
-    implements
+    implements, on_trait_change, Property, Instance, cached_property
 
 from forming_task import \
     FormingTask
 
 from i_forming_task import \
     IFormingTask
+
+from i_formed_object import \
+    IFormedObject
 
 
 class FactoryTask(FormingTask):
@@ -24,6 +27,15 @@ class FactoryTask(FormingTask):
     '''
     implements(IFormingTask)
 
+    @on_trait_change('+geometry')
+    def notify_geometry_change(self):
+        self.source_config_changed = True
+
+    formed_object = Property(Instance(IFormedObject),
+                             depends_on='source_config_changed')
+    r'''Subject of forming.
+    '''
+    @cached_property
     def _get_formed_object(self):
         return self.deliver()
 

@@ -49,7 +49,7 @@ class CreaseNodeOperators(HasStrictTraits):
 
     def _get_iN_theta_du(self):
         NN_theta_du = self.NN_theta_du
-        return [NN_theta_du[n, neighbors[:-1], :, :]
+        return [NN_theta_du[n, neighbors[:-1],:,:]
                 for n, neighbors in zip(self.iN, self.iN_nbr)]
 
     NN_theta = Property
@@ -83,8 +83,8 @@ class CreaseNodeOperators(HasStrictTraits):
         NN_theta_du = np.zeros((self.n_N, self.n_N, self.n_N, self.n_D),
                                dtype='float_')
         F_theta_du = self.F_theta_du
-        NN_theta_du[self.F_N[:, (0, 1, 2)], self.F_N[:, (1, 2, 0)], :, :] = \
-            F_theta_du[:, (0, 1, 2), :, :]
+        NN_theta_du[self.F_N[:, (0, 1, 2)], self.F_N[:, (1, 2, 0)], ...] = \
+            F_theta_du[:, (0, 1, 2), ...]
         return NN_theta_du
 
 
@@ -139,8 +139,8 @@ class CreaseLineOperators(HasStrictTraits):
         L_idx = np.arange(self.n_L)
         L_N0_idx = self.L[L_idx, 0]
         L_N1_idx = self.L[L_idx, 1]
-        L_vectors_du[L_idx, :, L_N0_idx, :] = DELTA
-        L_vectors_du[L_idx, :, L_N1_idx, :] = -DELTA
+        L_vectors_du[L_idx,:, L_N0_idx,:] = DELTA
+        L_vectors_du[L_idx,:, L_N1_idx,:] = -DELTA
         return L_vectors_du
 
     iL_within_F0 = Property
@@ -149,7 +149,7 @@ class CreaseLineOperators(HasStrictTraits):
     @cached_property
     def _get_iL_within_F0(self):
         iL_F0 = self.iL_F[:, 0]
-        L_of_F0_of_iL = self.F_L[iL_F0, :]
+        L_of_F0_of_iL = self.F_L[iL_F0,:]
         iL = self.iL
         iL_within_F0 = np.where(iL[:, np.newaxis] == L_of_F0_of_iL)
         return iL_within_F0
@@ -216,9 +216,9 @@ class CreaseLineOperators(HasStrictTraits):
         n = self.norm_iL_F_normals
         n0, n1 = np.einsum('ijk->jik', n)
         lxn0 = np.einsum('...i,...j,...kij->...k', l, n0, EPS)
-        T = np.concatenate([l[:, np.newaxis, :],
-                            n0[:, np.newaxis, :],
-                            lxn0[:, np.newaxis, :]], axis=1)
+        T = np.concatenate([l[:, np.newaxis,:],
+                            n0[:, np.newaxis,:],
+                            lxn0[:, np.newaxis,:]], axis=1)
         n1_ = np.einsum('...ij,...j->...i', T, n1)
         return np.arcsin(n1_[:, -1])
 
@@ -259,7 +259,7 @@ class CreaseFacetOperators(HasStrictTraits):
     def _get_F_N(self):
         turn_facets = np.where(self.sign_normals < 0)
         F_N = np.copy(self.F)
-        F_N[turn_facets, :] = self.F[turn_facets, ::-1]
+        F_N[turn_facets,:] = self.F[turn_facets, ::-1]
         return F_N
 
     F_normals = Property(Array, depends_on=INPUT)
@@ -310,7 +310,7 @@ class CreaseFacetOperators(HasStrictTraits):
         F_V = np.einsum('a,Ia,Ia->I', eta_w, ra[..., 2], a)
         return F_V
 
-    F_V = Property(Array, depends_on=INPUT)
+    F_V_du = Property(Array, depends_on=INPUT)
     r'''Get the derivative of total potential energy of gravity for each facet
     with respect to each node and displacement component [FIi]
     '''
@@ -321,7 +321,7 @@ class CreaseFacetOperators(HasStrictTraits):
         a_dx = self.Fa_area_du
         r3_a_dx = np.einsum('Ia,IaJj->IaJj', r[..., 2], a_dx)
         N_eta_ip = self.Na
-        r3_dx = np.einsum('aK,KJ,j->aJj', N_eta_ip, DELTA, DELTA[2, :])
+        r3_dx = np.einsum('aK,KJ,j->aJj', N_eta_ip, DELTA, DELTA[2,:])
         a_r3_dx = np.einsum('Ia,aJj->IaJj', a, r3_dx)
         F_V_du = np.einsum('a,IaJj->IJj', self.eta_w, (a_r3_dx + r3_a_dx))
         return F_V_du
@@ -419,10 +419,10 @@ class CreaseFacetOperators(HasStrictTraits):
         l = self.norm_F_L_vectors
         n = self.norm_F_normals
         lxn = np.einsum('...li,...j,...kij->...lk', l, n, EPS)
-        n_ = n[:, np.newaxis, :] * np.ones((1, 3, 1), dtype='float_')
-        T = np.concatenate([l[:, :, np.newaxis, :],
-                            n_[:, :, np.newaxis, :],
-                            lxn[:, :, np.newaxis, :]], axis=2)
+        n_ = n[:, np.newaxis,:] * np.ones((1, 3, 1), dtype='float_')
+        T = np.concatenate([l[:,:, np.newaxis,:],
+                            n_[:,:, np.newaxis,:],
+                            lxn[:,:, np.newaxis,:]], axis=2)
         return T
 
     F_L_bases = Property(Array, depends_on=INPUT)
@@ -442,8 +442,8 @@ class CreaseFacetOperators(HasStrictTraits):
     @cached_property
     def _get_F_theta(self):
         v = self.F_L_vectors
-        a = -v[..., (2, 0, 1)]
-        b = v[..., (0, 1, 2)]
+        a = -v[:, (2, 0, 1),:]
+        b = v[:, (0, 1, 2),:]
         return get_theta(a, b)
 
     F_theta_du = Property(Array, depends_on=INPUT)
@@ -454,10 +454,10 @@ class CreaseFacetOperators(HasStrictTraits):
         v = self.F_L_vectors
         v_du = self.F_L_vectors_du
 
-        a = -v[..., (2, 0, 1)]
-        b = v[..., (0, 1, 2)]
-        a_du = -v_du[..., (2, 0, 1)]
-        b_du = v_du[..., (0, 1, 2)]
+        a = -v[:, (2, 0, 1),:]
+        b = v[:, (0, 1, 2),:]
+        a_du = -v_du[:, (2, 0, 1), ...]
+        b_du = v_du[:, (0, 1, 2), ...]
 
         return get_theta_du(a, a_du, b, b_du)
 
@@ -505,10 +505,10 @@ class CreaseFacetOperators(HasStrictTraits):
         x_F = self.x[self.F_N]
         N_deta_ip = self.Na_deta
         NN_delta_eps_x1 = np.einsum('aK,aL,KJ,jli,ILl->IaJji',
-                                    N_deta_ip[:, 0, :], N_deta_ip[:, 1, :],
+                                    N_deta_ip[:, 0,:], N_deta_ip[:, 1,:],
                                     DELTA, EPS, x_F)
         NN_delta_eps_x2 = np.einsum('aK,aL,LJ,kji,IKk->IaJji',
-                                    N_deta_ip[:, 0, :], N_deta_ip[:, 1, :],
+                                    N_deta_ip[:, 0,:], N_deta_ip[:, 1,:],
                                     DELTA, EPS, x_F)
         n_du = NN_delta_eps_x1 + NN_delta_eps_x2
         return n_du
@@ -565,7 +565,7 @@ class CreaseCummulativeOperators(HasStrictTraits):
     '''
     @cached_property
     def _get_V(self):
-        return np.sum(self.get_F_V)
+        return np.sum(self.F_V)
 
     V_du = Property(Array, depends_on=INPUT)
     '''Get the gradient of potential energy with respect
@@ -575,8 +575,8 @@ class CreaseCummulativeOperators(HasStrictTraits):
     def _get_V_du(self):
         F = self.F_N
         F_V_du = self.F_V_du
-        dof_map = (3 * F[:, :, np.newaxis] +
-                   np.arange(3)[np.newaxis, np.newaxis, :])
+        dof_map = (3 * F[:,:, np.newaxis] +
+                   np.arange(3)[np.newaxis, np.newaxis,:])
         V_du = np.bincount(dof_map.flatten(), weights=F_V_du.flatten())
         return V_du
 

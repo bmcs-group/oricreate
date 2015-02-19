@@ -18,7 +18,7 @@ import numpy as np
 import sympy as sp
 
 from oricreate.crease_pattern import \
-    CreasePattern
+    CreasePatternState
 
 from oricreate.forming_tasks import \
     FactoryTask
@@ -42,10 +42,10 @@ class MiuraOriCPFactory(FactoryTask):
     n_y = Int(2, geometry=True)
     d_x = Float(4)
 
-    def _get_formed_object(self):
-        return CreasePattern(X=self.X,
-                             L=self.L,
-                             F=self.F)
+    def deliver(self):
+        return CreasePatternState(X=self.X,
+                                  L=self.L,
+                                  F=self.F)
 
     X = Property
 

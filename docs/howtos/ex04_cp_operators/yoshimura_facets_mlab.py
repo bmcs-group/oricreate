@@ -5,7 +5,8 @@ Plot the results of single vertex example.
 '''
 
 if __name__ == '__main__':
-    from docs.howtos.ex04_facet_operators.yoshimura_facets import create_cp
+    from docs.howtos.ex04_cp_operators.yoshimura_facets_normals import \
+        create_cp
     cp = create_cp()
 
     cp.u[5, 2] = 1.0
@@ -24,6 +25,5 @@ if __name__ == '__main__':
 
     m.points3d(x, y, z, scale_factor=0.1)
     m.quiver3d(x, y, z, u, v, w)
-
     # end
     m.show()

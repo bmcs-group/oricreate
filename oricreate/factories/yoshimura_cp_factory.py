@@ -39,7 +39,7 @@ class YoshimuraCPFactory(FactoryTask):
     n_x = Int(2, geometry=True)
     n_y = Int(2, geometry=True)
 
-    def _get_formed_object(self):
+    def deliver(self):
         return CreasePatternState(X=self.X,
                                   L=self.L,
                                   F=self.F)
