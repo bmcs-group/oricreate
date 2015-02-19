@@ -1,7 +1,8 @@
 r'''
 
-Plot the results of single vertex example.
-
+Construct a general crease pattern configuration,
+used in the examples evaluating available goal functions
+and constraints.
 '''
 
 

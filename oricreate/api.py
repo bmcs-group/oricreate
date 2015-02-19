@@ -18,3 +18,5 @@ from simulation_tasks import \
 
 from view import \
     FormingView
+
+from util.sym_vars import r_, s_, t_, x_, y_, z_

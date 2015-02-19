@@ -1,8 +1,14 @@
 r'''
-This script demonstrates the use of a factory
-with a client - i.e. a goal function using
-the factory product (crease pattern) for evaluation
-of the potential energy.
+This example uses the crease pattern in the constraint on
+flat-foldability.
+
+The obtained result show that the crease pattern configuration
+at hand satisfies the flat-foldability condition.
+Further, the derivatives of the condition with
+respect to the node displacement are all zero.
+This means in this case, that the displacement of any node
+in any direction affects/violates
+the condition with the same rate.
 '''
 from custom_factory_mpl import create_cp_factory
 

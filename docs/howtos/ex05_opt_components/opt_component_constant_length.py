@@ -1,8 +1,10 @@
 r'''
-This script demonstrates the use of a factory
-with a client - i.e. a goal function using
-the factory product (crease pattern) for evaluation
-of the potential energy.
+This example uses the crease pattern in the constraint on
+constant length or rigidity of facets.
+
+In order to show a non-zero value of the constraint residue,
+node displacement in vertical direction is assigned
+to the interior node of the sample crease pattern.
 '''
 from custom_factory_mpl import create_cp_factory
 

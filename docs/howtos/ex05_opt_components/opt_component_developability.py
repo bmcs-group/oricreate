@@ -1,8 +1,14 @@
 r'''
-This script demonstrates the use of a factory
-with a client - i.e. a goal function using
-the factory product (crease pattern) for evaluation
-of the potential energy.
+This example uses the crease pattern in the constraint on
+developability.
+
+The obtained result show that the crease pattern configuration
+at hand satisfies the developability condition.
+Further, the derivatives of the condition with
+respect to the node displacement can be easily verified
+by checking if a  node displacement in a respective direction
+increases or decreases the angle around the interior node
+of the example crease pattern.
 '''
 from custom_factory_mpl import create_cp_factory
 

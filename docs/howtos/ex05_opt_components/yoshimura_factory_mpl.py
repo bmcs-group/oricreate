@@ -1,7 +1,6 @@
 r'''
-
-Plot the results of single vertex example.
-
+Construct the Yoshimura crease patterns to be used
+in elementary examples.
 '''
 
 

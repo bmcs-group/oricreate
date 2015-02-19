@@ -20,8 +20,8 @@ from oricreate.gu import \
     GuDevelopability, \
     GuFlatFoldability, \
     GuPointsOnSurface, \
-    GrabPoints, \
-    PointsOnLine, DofConstraints
+    GuGrabPoints, \
+    GuPointsOnLine, GuDofConstraints
 from i_simulation_task import \
     ISimulationTask
 from oricreate.crease_pattern import \
@@ -308,10 +308,10 @@ class Lift(SimulationTask):
 
     def _Gu_default(self):
         return {'cl': GuConstantLength(FormingTask=self),
-                'gp': GrabPoints(FormingTask=self),
-                'pl': PointsOnLine(FormingTask=self),
+                'gp': GuGrabPoints(FormingTask=self),
+                'pl': GuPointsOnLine(FormingTask=self),
                 'ps': GuPointsOnSurface(FormingTask=self),
-                'dc': DofConstraints(FormingTask=self)
+                'dc': GuDofConstraints(FormingTask=self)
                 }
 
 if __name__ == '__main__':

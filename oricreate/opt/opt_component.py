@@ -5,7 +5,7 @@ Created on Nov 14, 2014
 '''
 
 from traits.api import \
-    HasStrictTraits, WeakRef
+    HasStrictTraits, WeakRef, Property
 
 
 class OptComponent(HasStrictTraits):
@@ -16,3 +16,8 @@ class OptComponent(HasStrictTraits):
     '''
 
     forming_task = WeakRef
+
+    formed_object = Property
+
+    def _get_formed_object(self):
+        return self.forming_task.formed_object

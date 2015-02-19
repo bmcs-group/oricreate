@@ -1,8 +1,8 @@
 
 from gu import \
     Gu
-from gu import \
-    GrabPoints, PointsOnLine, DofConstraints
+from gu_disp_control import \
+    GuGrabPoints, GuPointsOnLine, GuDofConstraints
 from gu_angle_based import \
     GuDevelopability, GuFlatFoldability
 from gu_constant_length import \
