@@ -1,56 +1,58 @@
 
-Components of the optimization problem
-======================================
+Goal functions
+==============
 
 This page uses a simple crease pattern to show how to construct algorithmic objects for implemented goal functions
 and constraints.
 
-.. automodule:: docs.howtos.ex05_opt_components.custom_factory_mpl
+Reference crease pattern
+------------------------
+
+.. automodule:: docs.howtos.ex05_fu_components.custom_factory_mpl
 
 .. include:: custom_factory_mpl.py
    :literal:
    :start-after: # begin
    :end-before: # end
 
-.. plot:: howtos/ex05_opt_components/custom_factory_mpl.py
+.. plot:: howtos/ex05_fu_components/custom_factory_mpl.py
    :width: 400px
 
-Goal functions
---------------
 
 Potential energy of gravity
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------
 
-.. automodule:: docs.howtos.ex05_opt_components.opt_component_poteng_gravity
+.. automodule:: docs.howtos.ex05_fu_components.fu_poteng_gravity
 
-.. include:: opt_component_poteng_gravity.py
+.. include:: opt_fu_poteng_gravity.py
    :literal:
    :start-after: # begin
    :end-before: # end
 
 The output of the script looks as follows:
 
-.. program-output:: python howtos/ex05_opt_components/opt_component_poteng_gravity.py
+.. program-output:: python howtos/ex05_fu_components/fu_poteng_gravity.py
 
 Distance to target faces
-^^^^^^^^^^^^^^^^^^^^^^^^
-.. automodule:: docs.howtos.ex05_opt_components.opt_component_distance_to_target_face
+------------------------
 
-.. include:: opt_component_distance_to_target_face.py
+.. automodule:: docs.howtos.ex05_fu_components.fu_distance_to_target_face
+
+.. include:: fu_distance_to_target_face.py
    :literal:
    :start-after: # begin
    :end-before: # end
 
 The output of the script looks as follows:
 
-.. program-output:: python howtos/ex05_opt_components/opt_component_distance_to_target_face.py
+.. program-output:: python howtos/fu_components/fu_distance_to_target_face.py
 
 
 Equality constraints
---------------------
+====================
 
 Constant length constraint
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------
 .. automodule:: docs.howtos.ex05_opt_components.opt_component_constant_length
 
 .. include:: opt_component_constant_length.py
@@ -64,7 +66,7 @@ The output of the script looks as follows:
 
 
 Developability
-^^^^^^^^^^^^^^
+--------------
 .. automodule:: docs.howtos.ex05_opt_components.opt_component_developability
 
 .. include:: opt_component_developability.py
@@ -78,7 +80,7 @@ The output of the script looks as follows:
 
 
 Flat foldability
-^^^^^^^^^^^^^^^^
+----------------
 .. automodule:: docs.howtos.ex05_opt_components.opt_component_flat_foldability
 
 .. include:: opt_component_flat_foldability.py
@@ -91,7 +93,7 @@ The output of the script looks as follows:
 .. program-output:: python howtos/ex05_opt_components/opt_component_flat_foldability.py
 
 Node displacement control
-^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------
 
 .. automodule:: docs.howtos.ex05_opt_components.opt_component_disp_control
 
@@ -104,12 +106,14 @@ The output of the script looks as follows:
 
 .. program-output:: python howtos/ex05_opt_components/opt_component_disp_control.py
 
+Planarity of neighboring facets 
+-------------------------------
 
 
 Inequality constraints
-----------------------
+======================
 
 Mountain / valley creases
-^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------
 
 

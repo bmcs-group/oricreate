@@ -1,7 +1,11 @@
 r'''
 
-This example demonstrates the interface of a CreasePattern class
-using the depicted node-line-facet structure.
+Let us construct a single vertex crease pattern.
+By accessing its property attribute, evaluation of characteristics
+like mappings between facets and nodes or facets and lines
+are calculated. Further, quantifiable properties like line
+vectors or facet areas or normals can be calculated including their
+derivatives with respect to the node displacements.
 
 .. image:: single_vertex.png
 
@@ -18,10 +22,10 @@ def create_cp():
                                [0, 4], [1, 4], [3, 4], [2, 4]],
                             F=[[0, 1, 4], [1, 3, 4], [3, 2, 4], [0, 2, 4]])
 
-    print cp.L
-
     print 'Nodes of facets enumerated counter clock-wise\n', cp.F_N
     print 'Lines of facets enumerated counter clock-wise\n', cp.F_L
+    print 'Facet areas\n', cp.F_area
+    print 'Vector normal to a face\nt', cp.F_normals
     # end
     return cp
 

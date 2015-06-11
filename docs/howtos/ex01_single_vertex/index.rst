@@ -2,11 +2,6 @@
 Single vertex example
 =====================
 
-This example constructs a single vertex crease pattern and
-shows how to obtain the basic characteristics including angles, 
-facet areas, normals to the facets. Extraction of derivatives
-is provided as well. 
-
 .. automodule:: docs.howtos.ex01_single_vertex.single_vertex
 
 .. include:: single_vertex.py

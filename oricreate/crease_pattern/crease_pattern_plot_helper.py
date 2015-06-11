@@ -29,7 +29,8 @@ class CreasePatternPlotHelper(HasStrictTraits):
     def _get_x_t(self):
         return np.array([self.x], dtype='float_')
 
-    def plot_mpl(self, ax, nodes=True, lines=True, facets=True):
+    def plot_mpl(self, ax, nodes=True, lines=True, facets=True,
+                 color='black', linewidth=1, fontsize=12):
         r'''Plot the crease pattern using mpl
         '''
         # set plot range
@@ -49,7 +50,8 @@ class CreasePatternPlotHelper(HasStrictTraits):
         # plot lines
         crease_line_pos = self.x_0[:, (0, 1)][self.cL_N]
         ax.plot(crease_line_pos[:, :, 0].T,
-                crease_line_pos[:, :, 1].T, color='black')
+                crease_line_pos[:, :, 1].T, color=color,
+                linewidth=linewidth)
         ax.set_xlim(*x_range[0, :])
         ax.set_ylim(*x_range[1, :])
         ax.set_aspect('equal')
@@ -60,7 +62,7 @@ class CreasePatternPlotHelper(HasStrictTraits):
                 xy = (x_0[0], x_0[1])
                 ax.annotate(xy=xy, s='%g' % n,
                             xytext=xy_offset, color='blue',
-                            textcoords='offset points')
+                            textcoords='offset points', size=fontsize)
         # plot line numbers
         if lines is True:
             xy_offset = (1, 1)
@@ -69,7 +71,7 @@ class CreasePatternPlotHelper(HasStrictTraits):
                 xy = (x_0[0], x_0[1])
                 ax.annotate(xy=xy, s='%g' % n,
                             xytext=xy_offset, color='red',
-                            textcoords='offset points')
+                            textcoords='offset points', size=fontsize)
         # plot facet numbers
         if facets is True:
             xy_offset = (0, 0)
@@ -78,7 +80,7 @@ class CreasePatternPlotHelper(HasStrictTraits):
                 xy = (x_0[0], x_0[1])
                 ax.annotate(xy=xy, s='%g' % n,
                             xytext=xy_offset, color='green',
-                            textcoords='offset points')
+                            textcoords='offset points', size=fontsize)
 
     def _get_bounding_box(self):
         return np.min(self.x, axis=0), np.max(self.x, axis=0)

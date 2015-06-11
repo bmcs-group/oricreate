@@ -249,7 +249,7 @@ class FindFormForGeometry(SimulationTask):
         return {'ff': GuFlatFoldability(FormingTask=self),
                 'uf': GuDevelopability(FormingTask=self),
                 'ps': GuPointsOnSurface(FormingTask=self),
-                'dc': DofConstraints(FormingTask=self)
+                'dc': GuDofConstraints(FormingTask=self)
                 }
 
     U_1 = Property(depends_on='source_config_changed, _U_0')
@@ -282,7 +282,7 @@ class FoldRigidly(SimulationTask):
     def _Gu_default(self):
         return {'cl': GuConstantLength(FormingTask=self),
                 'ps': GuPointsOnSurface(FormingTask=self),
-                'dc': DofConstraints(FormingTask=self)
+                'dc': GuDofConstraints(FormingTask=self)
                 }
 
 

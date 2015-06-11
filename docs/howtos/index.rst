@@ -2,9 +2,8 @@
 .. highlightlang:: python
 	:linenothreshold: 3
 
-============================
-Reviewing the origami basics
-============================
+Step by step definition of a simulation task
+============================================
 
 This chapter presents the functionality provided 
 within oricreate package using elementary examples
@@ -17,11 +16,29 @@ in order to be rigid foldable.
 
    ex01_single_vertex/index
 
-   ex02_vector_angles/index
+   ex04_cp_operators/index
+
+   ex05_fu_components/index
+
+   ex06_gu_components/index
+	
+   ex07_sim_task/index
+
+Crease pattern factories
+========================
+
+.. toctree::
+   :maxdepth: 2
 
    ex03_cp_factories/index
    
-   ex04_cp_operators/index
-   
-   ex05_opt_components/index
+
+General mathematical utilities
+==============================
+
+.. toctree::
+   :maxdepth: 2
+
+   ex02_vector_angles/index
+
    

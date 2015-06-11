@@ -1,6 +1,4 @@
 
-Crease pattern factories
-========================
 
 .. todo::
    Add parameters to the examples - to make them small.

@@ -10,6 +10,6 @@ if __name__ == '__main__':
     # begin
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots()
-    cp.plot_mpl(ax, facets=False)
+    cp.plot_mpl(ax, facets=True)
     plt.tight_layout()
     # end

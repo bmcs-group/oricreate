@@ -1,7 +1,7 @@
 r'''
 
 Construct a general crease pattern configuration,
-used in the examples evaluating available goal functions
+used in the examples below demonstrating the evaluation of goal functions
 and constraints.
 '''
 

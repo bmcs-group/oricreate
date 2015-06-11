@@ -7,6 +7,9 @@ in terms of an integral distance measure.
 The target surface is defined as horizontal plane at the level 1.0.
 In order to make the results easily interpretable only a single
 node (0) is included in the goal function.
+
+The derivative of the distance function contains only one non-zero
+value for the z-displacement of the node (0) equal to -1.
 '''
 from custom_factory_mpl import create_cp_factory
 
@@ -25,6 +28,11 @@ def create_fu():
     print 'f_du:\n', fu_target_faces.get_f_du(cp.u)
     # end
     return fu_target_faces
+
+
+def create_sim_step_tf():
+    fu_target_faces = create_fu()
+
 
 if __name__ == '__main__':
     create_fu()
