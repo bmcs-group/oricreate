@@ -299,10 +299,10 @@ class FuTargetFaces(Fu):
 
     tf_lst = List([])
 
-    def get_f(self, u, t=0):
+    def get_f(self, t=0):
         '''Get the the norm of distances between the individual target faces and nodes.
         '''
-        x = self.forming_task.formed_object.x_0 + u
+        x = self.forming_task.formed_object.x
         d_arr = np.array([])
         for caf, nodes in self.tf_lst:
             caf.X_arr = x[nodes]
@@ -311,10 +311,10 @@ class FuTargetFaces(Fu):
 
         return np.linalg.norm(d_arr)
 
-    def get_f_du(self, u, t=0):
+    def get_f_du(self, t=0):
         '''Get the derivatives with respect to individual displacements.
         '''
-        x = self.forming_task.formed_object.x_0 + u
+        x = self.forming_task.formed_object.x
         d_xyz = np.zeros_like(x)
         dist_arr = np.array([])
         for caf, nodes in self.tf_lst:

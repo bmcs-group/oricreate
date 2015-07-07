@@ -12,10 +12,10 @@ class IGu(Interface):
     '''Interface of an equality constraint.
     '''
 
-    def get_G(self, U, t=0):
+    def get_G(self, t=0):
         '''Return the vector of equality constraint values.
         '''
 
-    def get_G_du(self, U, t=0):
+    def get_G_du(self, t=0):
         '''Return the jacobian of equality constraint values.
         '''

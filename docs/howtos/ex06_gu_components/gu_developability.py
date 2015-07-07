@@ -18,10 +18,9 @@ def create_fu():
     # begin
     from oricreate.gu import GuDevelopability
     # Link the pattern factory with the constraint client.
-    gu_devel = GuDevelopability(cp_factory)
-    cp = cp_factory.formed_object
-    print 'gu:', gu_devel.get_G(cp.u)
-    print 'g_du:\n', gu_devel.get_G_du(cp.u)
+    gu_devel = GuDevelopability(forming_task=cp_factory)
+    print 'gu:', gu_devel.get_G()
+    print 'g_du:\n', gu_devel.get_G_du()
     # end
     return gu_devel
 

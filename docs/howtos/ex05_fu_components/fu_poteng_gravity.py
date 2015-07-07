@@ -12,7 +12,7 @@ def create_fu():
     # begin
     from oricreate.fu import FuPotentialEnergy
     # Link the pattern factory with the goal function client.
-    fu_poteng = FuPotentialEnergy(cp_factory)
+    fu_poteng = FuPotentialEnergy(forming_task=cp_factory)
     # Change the vertical coordinate to get
     # a non-zero value of potential energy
     cp = cp_factory.formed_object

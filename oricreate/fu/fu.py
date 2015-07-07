@@ -29,9 +29,3 @@ class Fu(OptComponent):
     '''Indicates the derivatives are unavailable for a given
     type of constraint.
     '''
-
-    def __init__(self, simulation_task, *args, **kw):
-        '''Initialization requiring the simulation_task tool.
-        '''
-        self.forming_task = simulation_task
-        super(HasStrictTraits, self).__init__(*args, **kw)

@@ -26,6 +26,8 @@ class SimulationConfig(HasStrictTraits):
     implements(IOpt)
 
     debug_level = Int(0, label='Debug level', auto_set=False, enter_set=True)
+    r'''Debug level for simulation scheme.
+    '''
 
     goal_function_type = Trait('target_faces',
                                {'none': None,
@@ -33,19 +35,12 @@ class SimulationConfig(HasStrictTraits):
                                 'potential_energy': FuPotentialEnergy
                                 },
                                input_change=True)
-    '''Type of the goal function.
+    r'''Type of the goal function.
     '''
 
-    sim_step = WeakRef
-
-    fu = Property(Instance(IFu), depends_on='+input_change')
-
-    @cached_property
-    def _get_fu(self):
-        if self.fu_type_:
-            return self.goal_function_type_(simulation_step=self.sim_step)
-        else:
-            return None
+    fu = Instance(IFu)
+    '''Goal function.
+    '''
 
     gu = Dict(Str, IGu)
     '''Dictionary of equality constraints.
@@ -74,13 +69,6 @@ class SimulationConfig(HasStrictTraits):
     @cached_property
     def _get_hu_lst(self):
         return self.gu.values()
-
-    tf_lst = DelegatesTo('goal_function')
-    '''List of target faces.
-
-    If target face is available, than use it for initialization.
-    The z component of the face is multiplied with a small init_factor
-    '''
 
     # ===========================================================================
     # Kinematic constraints

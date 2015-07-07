@@ -21,3 +21,23 @@ class OptComponent(HasStrictTraits):
 
     def _get_formed_object(self):
         return self.forming_task.formed_object
+
+    U = Property
+
+    def _get_U(self):
+        return self.formed_object.U
+
+    u = Property
+
+    def _get_u(self):
+        return self.formed_object.u
+
+    X = Property
+
+    def _get_X(self):
+        return self.formed_object.X
+
+    x = Property
+
+    def _get_x(self):
+        return self.formed_object.x

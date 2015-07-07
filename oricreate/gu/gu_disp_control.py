@@ -62,13 +62,13 @@ class GuGrabPoints(Gu):
         L = L.reshape(-1, 3)  # gives L1,L2,L3 for each grabpoint
         return L
 
-    def get_G(self, U, t=0):
+    def get_G(self, t=0):
         ''' Calculate the residuum for constant crease length
         given the fold vector U.
         '''
         return np.zeros(self.n_GP * self.n_D,)
 
-    def get_G_du(self, U, t=0):
+    def get_G_du(self, t=0):
         ''' Calculate the residuum for constant crease length
         given the fold vector dX.
 
@@ -108,13 +108,13 @@ class GuPointsOnLine(Gu):
     L = DelegatesTo('forming_task')
     N = DelegatesTo('forming_task')
 
-    def get_G(self, U, t=0):
+    def get_G(self, t=0):
 
         line = np.array(self.LP)
         if(len(line) == 0):
             return []
         cl = self.L[line[:, 1]]
-        u = U.reshape(self.n_N, self.n_D)
+        u = self.u
         p0 = self.x_0[line[:, 0]]
         p1 = self.x_0[cl[:, 0]]
         p2 = self.x_0[cl[:, 1]]
@@ -155,7 +155,7 @@ class GuPointsOnLine(Gu):
 
         return R.reshape((-1,))
 
-    def get_G_du(self, U, t=0):
+    def get_G_du(self, t=0):
         ''' Calculate the jacobian of the residuum at the instantaneous
         configuration dR
         '''
@@ -163,7 +163,7 @@ class GuPointsOnLine(Gu):
         if(len(line) == 0):
             return np.zeros((self.n_LP * 2, self.n_dofs))
         cl = self.L[line[:, 1]]
-        u = U.reshape(self.n_N, self.n_D)
+        u = self.u
         p0 = self.x_0[line[:, 0]]
         p1 = self.x_0[cl[:, 0]]
         p2 = self.x_0[cl[:, 1]]
@@ -281,11 +281,11 @@ class GuDofConstraints(Gu):
     :func:`oricrete.fix` and :func:`oricrete.link`.
     '''
 
-    def get_G(self, U, t=0):
+    def get_G(self, t=0):
         ''' Calculate the residuum for given constraint equations
         '''
         cp = self.formed_object
-        u = U.reshape(cp.n_N, cp.n_D)
+        u = self.u
         G = np.zeros((len(self.dof_constraints)), dtype='float_')
         for i, dof_cnstr in enumerate(self.dof_constraints):
             lhs, rhs = dof_cnstr
@@ -295,7 +295,7 @@ class GuDofConstraints(Gu):
 
         return G
 
-    def get_G_du(self, U, t=0.0):
+    def get_G_du(self, t=0.0):
         ''' Calculate the residue for given constraint equations
         '''
         cp = self.formed_object

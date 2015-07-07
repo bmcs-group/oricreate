@@ -36,14 +36,14 @@ class GuAngle(Gu):
     # Constraint methods
     # =========================================================================
 
-    def _get_G(self, u, t=0.0):
+    def _get_G(self, t=0.0):
         cp = self.forming_task.formed_object
         theta_arr = cp.iN_theta
         signs = self.signs
         return np.array([np.sum(signs[:theta.shape[0]] * theta)
                          for theta in theta_arr])
 
-    def _get_G_du(self, u, t=0.0):
+    def _get_G_du(self, t=0.0):
         cp = self.forming_task.formed_object
         theta_du_arr = cp.iN_theta_du
         signs = self.signs
@@ -160,11 +160,11 @@ class GuDevelopability(GuAngle):
         signs = np.ones((20,), dtype='f')
         return signs
 
-    def get_G(self, U, t=0.0):
-        return self._get_G(U, t) - 2 * np.pi
+    def get_G(self, t=0.0):
+        return self._get_G(t) - 2 * np.pi
 
-    def get_G_du(self, U, t=0.0):
-        return self._get_G_du(U, t)
+    def get_G_du(self, t=0.0):
+        return self._get_G_du(t)
 
 
 class GuFlatFoldability(GuAngle):
@@ -181,40 +181,10 @@ class GuFlatFoldability(GuAngle):
         signs[::2] = -1
         return signs
 
-    def get_G(self, U, t=0.0):
+    def get_G(self, t=0.0):
         ''' Calculate the residuum for given constraint equations
         '''
-        return self._get_G(U, t)
+        return self._get_G(t)
 
-    def get_G_du(self, U, t=0.0):
-        return self._get_G_du(U, t)
-
-
-if __name__ == '__main__':
-    from oricreate.api import FormingTask, CreasePattern
-
-    cp = CreasePattern(X=[[-4, -5, -3],
-                          [0, 0.0, 0],
-                          [1.0, 0.1, 0],
-                          [0.0, 1.0, 0],
-                          [-1.0, 0.0, 0],
-                          [0.0, -1.0, 0]],
-                       L=[[1, 2], [1, 3], [1, 4], [1, 5],
-                          [2, 3], [3, 4], [4, 5], [5, 2]],
-                       F=[[1, 2, 3], [1, 3, 4], [1, 4, 5], [1, 5, 2]]
-                       )
-
-    FormingTask = FormingTask(cp=cp)
-
-    print 'in_neighbors', cp.iN_neighbors
-
-    uf = GuDevelopability(FormingTask)
-
-    U = np.zeros_like(cp.X)
-    U[3] = 0.1
-    print 'iN_theta', uf.get_iN_theta(U, 0)
-
-    print 'G\n', uf.get_G(U, 0)
-
-    print 'G_du\n', uf.get_G_du(U, 0)
-    # print 'G_du\n', uf.x_get_G_du(U, 0)
+    def get_G_du(self, t=0.0):
+        return self._get_G_du(t)

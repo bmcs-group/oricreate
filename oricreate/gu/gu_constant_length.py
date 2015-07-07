@@ -11,8 +11,10 @@
 # Thanks for using Simvisage open source!
 #
 
+from traits.api import \
+    implements
 from gu import \
-    Gu
+    Gu, IGu
 import numpy as np
 
 
@@ -20,14 +22,15 @@ class GuConstantLength(Gu):
 
     '''Constant length constraint.
     '''
+    implements(IGu)
 
-    def get_G(self, U, t=0.0):
+    def get_G(self, t=0.0):
         '''Calculate the residue for constant crease length
         given the fold vector dX.
         '''
         cp = self.forming_task.formed_object
         v_0 = cp.L_vectors
-        u = U.reshape(cp.n_N, cp.n_D)
+        u = cp.u
         u_i, u_j = u[cp.L.T]
         v_u_i = np.sum(v_0 * u_i, axis=1)
         v_u_j = np.sum(v_0 * u_j, axis=1)
@@ -38,7 +41,7 @@ class GuConstantLength(Gu):
 
         return G
 
-    def get_G_du(self, U, t=0.0):
+    def get_G_du(self, t=0.0):
         '''Calculate the residue for constant crease length
         given the fold vector dX.
         '''
@@ -48,7 +51,7 @@ class GuConstantLength(Gu):
         # running crease line index
         if cp.n_L > 0:
             v_0 = cp.L_vectors
-            u = U.reshape(cp.n_N, cp.n_D)
+            u = cp.u
             i, j = cp.L.T
             u_i, u_j = u[cp.L.T]
             l = np.arange(cp.n_L)

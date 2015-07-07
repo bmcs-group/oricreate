@@ -7,11 +7,11 @@ import math
 
 from traits.api import Property, Str, Int, Float, Array, cached_property
 import numpy as np
-from oricreate.forming_tasks import \
-    FormingTask
+from mapping_tasks import \
+    MappingTask
 
 
-class RotateCopy(FormingTask):
+class RotateCopy(MappingTask):
 
     ''' Replicate the source to form a structure.
 
@@ -205,7 +205,7 @@ def q_to_axis_angle(q):
     return theta, v_normalize(v)
 
 
-class MonoShapeAssembly(FormingTask):
+class MonoShapeAssembly(MappingTask):
 
     '''Use the source element to assemble a structure
     consisting of a singly prefabricated element.

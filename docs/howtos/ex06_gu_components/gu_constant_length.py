@@ -14,7 +14,7 @@ def create_gu():
     # begin
     from oricreate.gu import GuConstantLength
     # Link the crease factory it with the constraint client
-    gu_constant_length = GuConstantLength(cp_factory)
+    gu_constant_length = GuConstantLength(forming_task=cp_factory)
     cp = cp_factory.formed_object
     # Set a vertical of the mid node
     cp.u[4, 2] = -1.0

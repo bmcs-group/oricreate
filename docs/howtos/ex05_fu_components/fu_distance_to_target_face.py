@@ -21,11 +21,10 @@ def create_fu():
     from oricreate.api import r_, s_
     # Link the pattern factory with the goal function client.
     target_face = TF(F=[r_, s_, 1.0])
-    fu_target_faces = FuTargetFaces(cp_factory,
+    fu_target_faces = FuTargetFaces(forming_task=cp_factory,
                                     tf_lst=[(target_face, [0])])
-    cp = cp_factory.formed_object
-    print 'fu:', fu_target_faces.get_f(cp.u)
-    print 'f_du:\n', fu_target_faces.get_f_du(cp.u)
+    print 'fu:', fu_target_faces.get_f()
+    print 'f_du:\n', fu_target_faces.get_f_du()
     # end
     return fu_target_faces
 

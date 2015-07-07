@@ -12,13 +12,12 @@ def create_gu():
     from oricreate.gu import GuDofConstraints
     # Link the crease factory it with the constraint client
     gu_dof_constraints = \
-        GuDofConstraints(cp_factory,
+        GuDofConstraints(forming_task=cp_factory,
                          dof_constraints=[([(0, 0, 1.0)], 0.1),
                                           ([(0, 1, 1.0)], 0.2),
                                           ])
-    cp = cp_factory.formed_object
-    print 'gu:', gu_dof_constraints.get_G(cp.u, 1.0)
-    print 'g_du:\n', gu_dof_constraints.get_G_du(cp.u, 1.0)
+    print 'gu:', gu_dof_constraints.get_G(1.0)
+    print 'g_du:\n', gu_dof_constraints.get_G_du(1.0)
     # end
     return gu_dof_constraints
 

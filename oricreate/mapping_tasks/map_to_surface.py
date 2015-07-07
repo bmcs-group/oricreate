@@ -13,11 +13,11 @@ import numpy as np
 from oricreate.simulation_step import \
     SimulationStep
 
-from oricreate.forming_tasks import \
-    FormingTask
+from mapping_tasks import \
+    MappingTask
 
 
-class MapToSurface(FormingTask):
+class MapToSurface(MappingTask):
 
     '''The nodes of the formed are  mapped on an target face, without any
     constraints. This will be done for time_step = 0.001, so theirs only

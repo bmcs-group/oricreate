@@ -13,12 +13,11 @@
 # Created on Jan 3, 2013 by: rch, schmerl
 
 from traits.api import \
-    HasStrictTraits, \
     DelegatesTo, \
     Bool
 
 from oricreate.opt import \
-    OptComponent
+    OptComponent, IGu
 
 
 class Gu(OptComponent):
@@ -34,9 +33,3 @@ class Gu(OptComponent):
     '''Indicates the derivatives are unavailable for a given
     type of constraint.
     '''
-
-    def __init__(self, forming_task, *args, **kw):
-        '''Initialization requiring the forming_task tool.
-        '''
-        self.forming_task = forming_task
-        super(HasStrictTraits, self).__init__(*args, **kw)

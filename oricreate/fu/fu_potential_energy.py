@@ -31,12 +31,12 @@ class FuPotentialEnergy(Fu):
 
     implements(IFu)
 
-    def get_f(self, u, t=0):
+    def get_f(self, t=0):
         '''Get the potential energy of gravity.
         '''
         return self.forming_task.formed_object.V
 
-    def get_f_du(self, u, t=0):
+    def get_f_du(self, t=0):
         '''Get the derivatives with respect to individual displacements.
         '''
         return self.forming_task.formed_object.V_du

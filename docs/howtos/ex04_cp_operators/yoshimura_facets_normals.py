@@ -14,6 +14,15 @@ def create_cp():
     cp_factory = YoshimuraCPFactory(n_x=1, n_y=2, L_x=2, L_y=4)
     cp = cp_factory.formed_object
 
+    print 'Initial configuration'
+    print 'Integration point positions r within facets:\n', cp.Fa_r
+    print 'Normal vectors at integration positions r\n', cp.Fa_normals
+
+    cp.u[5, 2] = 1.0
+    cp.u[6, 2] = 1.0
+    cp.u = cp.u
+
+    print 'Displaced configuration'
     print 'Integration point positions r within facets:\n', cp.Fa_r
     print 'Normal vectors at integration positions r\n', cp.Fa_normals
 

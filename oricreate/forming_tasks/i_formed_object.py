@@ -4,11 +4,11 @@ Created on Nov 3, 2014
 @author: rch
 '''
 
-import traits.has_traits as ht
-ht.CHECK_INTERFACES = 2
-
 from traits.api import \
     Interface, Array, HasStrictTraits
+
+import traits.has_traits as ht
+ht.CHECK_INTERFACES = 2
 
 
 class IFormedObject(Interface):

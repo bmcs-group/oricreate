@@ -24,7 +24,7 @@ Potential energy of gravity
 
 .. automodule:: docs.howtos.ex05_fu_components.fu_poteng_gravity
 
-.. include:: opt_fu_poteng_gravity.py
+.. include:: fu_poteng_gravity.py
    :literal:
    :start-after: # begin
    :end-before: # end
@@ -45,75 +45,6 @@ Distance to target faces
 
 The output of the script looks as follows:
 
-.. program-output:: python howtos/fu_components/fu_distance_to_target_face.py
-
-
-Equality constraints
-====================
-
-Constant length constraint
---------------------------
-.. automodule:: docs.howtos.ex05_opt_components.opt_component_constant_length
-
-.. include:: opt_component_constant_length.py
-   :literal:
-   :start-after: # begin
-   :end-before: # end
-
-The output of the script looks as follows:
-
-.. program-output:: python howtos/ex05_opt_components/opt_component_constant_length.py
-
-
-Developability
---------------
-.. automodule:: docs.howtos.ex05_opt_components.opt_component_developability
-
-.. include:: opt_component_developability.py
-   :literal:
-   :start-after: # begin
-   :end-before: # end
-
-The output of the script looks as follows:
-
-.. program-output:: python howtos/ex05_opt_components/opt_component_developability.py
-
-
-Flat foldability
-----------------
-.. automodule:: docs.howtos.ex05_opt_components.opt_component_flat_foldability
-
-.. include:: opt_component_flat_foldability.py
-   :literal:
-   :start-after: # begin
-   :end-before: # end
-
-The output of the script looks as follows:
-
-.. program-output:: python howtos/ex05_opt_components/opt_component_flat_foldability.py
-
-Node displacement control
--------------------------
-
-.. automodule:: docs.howtos.ex05_opt_components.opt_component_disp_control
-
-.. include:: opt_component_disp_control.py
-   :literal:
-   :start-after: # begin
-   :end-before: # end
-
-The output of the script looks as follows:
-
-.. program-output:: python howtos/ex05_opt_components/opt_component_disp_control.py
-
-Planarity of neighboring facets 
--------------------------------
-
-
-Inequality constraints
-======================
-
-Mountain / valley creases
--------------------------
+.. program-output:: python howtos/ex05_fu_components/fu_distance_to_target_face.py
 
 

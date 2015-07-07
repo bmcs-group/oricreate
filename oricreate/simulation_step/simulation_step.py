@@ -16,15 +16,18 @@ from scipy.optimize import \
     fmin_slsqp
 
 from traits.api import \
-    Event, Property, cached_property, \
-    Int, Float, Bool, \
-    Instance
+    HasTraits, Event, Property, cached_property, \
+    Int, Float, Bool, DelegatesTo, \
+    Instance, WeakRef, Array
 
 from simulation_config import \
     SimulationConfig
 
 from oricreate.crease_pattern import \
     CreasePatternState
+
+from oricreate.forming_tasks import \
+    FormingTask
 
 import time
 
@@ -38,29 +41,75 @@ elif platform.system() == 'Windows':
     sysclock = time.clock
 
 
-class SimulationStep(CreasePatternState):
+class SimulationStep(HasTraits):
 
     r"""Class implementing the transition of the crease pattern state
     to the target time :math:`t`.
     """
+
+    forming_task = WeakRef(FormingTask)
+    r'''Backward link to the client forming tasks.
+    This may be an incremental time stepping SimulationTask
+    of a MappingTaks performed in a single iterative step.
+    '''
 
     source_config_changed = Event
     r'''Notification event for changes in the configuration
     of the optimization problem.
     '''
 
-    opt = Instance(SimulationConfig)
+    config = WeakRef(SimulationConfig)
     r'''Configuration of the optimization problem.
     '''
 
-    opt_ = Property(depends_on='sim_config')
-    r'''Configuration of the optimization problem including the backward link.
+    # =====================================================================
+    # Cached properties derived from configuration and position in the pipe
+    # =====================================================================
+    cp_state = Property(Instance(CreasePatternState),
+                        depends_on='source_config_changed')
+    r'''Crease pattern state.
     '''
     @cached_property
-    def _get_opt_(self):
-        self.opt.sim_step = self
-        return self.opt
+    def _get_cp_state(self):
+        return self.forming_task.formed_object
 
+    U = Property(Array(float))
+    r'''Displacement vector of the cp_state
+    '''
+
+    def _get_U(self):
+        return self.cp_state.U
+
+    fu = Property(depends_on='source_config_changed')
+    r'''Goal function object.
+    '''
+    @cached_property
+    def _get_fu(self):
+        self.config.fu.forming_task = self.forming_task
+        return self.config.fu
+
+    gu_lst = Property(depends_on='source_config_changed')
+    r'''Equality constraint object.
+    '''
+    @cached_property
+    def _get_gu_lst(self):
+        for gu in self.config.gu_lst:
+            gu.forming_task = self.forming_task
+        return self.config.gu_lst
+
+    hu_lst = Property(depends_on='source_config_changed')
+    r'''Inequality constraint object.
+    '''
+    @cached_property
+    def _get_hu_lst(self):
+        for hu in self.config.gu_lst:
+            hu.forming_task = self.forming_task
+        return self.config.hu_lst
+
+    debug_level = DelegatesTo("config")
+    # ===========================================================================
+    # Configuration parameters for the iterative solver
+    # ===========================================================================
     t = Float(0.0, auto_set=False, enter_set=True)
     r'''Current time within the step in the range (0,1).
     '''
@@ -77,6 +126,13 @@ class SimulationStep(CreasePatternState):
     r'''Required accuracy.
     '''
 
+    use_G_du = Bool(True, auto_set=False, enter_set=True)
+    r'''Switch the use of constraint derivatives on.
+    '''
+
+    # ===========================================================================
+    # Iterative solvers
+    # ===========================================================================
     def _solve_nr(self, t):
         '''Find the solution using the Newton-Raphson procedure.
         '''
@@ -101,8 +157,6 @@ class SimulationStep(CreasePatternState):
 
         return self.U
 
-    use_G_du = Bool(True, auto_set=False, enter_set=True)
-
     def _solve_fmin(self):
         '''Solve the problem using the
         Sequential Least Square Quadratic Programming method.
@@ -112,22 +166,21 @@ class SimulationStep(CreasePatternState):
         eps = d0 * 1e-4
         get_G_du_t = None
 
-        self.t = time
         if self.use_G_du:
             get_G_du_t = self.get_G_du_t
 
         info = fmin_slsqp(self.get_f_t,
-                          self.cp_state.U,
+                          self.U,
                           fprime=self.get_f_du_t,
-                          f_Gu=self.get_G_t,
-                          fprime_Gu=get_G_du_t,
+                          f_eqcons=self.get_G_t,
+                          fprime_eqcons=get_G_du_t,
                           acc=self.acc, iter=self.MAX_ITER,
                           iprint=0,
                           full_output=True,
                           epsilon=eps)
         U, f, n_iter, imode, smode = info
         if imode == 0:
-            print '(time: %g, iter: %d, f: %g)' % (time, n_iter, f)
+            print '(time: %g, iter: %d, f: %g)' % (self.t, n_iter, f)
         else:
             print '(time: %g, iter: %d, f: %g, err: %d, %s)' % \
                 (time, n_iter, f, imode, smode)
@@ -139,44 +192,51 @@ class SimulationStep(CreasePatternState):
     def get_f_t(self, U):
         '''Get the goal function value.
         '''
-        u = U.reshape(-1, self.n_D)
-        f = self.opt.fu.get_f(u, self.t)
+        self.cp_state.U = U
+        f = self.get_f()
         if self.debug_level > 0:
             print 'f:\n', f
         return f
 
+    def get_f(self):
+        return self.fu.get_f(self.t)
+
     def get_f_du_t(self, U):
         '''Get the goal function derivatives.
         '''
-        u = U.reshape(-1, self.n_D)
-        f_du = self.opt.fu.get_f_du(u, self.t)
+        self.cp_state.U = U
+        f_du = self.get_f_du()
         if self.debug_level > 1:
             print 'f_du.shape:\n', f_du.shape
             print 'f_du:\n', f_du
         return f_du
 
+    def get_f_du(self):
+        return self.fu.get_f_du(self.t)
+
     # ==========================================================================
     # Equality constraints
     # ==========================================================================
-    def get_g_t(self, U):
-        u = U.reshape(-1, self.n_D)
-        g = self.get_g(u, self.t)
+    def get_G_t(self, U):
+        self.cp_state.U = U
+        g = self.get_G(self.t)
         if self.debug_level > 0:
             print 'G:\n', [g]
         return g
 
-    def get_g(self, u, t=0):
-        g_lst = [gu.get_g(u, t) for gu in self.opt.gu_lst]
+    def get_G(self, t=0):
+        g_lst = [gu.get_G(t) for gu in self.gu_lst]
         if(g_lst == []):
             return []
         return np.hstack(g_lst)
 
-    def get_g_du_t(self, U):
-        u = U.reshape(-1, self.n_D)
-        return self.get_g_du(u, self.t)
+    def get_G_du_t(self, U):
+        self.cp_state.U = U
+        self.cp_state.U[:] = U[:]
+        return self.get_G_du(self.t)
 
-    def get_g_du(self, u, t=0):
-        g_du_lst = [gu.get_G_du(u, t) for gu in self.opt.gu_lst]
+    def get_G_du(self, t=0):
+        g_du_lst = [gu.get_G_du(t) for gu in self.gu_lst]
         if(g_du_lst == []):
             return []
         g_du = np.vstack(g_du_lst)

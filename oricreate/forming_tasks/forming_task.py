@@ -17,6 +17,8 @@ from traits.api import \
     List, Instance, implements, \
     cached_property
 
+import copy
+
 from traitsui.api import \
     View
 
@@ -56,7 +58,11 @@ class FormingTask(HasStrictTraits):
     '''
     @cached_property
     def _get_formed_object(self):
-        raise NotImplementedError('No pre-fabrication for the object to form')
+        if self.previous_task:
+            return copy.deepcopy(self.previous_task.formed_object)
+        else:
+            raise NotImplementedError('No pre-fabrication method'
+                                      'for the object to form')
 
     source_task = Property
     r'''The task without ``previous_task`` is the initial task.

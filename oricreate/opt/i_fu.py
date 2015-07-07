@@ -14,10 +14,10 @@ class IFu(Interface):
         :math::
     '''
 
-    def get_f(self, u, t=0):
+    def get_f(self, t=0):
         '''Return the vector of equality constraint values.
         '''
 
-    def get_f_du(self, u, t=0):
+    def get_f_du(self, t=0):
         '''Return the Jacobian of equality constraint values.
         '''
