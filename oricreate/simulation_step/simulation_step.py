@@ -12,28 +12,23 @@
 #
 # Created on Jan 29, 2013 by: rch
 
+import platform
 from scipy.optimize import \
     fmin_slsqp
-
+import time
 from traits.api import \
     HasTraits, Event, Property, cached_property, \
     Int, Float, Bool, DelegatesTo, \
     Instance, WeakRef, Array
 
+import numpy as np
+from oricreate.crease_pattern import \
+    CreasePatternState
+from oricreate.forming_tasks import \
+    FormingTask
 from simulation_config import \
     SimulationConfig
 
-from oricreate.crease_pattern import \
-    CreasePatternState
-
-from oricreate.forming_tasks import \
-    FormingTask
-
-import time
-
-import numpy as np
-
-import platform
 
 if platform.system() == 'Linux':
     sysclock = time.time

@@ -4,11 +4,11 @@ Created on Jun 20, 2013
 @author: rch
 '''
 import math
-
 from traits.api import Property, Str, Int, Float, Array, cached_property
-import numpy as np
-from mapping_tasks import \
+
+from mapping_task import \
     MappingTask
+import numpy as np
 
 
 class RotateCopy(MappingTask):

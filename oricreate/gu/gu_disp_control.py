@@ -8,12 +8,10 @@ from traits.api import \
     implements, \
     Array, DelegatesTo, cached_property, Property
 
+from gu import Gu
 import numpy as np
-
 from oricreate.opt import \
     IGu
-
-from gu import Gu
 
 
 class GuGrabPoints(Gu):
@@ -284,7 +282,6 @@ class GuDofConstraints(Gu):
     def get_G(self, t=0):
         ''' Calculate the residuum for given constraint equations
         '''
-        cp = self.formed_object
         u = self.u
         G = np.zeros((len(self.dof_constraints)), dtype='float_')
         for i, dof_cnstr in enumerate(self.dof_constraints):

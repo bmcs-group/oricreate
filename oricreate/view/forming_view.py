@@ -14,35 +14,29 @@
 
 
 import copy
+from mayavi.core.api import \
+    PipelineBase
+from mayavi.core.ui.api import \
+    MayaviScene, SceneEditor, MlabSceneModel
 import os
 import string
 import tempfile
-
-from oricreate.crease_pattern import \
-    CreasePattern
-
-from mayavi.core.api import \
-    PipelineBase
-
-from mayavi.core.ui.api import \
-    MayaviScene, SceneEditor, MlabSceneModel
-
 from traits.api import \
     HasTraits, Range, Instance, on_trait_change, \
     Property, cached_property, Button, \
     Int, Bool, File, Array, List, Float
-
 from traitsui.api import \
     View, Item, Group, RangeEditor, \
     VGroup, HSplit, TreeEditor, \
     TreeNode, VSplit
 
 from face_view import FaceView
-
 import numpy as np
-
+from oricreate.crease_pattern import \
+    CreasePattern
 from oricreate.forming_tasks import \
     IFormingTask, FormingTask
+
 
 FormingTask_tree_editor = TreeEditor(
     nodes=[

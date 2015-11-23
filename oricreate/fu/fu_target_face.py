@@ -12,22 +12,21 @@
 #
 # Created on Nov 18, 2011 by: matthias
 
+from scipy.optimize import fsolve
 from traits.api import \
     implements, HasTraits, List, \
     Property, cached_property, Any,\
     DelegatesTo, Float, Str, Array, \
     Instance
 
-import numpy as np
-from scipy.optimize import fsolve
-import sympy as sm
-
-from oricreate.opt import \
-    IFu
 from fu import \
     Fu
+import numpy as np
+from oricreate.opt import \
+    IFu
 from oricreate.util import \
     x_, y_, z_, r_, s_, t_
+import sympy as sm
 
 
 class ParamFaceOperator(HasTraits):

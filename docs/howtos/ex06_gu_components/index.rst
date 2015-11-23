@@ -75,10 +75,5 @@ Planarity of neighboring facets
 -------------------------------
 
 
-Inequality constraints
-======================
-
-Mountain / valley creases
--------------------------
 
 

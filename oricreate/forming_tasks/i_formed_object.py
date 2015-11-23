@@ -8,6 +8,8 @@ from traits.api import \
     Interface, Array, HasStrictTraits
 
 import traits.has_traits as ht
+
+
 ht.CHECK_INTERFACES = 2
 
 

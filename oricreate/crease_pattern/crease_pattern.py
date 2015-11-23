@@ -15,23 +15,21 @@
 from traits.api import \
     Property, cached_property, \
     Array, Constant, implements
-
 from traitsui.api import \
     View, Item, TabularEditor
-
-import numpy as np
-
-from oricreate.forming_tasks import \
-    IFormedObject
+from traitsui.tabular_adapter import TabularAdapter
 
 from crease_pattern_export import \
     CreasePatternExport
 from crease_pattern_plot_helper import \
     CreasePatternPlotHelper
+import numpy as np
+from oricreate.forming_tasks import \
+    IFormedObject
+
 
 INPUT = '+cp_input'
 
-from traitsui.tabular_adapter import TabularAdapter
 
 
 class XArrayAdapter(TabularAdapter):

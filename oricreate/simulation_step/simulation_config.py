@@ -8,13 +8,11 @@ from traits.api import \
     HasStrictTraits, Property, cached_property, implements, \
     Int, Trait, Instance, DelegatesTo, WeakRef, Dict, Str, Array, List
 
-from oricreate.opt import \
-    IOpt, IFu, IGu, IHu
-
+import numpy as np
 from oricreate.fu import \
     FuTargetFaces, FuPotentialEnergy
-
-import numpy as np
+from oricreate.opt import \
+    IOpt, IFu, IGu, IHu
 
 
 class SimulationConfig(HasStrictTraits):

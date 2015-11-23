@@ -12,9 +12,19 @@
 #
 # Created on Jan 29, 2013 by: rch
 
+import platform
+import time
 from traits.api import Instance, \
     Property, cached_property, Str, \
     Array, Dict, implements, Int, Bool
+
+from i_simulation_task import \
+    ISimulationTask
+import numpy as np
+from oricreate.crease_pattern import \
+    CreasePattern
+from oricreate.forming_tasks import \
+    FormingTask, IFormingTask
 from oricreate.gu import \
     GuConstantLength, \
     GuDevelopability, \
@@ -22,21 +32,13 @@ from oricreate.gu import \
     GuPointsOnSurface, \
     GuGrabPoints, \
     GuPointsOnLine, GuDofConstraints
-from i_simulation_task import \
-    ISimulationTask
-from oricreate.crease_pattern import \
-    CreasePattern
-from oricreate.forming_tasks import \
-    FormingTask, IFormingTask
-from oricreate.simulation_step import \
-    SimulationStep
 from oricreate.mapping_tasks import \
     MapToSurface
 from oricreate.opt import \
     IGu
-import numpy as np
-import time
-import platform
+from oricreate.simulation_step import \
+    SimulationStep
+
 
 if platform.system() == 'Linux':
     sysclock = time.time

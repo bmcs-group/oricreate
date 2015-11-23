@@ -18,12 +18,11 @@ from traits.api import \
 
 from crease_pattern import \
     CreasePattern
-
 from crease_pattern_operators import \
     CreaseNodeOperators, CreaseLineOperators, CreaseFacetOperators, \
     CreaseCummulativeOperators
-
 import numpy as np
+
 
 INPUT = '+cp_input'
 
@@ -80,10 +79,7 @@ class CreasePatternState(CreasePattern,
     '''
     @cached_property
     def _get_x(self):
-        if len(self.x_0) == len(self.u):
-            return self.x_0 + self.u
-        else:
-            return self.x_0
+        return self.x_0 + self.u
 
     n_dofs = Property(depends_on=INPUT)
     '''Total number of displacement degrees of freedom.

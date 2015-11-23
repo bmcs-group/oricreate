@@ -13,6 +13,7 @@
 
 from traits.api import \
     implements
+
 from gu import \
     Gu, IGu
 import numpy as np
@@ -29,7 +30,7 @@ class GuConstantLength(Gu):
         given the fold vector dX.
         '''
         cp = self.forming_task.formed_object
-        v_0 = cp.L_vectors
+        v_0 = cp.L_vectors_0
         u = cp.u
         u_i, u_j = u[cp.L.T]
         v_u_i = np.sum(v_0 * u_i, axis=1)
@@ -50,7 +51,7 @@ class GuConstantLength(Gu):
 
         # running crease line index
         if cp.n_L > 0:
-            v_0 = cp.L_vectors
+            v_0 = cp.L_vectors_0
             u = cp.u
             i, j = cp.L.T
             u_i, u_j = u[cp.L.T]

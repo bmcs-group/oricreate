@@ -15,10 +15,10 @@
 from traits.api import \
     implements
 
-from oricreate.opt import \
-    IFu
 from fu import \
     Fu
+from oricreate.opt import \
+    IFu
 
 
 class FuPotentialEnergy(Fu):

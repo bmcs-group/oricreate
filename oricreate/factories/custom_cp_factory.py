@@ -17,7 +17,6 @@ from traits.api import \
 
 from oricreate.crease_pattern import \
     CreasePattern
-
 from oricreate.forming_tasks import \
     FactoryTask
 

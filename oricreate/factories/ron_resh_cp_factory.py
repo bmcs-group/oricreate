@@ -19,15 +19,14 @@ Created on 09.12.2014
 
 from traits.api import \
     Float, Int, Property, cached_property, Callable
-import numpy as np
-import sympy as sp
 
+import numpy as np
 from oricreate.crease_pattern import \
     CreasePatternState
-
-
 from oricreate.forming_tasks import \
     FactoryTask
+import sympy as sp
+
 
 x_, y_ = sp.symbols('x, y')
 

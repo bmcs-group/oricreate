@@ -8,13 +8,11 @@ from traits.api import \
     Array, Property, cached_property, Instance, \
     Str, List
 
+from mapping_task import \
+    MappingTask
 import numpy as np
-
 from oricreate.simulation_step import \
     SimulationStep
-
-from mapping_tasks import \
-    MappingTask
 
 
 class MapToSurface(MappingTask):

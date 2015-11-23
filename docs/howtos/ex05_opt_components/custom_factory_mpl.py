@@ -1,4 +1,5 @@
 r'''
+
 Construct a general crease pattern configuration,
 used in the examples below demonstrating the evaluation of goal functions
 and constraints.
@@ -15,9 +16,9 @@ def create_cp_factory():
                                [0, 1, 0],
                                [0.5, 0.5, 0]
                                ],
-                            L=[[0, 1], [1, 2], [3, 0],
+                            L=[[0, 1], [1, 2], [2, 3], [3, 0],
                                [0, 4], [1, 4], [2, 4], [3, 4]],
-                            F=[[0, 1, 4], [1, 2, 4], [4, 3, 0]]
+                            F=[[0, 1, 4], [1, 2, 4], [4, 3, 2], [4, 3, 0]]
                             )
 
     cp_factory = CustomCPFactory(formed_object=cp)

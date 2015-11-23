@@ -8,3 +8,5 @@ from crease_pattern_operators import \
     CreaseCummulativeOperators
 from crease_pattern_state import \
     CreasePatternState
+
+

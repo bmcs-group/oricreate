@@ -13,8 +13,7 @@
 # Created on Jan 3, 2013 by: rch, schmerl
 
 from traits.api import \
-    HasStrictTraits, \
-    DelegatesTo, Bool, implements
+    Bool
 
 from oricreate.opt import \
     OptComponent

@@ -16,10 +16,9 @@ from traits.api import \
     Property, cached_property, \
     Array, List
 
+import numpy as np
 from oricreate.crease_pattern import \
     CreasePatternState
-
-import numpy as np
 
 
 INPUT = '+cp_input'

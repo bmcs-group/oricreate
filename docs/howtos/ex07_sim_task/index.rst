@@ -12,7 +12,7 @@ Reference crease pattern
    :start-after: # begin
    :end-before: # end
 
-.. plot:: howtos/ex05_fu_components/custom_factory_mpl.py
+.. plot:: howtos/ex07_sim_task/custom_factory_mpl.py
    :width: 400px
 
 Map a crease pattern to a target surface
@@ -48,9 +48,6 @@ The output of the script looks as follows:
 Map a crease pattern to a target surface while preserving the line distances
 ----------------------------------------------------------------------------
 
-.. plot:: howtos/ex07_sim_task/sim_map_pattern_to_target_face_mpl.py
-   :width: 400px
-
 .. automodule:: docs.howtos.ex07_sim_task.sim_map_pattern_to_target_face
 
 .. include:: sim_map_pattern_to_target_face.py
@@ -61,3 +58,8 @@ Map a crease pattern to a target surface while preserving the line distances
 The output of the script looks as follows:
 
 .. program-output:: python howtos/ex07_sim_task/sim_map_pattern_to_target_face.py
+
+The target configuration is depicted here:
+
+.. plot:: howtos/ex07_sim_task/sim_map_pattern_to_target_face_plot.py
+   :width: 400px

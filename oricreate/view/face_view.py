@@ -10,6 +10,7 @@ from traits.api import HasTraits, Instance, on_trait_change, \
     Int, Bool, Float, WeakRef
 from traitsui.api import \
     View, Item, RangeEditor
+
 import numpy as np
 
 

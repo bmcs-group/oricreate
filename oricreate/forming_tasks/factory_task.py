@@ -9,12 +9,10 @@ from traits.api import \
 
 from forming_task import \
     FormingTask
-
-from i_forming_task import \
-    IFormingTask
-
 from i_formed_object import \
     IFormedObject
+from i_forming_task import \
+    IFormingTask
 
 
 class FactoryTask(FormingTask):

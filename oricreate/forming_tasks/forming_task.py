@@ -12,21 +12,18 @@
 #
 # Created on Jan 29, 2013 by: rch
 
+import copy
 from traits.api import \
     HasStrictTraits, Event, Property, Str, \
     List, Instance, implements, \
     cached_property
-
-import copy
-
 from traitsui.api import \
     View
 
-from i_forming_task import \
-    IFormingTask
-
 from i_formed_object import \
     IFormedObject
+from i_forming_task import \
+    IFormingTask
 
 
 class FormingTask(HasStrictTraits):

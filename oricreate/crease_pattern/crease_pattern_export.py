@@ -17,6 +17,7 @@ from traits.api import \
 
 import numpy as np
 
+
 INPUT = '+cp_input'
 
 
