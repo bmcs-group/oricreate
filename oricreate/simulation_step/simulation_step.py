@@ -38,8 +38,8 @@ elif platform.system() == 'Windows':
 
 class SimulationStep(HasTraits):
 
-    r"""Class implementing the transition of the crease pattern state
-    to the target time :math:`t`.
+    r"""Class implementing the transition of the formed object 
+    from its initial time to the target time :math:`t`.
     """
 
     forming_task = WeakRef(FormingTask)

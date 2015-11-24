@@ -6,14 +6,14 @@ Equality constraints
 Reference crease pattern
 ------------------------
 
-.. automodule:: docs.howtos.ex05_fu_components.custom_factory_mpl
+.. automodule:: docs.howtos.ex06_gu_components.custom_factory_mpl
 
 .. include:: custom_factory_mpl.py
    :literal:
    :start-after: # begin
    :end-before: # end
 
-.. plot:: howtos/ex05_fu_components/custom_factory_mpl.py
+.. plot:: howtos/ex06_gu_components/custom_factory_mpl.py
    :width: 400px
    
 Constant length constraint

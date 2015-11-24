@@ -5,7 +5,7 @@ Simulation task
 Reference crease pattern
 ------------------------
 
-.. automodule:: docs.howtos.ex05_fu_components.custom_factory_mpl
+.. automodule:: docs.howtos.ex07_sim_task.custom_factory_mpl
 
 .. include:: custom_factory_mpl.py
    :literal:
