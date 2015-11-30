@@ -4,14 +4,17 @@ used in the examples below demonstrating the evaluation of goal functions
 and constraints.
 '''
 
-from sim_map_pattern_to_target_face import create_sim_step
+from sim04_map_to_surface import create_sim_step
 
 if __name__ == '__main__':
     import mayavi.mlab as m
-    sim_step = create_sim_step()
-    cp = sim_step.cp_state
+    map_to_surface = create_sim_step()
+
     m.figure(bgcolor=(1.0, 1.0, 1.0), fgcolor=(0.6, 0.6, 0.6))
-    cp.plot_mlab(m, lines=True)
+    map_to_surface.previous_task.formed_object.plot_mlab(m, lines=True)
+    map_to_surface.formed_object.plot_mlab(m, lines=True)
+
+    m.view(azimuth=-40, elevation=76)
 
     arr = m.screenshot()
     import pylab as p

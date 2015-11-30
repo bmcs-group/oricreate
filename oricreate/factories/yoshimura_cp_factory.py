@@ -15,16 +15,15 @@
 from traits.api import \
     Float, Int, Property, cached_property, Bool, Array, Callable, Any
 
-from forming_tasks import \
-    FactoryTask  # @UnresolvedImport
 import numpy as np
 from oricreate.crease_pattern import \
     CreasePatternState
+from oricreate.forming_tasks import \
+    FactoryTask
 import sympy as sp
 
 
 x_, y_ = sp.symbols('x, y')
-
 
 
 class YoshimuraCPFactory(FactoryTask):

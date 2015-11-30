@@ -18,6 +18,7 @@ from traits.api import \
 
 from crease_pattern import \
     CreasePattern
+
 from crease_pattern_operators import \
     CreaseNodeOperators, CreaseLineOperators, CreaseFacetOperators, \
     CreaseCummulativeOperators

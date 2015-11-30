@@ -28,14 +28,9 @@ class MappingTask(FormingTask):
     There is no forming process involved.
     '''
 
-    def _get_formed_object(self):
-        return CreasePattern(X=self.previous_task.formed_object.X,
-                             L=self.previous_task.formed_object.L,
-                             F=self.previous_task.formed_object.F)
-
-
 if __name__ == '__main__':
     cp = CreasePattern(X=[[1, 2, 3]])
     it = CustomCPFactory(formed_object=cp)
     ft = MappingTask(previous_task=it)
+    print cp
     print ft.formed_object

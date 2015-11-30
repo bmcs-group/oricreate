@@ -8,6 +8,7 @@ that is configured using the RFKConfig.
 The target face is defined as horizontal plane at the height 8
 and nodes [0,1,2] are involved in the minimum distance criterion.
 '''
+
 from oricreate.forming_tasks import \
     FormingTask
 from oricreate.simulation_step import \

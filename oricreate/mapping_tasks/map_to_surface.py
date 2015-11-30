@@ -11,8 +11,9 @@ from traits.api import \
 from mapping_task import \
     MappingTask
 import numpy as np
+from oricreate.fu import FuTargetFaces
 from oricreate.simulation_step import \
-    SimulationStep
+    SimulationStep, SimulationConfig
 
 
 class MapToSurface(MappingTask):
@@ -25,68 +26,44 @@ class MapToSurface(MappingTask):
     default = 0.001
     '''
 
-    name = Str('init')
+    name = Str('map to surface')
 
-    target_surfaces = List(None)
+    tf_lst = List([], input=True)
 
-    mapping_operator = Instance(SimulationStep)
-
-    X_0 = Property()
-    '''Array of nodal coordinates.
-    '''
-
-    def _get_X_0(self):
-        return self.formed_object.X.flatten()
-
-    L = Property()
-    '''Array of crease_lines defined by pairs of node numbers.
-    '''
-
-    def _get_L(self):
-        return self.formed_object.L
-
-    F = Property()
-    '''Array of crease facets defined by list of node numbers.
-    '''
-
-    def _get_F(self):
-        return self.formed_object.F
-
-    # cached initial vector
-    _U_0 = Array(float)
-
-    U_0 = Property(Array(float))
-    '''Attribute storing the optional user-supplied initial array.
-    It is used as the trial vector of unknown displacements
-    for the current FormingTask simulation.
-    '''
-
-    def _get_U_0(self):
-        len_U_0 = len(self._U_0)
-        if len_U_0 == 0 or len_U_0 != self.n_dofs:
-            self._U_0 = np.zeros((self.n_N * self.n_D,), dtype='float_')
-        return self._U_0
-
-    def _set_U_0(self, value):
-        self._U_0 = value
-
-    U_1 = Property(depends_on='source_config_changed, _U_0, unfold')
-    '''Result of the initialization.
-    The ``U0`` vector is used as a first choice. If target
-    faces for initialization are specified, the
-    rigid folding simulator is used to get the projection of the nodes
-    to the target surface at the time (t_init).
+    fu_target_faces = Property(depends_on='+input')
+    '''Goal function handling the distance to several target faces
     '''
     @cached_property
-    def _get_U_1(self):
-        if self.mapping_operator is None:
-            return self.U_0
-        else:
-            return self.mapping_operator.U_1[-1]
+    def _get_fu_target_faces(self):
+        return FuTargetFaces(tf_lst=self.tf_lst)
 
-    X_1 = Property(depends_on='source_config_changed, _U_0')
-    '''Output of the respaing step.
+    sim_config = Property(depends_on='+input')
+    '''Configuration of the simulation step.
     '''
     @cached_property
-    def _get_X_1(self):
-        return self.X_0
+    def _get_sim_config(self):
+        return SimulationConfig(fu=self.fu_target_faces)
+
+    sim_step = Property(depends_on='+input')
+    '''Simulation step object controlling the transition from time 0 to time 1
+    '''
+    @cached_property
+    def _get_sim_step(self):
+        return SimulationStep(forming_task=self,
+                              config=self.sim_config, acc=1e-6)
+
+    u_1 = Property(depends_on='+input')
+    '''Resulting displacement vector
+    '''
+    @cached_property
+    def _get_u_1(self):
+        self.sim_step._solve_fmin()
+        return self.formed_object.u
+
+    x_1 = Property(depends_on='+input')
+    '''Resulting position vector .
+    '''
+    @cached_property
+    def _get_x_1(self):
+        self.u_1
+        return self.formed_object.x

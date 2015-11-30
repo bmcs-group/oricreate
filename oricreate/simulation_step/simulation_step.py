@@ -105,8 +105,8 @@ class SimulationStep(HasTraits):
     # ===========================================================================
     # Configuration parameters for the iterative solver
     # ===========================================================================
-    t = Float(0.0, auto_set=False, enter_set=True)
-    r'''Current time within the step in the range (0,1).
+    t = Float(1.0, auto_set=False, enter_set=True)
+    r'''Target time within the step in the range (0,1).
     '''
 
     show_iter = Bool(False, auto_set=False, enter_set=True)
