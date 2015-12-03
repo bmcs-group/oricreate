@@ -959,7 +959,7 @@ class FormingView(HasTraits):
 # =========================================================================
 
 if __name__ == '__main__':
-    from oricreate import CustomCPFactory
+    from oricreate.api import CustomCPFactory
     cp = CreasePattern(X=[[0, 0, 0],
                           [1, 0, 0],
                           [1, 1, 0],

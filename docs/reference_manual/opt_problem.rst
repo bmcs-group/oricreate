@@ -12,35 +12,35 @@ Crease pattern components
 IOptCrit
 ========
 
-.. inheritance-diagram:: opt.IOpt
+.. inheritance-diagram:: oricreate.opt.IOpt
 	:parts: 1
 
-.. autoclass:: opt.IOpt
+.. autoclass:: oricreate.opt.IOpt
 	:members:
 
 IFu
 ===
 
-.. inheritance-diagram:: opt.IFu
+.. inheritance-diagram:: oricreate.opt.IFu
 	:parts: 1
 
-.. autoclass:: opt.IFu
+.. autoclass:: oricreate.opt.IFu
 	:members:
 
 IGu
 ===
 
-.. inheritance-diagram:: opt.IGu
+.. inheritance-diagram:: oricreate.opt.IGu
 	:parts: 1
 
-.. autoclass:: opt.IGu
+.. autoclass:: oricreate.opt.IGu
 	:members:
 
 IHu
 ===
 
-.. inheritance-diagram:: opt.IHu
+.. inheritance-diagram:: oricreate.opt.IHu
 	:parts: 1
 
-.. autoclass:: opt.IHu
+.. autoclass:: oricreate.opt.IHu
 	:members:

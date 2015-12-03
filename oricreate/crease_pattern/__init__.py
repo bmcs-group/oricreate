@@ -8,5 +8,5 @@ from crease_pattern_operators import \
     CreaseCummulativeOperators
 from crease_pattern_state import \
     CreasePatternState
-
-
+from crease_pattern_viz3d import \
+    CreasePatternViz3D

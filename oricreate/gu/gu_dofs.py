@@ -60,7 +60,7 @@ def link(nodes1, dirs1, c1, nodes2, dirs2, c2, value=0.0):
 
     For example, given the call::
 
-        fix([2,4],[0],1.0,[0,1],[0],-1.0)
+        link([2,4],[0],1.0,[0,1],[0],-1.0)
 
     defines the dof_constraints of the form:
 

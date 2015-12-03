@@ -5,13 +5,12 @@ Created on Aug 14, 2014
 '''
 
 from traits.api import \
-    Array, Property, cached_property, Instance, \
+    Property, cached_property, \
     Str, List
 
-from mapping_task import \
-    MappingTask
-import numpy as np
+from mapping_task import MappingTask
 from oricreate.fu import FuTargetFaces
+from oricreate.gu import GuDofConstraints
 from oricreate.simulation_step import \
     SimulationStep, SimulationConfig
 
@@ -28,21 +27,32 @@ class MapToSurface(MappingTask):
 
     name = Str('map to surface')
 
-    tf_lst = List([], input=True)
+    target_faces = List([], input=True)
+    '''List of target surfaces.
+    '''
 
     fu_target_faces = Property(depends_on='+input')
     '''Goal function handling the distance to several target faces
     '''
     @cached_property
     def _get_fu_target_faces(self):
-        return FuTargetFaces(tf_lst=self.tf_lst)
+        return FuTargetFaces(forming_task=self, tf_lst=self.target_faces)
+
+    dof_constraints = List([], input=True)
+    '''List of dof constraints in the format
+    [([( node1, dim1, factor1 ), (node2, dim2, factor2)], value ), ... ]
+    defining a kinematic equation on the specified degrees of freedom 
+    '''
 
     sim_config = Property(depends_on='+input')
     '''Configuration of the simulation step.
     '''
     @cached_property
     def _get_sim_config(self):
-        return SimulationConfig(fu=self.fu_target_faces)
+        gu_dofs = GuDofConstraints(forming_task=self,
+                                   dof_constraints=self.dof_constraints)
+        return SimulationConfig(fu=self.fu_target_faces,
+                                gu={'dofs': gu_dofs})
 
     sim_step = Property(depends_on='+input')
     '''Simulation step object controlling the transition from time 0 to time 1

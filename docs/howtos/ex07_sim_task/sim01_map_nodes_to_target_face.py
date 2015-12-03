@@ -1,4 +1,8 @@
 r'''
+
+Map a crease pattern to a target surface
+----------------------------------------
+
 This example demonstrates how to define a FormingTask
 on a preform FormedObject that has been previously produced
 in a CreasePatternFactory. The forming process within 

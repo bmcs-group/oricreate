@@ -23,6 +23,8 @@ in order to be rigid foldable.
    ex06_gu_components/index
 	
    ex07_sim_task/index
+   
+   ex08_rigid_facets/index
 
 Crease pattern factories
 ========================

@@ -13,12 +13,16 @@
 # Created on Sep 7, 2011 by: rch
 
 from traits.api import \
-    HasStrictTraits, Float, Property
+    Float, Property
 
+from crease_pattern_viz3d import \
+    CreasePatternViz3D
 import numpy as np
+from oricreate.viz3d import \
+    Visual3D
 
 
-class CreasePatternPlotHelper(HasStrictTraits):
+class CreasePatternPlotHelper(Visual3D):
 
     '''
     Methods exporting the crease pattern geometry into other formats.
@@ -93,10 +97,7 @@ class CreasePatternPlotHelper(HasStrictTraits):
     def _get_line_width(self):
         return self._get_max_length() * self.line_with_factor
 
-    # =========================================================================
-    # Garbage
-    # =========================================================================
-    def plot_mlab(self, mlab, nodes=True, lines=True):
+    def plot_mlab(self, mlab, nodes=True, lines=True, L_selection=[]):
         r'''Visualize the crease pattern in a supplied mlab instance.
         '''
         x, y, z = self.x.T
@@ -104,8 +105,11 @@ class CreasePatternPlotHelper(HasStrictTraits):
             cp_pipe = mlab.triangular_mesh(x, y, z, self.F,
                                            line_width=3,
                                            color=(0.6, 0.6, 0.6))
-            cp_pipe.mlab_source.dataset.lines = self.L
             if lines is True:
+                L = self.L
+                if len(L_selection):
+                    L = L[L_selection]
+                cp_pipe.mlab_source.dataset.lines = L
                 tube = mlab.pipeline.tube(cp_pipe,
                                           tube_radius=self._get_line_width())
                 mlab.pipeline.surface(tube, color=(1.0, 1.0, 1.0))
@@ -113,12 +117,16 @@ class CreasePatternPlotHelper(HasStrictTraits):
         else:
             cp_pipe = mlab.points3d(x, y, z, scale_factor=0.2)
             cp_pipe.mlab_source.dataset.lines = self.L
+        return cp_pipe.mlab_source
+
+    def _viz3d_dict_default(self):
+        return dict(default=CreasePatternViz3D(vis3d=self))
 
     def get_cnstr_pos(self, iteration_step):
         r'''
          Get the coordinates of the constraints.
 
-        @todo this should be moved to FormingTask
+        @todo this should be moved to GuDofConstraints
         '''
         print 'get position'
         u_t = self.fold_steps[iteration_step]
@@ -127,6 +135,9 @@ class CreasePatternPlotHelper(HasStrictTraits):
         con_l = None
         return (pts_l, con_l, pts_p, faces_p)
 
+    # =========================================================================
+    # Garbage
+    # =========================================================================
     def get_line_position(self, i):
         r'''
         This method prints the procentual position of a linepoint element on

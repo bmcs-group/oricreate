@@ -1,6 +1,6 @@
 
 from crease_pattern import \
-    CreasePattern, CreasePatternState
+    CreasePattern, CreasePatternState, CreasePatternViz3D
 from factories import \
     WaterBombCPFactory, YoshimuraCPFactory, CustomCPFactory, \
     MiuraOriCPFactory, RonReshCPFactory
@@ -14,3 +14,5 @@ from simulation_tasks import \
 from util.sym_vars import r_, s_, t_, x_, y_, z_
 from view import \
     FormingView
+from viz3d import \
+    FTV

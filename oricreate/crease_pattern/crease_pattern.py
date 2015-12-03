@@ -31,7 +31,6 @@ from oricreate.forming_tasks import \
 INPUT = '+cp_input'
 
 
-
 class XArrayAdapter(TabularAdapter):
 
     columns = [('i', 'index'), ('x', 0), ('y', 1),  ('z', 2), ]
@@ -304,7 +303,7 @@ class CreasePattern(CreasePatternPlotHelper,
         L = np.arange(self.n_L)
 
         # use broadcasting to identify the matching indexes in both arrays
-        L_F_bool = L[np.newaxis, np.newaxis, :] == self.F_L[:,:, np.newaxis]
+        L_F_bool = L[np.newaxis, np.newaxis, :] == self.F_L[:, :, np.newaxis]
 
         # within the facet any of the line numbers can match, merge the axis 1
         L_F_bool = np.any(L_F_bool, axis=1)
@@ -456,6 +455,7 @@ class CreasePattern(CreasePatternPlotHelper,
 
 if __name__ == '__main__':
 
+    from oricreate.viz3d import FTV
     # trivial example with a single triangle positioned
 
     cp = CreasePattern(X=[[0, 0, 0],
@@ -469,7 +469,9 @@ if __name__ == '__main__':
                        F=[[0, 1, 2]]
                        )
 
-    print 'vectors\n', cp.L_vectors
-    print 'lengths\n', cp.L_lengths
-
-    cp.configure_traits()
+    from crease_pattern_viz3d import CreasePatternViz3D
+    # configure a viz object
+    ftv = FTV()
+    cp.viz3d_dict['smaller'] = CreasePatternViz3D(vis3d=cp, L_selection=[0, 1])
+    cp.viz3d_dict['smaller'].register(ftv)
+    ftv.show()

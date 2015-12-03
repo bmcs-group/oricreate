@@ -14,7 +14,8 @@ if __name__ == '__main__':
     map_to_surface.previous_task.formed_object.plot_mlab(m, lines=True)
     map_to_surface.formed_object.plot_mlab(m, lines=True)
 
-    m.view(azimuth=-40, elevation=76)
+    m.view(azimuth=120, elevation=82)
+    m.axes(extent=[0, 2, 0, 1, 0, 1])
 
     arr = m.screenshot()
     import pylab as p

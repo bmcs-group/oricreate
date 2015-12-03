@@ -1,4 +1,8 @@
 r'''
+
+Reference crease pattern
+------------------------
+
 Construct a general crease pattern configuration,
 used in the examples below demonstrating the evaluation of goal functions
 and constraints.

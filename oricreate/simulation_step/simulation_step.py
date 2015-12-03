@@ -132,7 +132,7 @@ class SimulationStep(HasTraits):
         '''Find the solution using the Newton-Raphson procedure.
         '''
         i = 0
-
+        U = self.cp_state.U
         while i <= self.MAX_ITER:
             dR = self.get_G_du(t)
             R = self.get_G(t)
@@ -142,15 +142,17 @@ class SimulationStep(HasTraits):
                 break
             try:
                 d_U = np.linalg.solve(dR, -R)
-                self.U += d_U
+                U += d_U
+                self.cp_state.U = U
                 i += 1
             except Exception as inst:
                 print '=== Problems solving iteration step %d  ====' % i
                 print '=== Exception message: ', inst
+                raise inst
         else:
             print '==== did not converge in %d iterations ====' % i
 
-        return self.U
+        return U
 
     def _solve_fmin(self):
         '''Solve the problem using the
@@ -178,7 +180,7 @@ class SimulationStep(HasTraits):
             print '(time: %g, iter: %d, f: %g)' % (self.t, n_iter, f)
         else:
             print '(time: %g, iter: %d, f: %g, err: %d, %s)' % \
-                (time, n_iter, f, imode, smode)
+                (self.t, n_iter, f, imode, smode)
         return U
 
     # ==========================================================================
@@ -287,7 +289,3 @@ class SimulationStep(HasTraits):
 
     def _get_u_1(self):
         return self.u_t[-1]
-
-if __name__ == '__main__':
-    fs = SimulationStep()
-    fs.configure_traits()
