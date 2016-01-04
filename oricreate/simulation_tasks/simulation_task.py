@@ -70,6 +70,11 @@ class SimulationTask(FormingTask):
     of the time-dependent constraints.
     '''
 
+    def _run(self):
+        '''Run the simulation within the time range and gather 
+        the resulting solution vector within the forming history..
+        '''
+
     cp = Property(depends_on='source')
     '''Instance of a crease pattern.
     '''

@@ -17,11 +17,12 @@ from traits.api import \
     Property, cached_property, \
     Array
 
+import numpy as np
 from oricreate.util import \
     get_theta, get_theta_du
 from oricreate.util.einsum_utils import \
     DELTA, EPS
-import numpy as np
+
 
 INPUT = '+cp_input'
 
@@ -432,11 +433,11 @@ class CreaseFacetOperators(HasStrictTraits):
         lxn = np.einsum('...li,...j,...kij->...lk', l, n, EPS)
         n_ = n[:, np.newaxis, :] * np.ones((1, 3, 1), dtype='float_')
         T = np.concatenate([l[:, :, np.newaxis, :],
-                            n_[:, :, np.newaxis, :],
-                            lxn[:, :, np.newaxis, :]], axis=2)
+                            -lxn[:, :, np.newaxis, :],
+                            n_[:, :, np.newaxis, :]], axis=2)
         return T
 
-    F_L_bases = Property(Array, depends_on=INPUT)
+    F_L_bases_du = Property(Array, depends_on=INPUT)
     r'''Derivatives of the line bases around a facet.
     '''
     @cached_property
@@ -566,6 +567,10 @@ class CreaseFacetOperators(HasStrictTraits):
         r = np.einsum('aK,IKi->Iai', N_eta_ip, x_F)
         return r
 
+    # =========================================================================
+    # Interier as level set
+    # =========================================================================
+
 
 class CreaseCummulativeOperators(HasStrictTraits):
 
@@ -590,6 +595,27 @@ class CreaseCummulativeOperators(HasStrictTraits):
                    np.arange(3)[np.newaxis, np.newaxis, :])
         V_du = np.bincount(dof_map.flatten(), weights=F_V_du.flatten())
         return V_du
+
+
+class CreaseViewRelatedOperators(HasStrictTraits):
+
+    '''Characteristics of the whole crease pattern.
+    '''
+    center = Property(Array, depends_on=INPUT)
+    '''Get the total potential energy of gravity
+    '''
+    @cached_property
+    def _get_center(self):
+        return np.sum(self.bounding_box, axis=0) / 2.0
+
+    bounding_box = Property(Array, depends_on=INPUT)
+    '''Get the gradient of potential energy with respect
+    to the current nodal position.
+    '''
+    @cached_property
+    def _get_bounding_box(self):
+        x_min, x_max = np.min(self.x, axis=0), np.max(self.x, axis=0)
+        return np.array([x_min, x_max])
 
 if __name__ == '__main__':
     from crease_pattern_state import CreasePatternState
@@ -725,3 +751,11 @@ if __name__ == '__main__':
     print 'iN_theta_du'
     print cp.iN_theta_du
     print
+
+    print '----------------'
+    print '  VIEW RELATED  '
+    print '----------------'
+    print 'bounding box'
+    print cp.bounding_box
+    print 'center'
+    print cp.center

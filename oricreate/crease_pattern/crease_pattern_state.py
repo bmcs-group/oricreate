@@ -19,21 +19,13 @@ from traits.api import \
 from crease_pattern import \
     CreasePattern
 
-from crease_pattern_operators import \
-    CreaseNodeOperators, CreaseLineOperators, CreaseFacetOperators, \
-    CreaseCummulativeOperators
 import numpy as np
 
 
 INPUT = '+cp_input'
 
 
-class CreasePatternState(CreasePattern,
-                         CreaseNodeOperators,
-                         CreaseLineOperators,
-                         CreaseFacetOperators,
-                         CreaseCummulativeOperators,
-                         ):
+class CreasePatternState(CreasePattern):
 
     r'''
     This class is used by the FormingTask tasks during the

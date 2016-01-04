@@ -14,43 +14,59 @@
 
 from traits.api import \
     Property, cached_property, \
-    Array, List
+    Array, List, Int, on_trait_change
 
 import numpy as np
 from oricreate.crease_pattern import \
-    CreasePatternState
+    CreasePattern
 
 
 INPUT = '+cp_input'
 
 
-class FormingHistory(CreasePatternState):
+class SimulationHistory(CreasePattern):
 
     r'''
     This class is used to record the motion history
-    of a crease pattern during a FormingTask task.
+    of a crease pattern during a SimulationTask task.
 
     It maintains an array :math:`\bm{u}_t` of displacement vectors
     corresponding to each time step.
 
     '''
 
-    u_t = List(Array(value=[], dtype='float_'), cp_input=True)
-    r'''Displacement array with ``(n_N,n_D)`` values.
+    u_t_list = List(Array(value=[], dtype='float_'), cp_input=True)
+    r'''Displacement array with ``(n_t,n_N,n_D)`` values.
     '''
 
-    def u_t_default(self):
-        return np.zeros_like(self.x_0)
+    u_t = Property(Array(dtype='float_'), depends_on='+INPUT')
+
+    @cached_property
+    def _get_u_t(self):
+        return np.array(self.u_t_list, dtype='float_')
 
     x_t = Property(depends_on=INPUT)
     r'''Interim coordinates of the crease pattern
     '''
     @cached_property
+    def _get_x_t(self):
+        return self.x_0[np.newaxis, ...] + self.u_t
+
+    @on_trait_change('vot')
+    def _set_time_step(self):
+        n_t = len(self.x_t) - 1
+        i_t = int(self.vot * n_t)
+        self.time_step = i_t
+
+    time_step = Int(0, cp_input=True)
+    r'''Current time step
+    '''
+    x = Property
+    '''Current position of the coordinates.
+    '''
+
     def _get_x(self):
-        if len(self.x_0) == len(self.u):
-            return self.x_0 + self.u
-        else:
-            return self.x_0
+        return self.x_t[self.time_step]
 
 if __name__ == '__main__':
 

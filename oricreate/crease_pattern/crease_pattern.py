@@ -21,6 +21,9 @@ from traitsui.tabular_adapter import TabularAdapter
 
 from crease_pattern_export import \
     CreasePatternExport
+from crease_pattern_operators import \
+    CreaseNodeOperators, CreaseLineOperators, CreaseFacetOperators, \
+    CreaseCummulativeOperators, CreaseViewRelatedOperators
 from crease_pattern_plot_helper import \
     CreasePatternPlotHelper
 import numpy as np
@@ -70,7 +73,12 @@ class FArrayAdapter(TabularAdapter):
         return str(self.row)
 
 
-class CreasePattern(CreasePatternPlotHelper,
+class CreasePattern(CreaseNodeOperators,
+                    CreaseLineOperators,
+                    CreaseFacetOperators,
+                    CreaseCummulativeOperators,
+                    CreaseViewRelatedOperators,
+                    CreasePatternPlotHelper,
                     CreasePatternExport):
 
     '''

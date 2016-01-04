@@ -5,7 +5,7 @@ Created on Dec 3, 2015
 '''
 
 from traits.api import \
-    HasTraits, WeakRef, Str
+    HasTraits, WeakRef, Str, Event
 
 from visual3d import \
     Visual3D
@@ -26,6 +26,10 @@ class Viz3D(HasTraits):
     vis3d = WeakRef(Visual3D)
     '''Link to the visual object to transform into the 
     forming_task_view3d.
+    '''
+
+    vis3d_changed = Event
+    '''Event registering changes in the source object.
     '''
 
     ftv = WeakRef

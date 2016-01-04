@@ -17,7 +17,7 @@ from scipy.optimize import \
     fmin_slsqp
 import time
 from traits.api import \
-    HasTraits, Event, Property, cached_property, \
+    HasStrictTraits, Event, Property, cached_property, \
     Int, Float, Bool, DelegatesTo, \
     Instance, WeakRef, Array
 
@@ -36,7 +36,7 @@ elif platform.system() == 'Windows':
     sysclock = time.clock
 
 
-class SimulationStep(HasTraits):
+class SimulationStep(HasStrictTraits):
 
     r"""Class implementing the transition of the formed object 
     from its initial time to the target time :math:`t`.
@@ -53,7 +53,7 @@ class SimulationStep(HasTraits):
     of the optimization problem.
     '''
 
-    config = WeakRef(SimulationConfig)
+    config = Instance(SimulationConfig)
     r'''Configuration of the optimization problem.
     '''
 
@@ -82,6 +82,14 @@ class SimulationStep(HasTraits):
     def _get_fu(self):
         self.config.fu.forming_task = self.forming_task
         return self.config.fu
+
+    gu = Property(depends_on='source_config_changed')
+    r'''Goal function object.
+    '''
+    @cached_property
+    def _get_gu(self):
+        self.config.gu.forming_task = self.forming_task
+        return self.config.gu
 
     gu_lst = Property(depends_on='source_config_changed')
     r'''Equality constraint object.

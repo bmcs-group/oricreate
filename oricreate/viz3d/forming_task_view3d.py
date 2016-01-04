@@ -6,9 +6,12 @@ Created on Dec 3, 2015
 
 from traits.api import \
     HasStrictTraits, Dict, \
-    Property, Str
+    Property, Str, Color, Float, \
+    on_trait_change
+
 import mayavi.mlab as \
     m2_lab
+import numpy as np
 from viz3d import \
     Viz3D
 
@@ -20,6 +23,29 @@ class FormingTaskView3D(HasStrictTraits):
     '''Dictionary of visualization objects.
     '''
 
+    vis3d_list = Property
+    '''Gather all the visualization objects
+    '''
+
+    def _get_vis3d_list(self):
+        return np.unique(np.array([viz3d.vis3d for viz3d in self.viz3d_dict.values()]))
+
+    vot = Float(0.0)
+
+    @on_trait_change('vot')
+    def _broadcast_vot(self):
+        for vis4d in self.vis3d_list:
+            vis4d.vot = self.vot
+
+    def get_center(self):
+        for vis3d in self.vis3d_list:
+            x_min, x_max = np.min(vis3d.x, axis=0), np.max(vis3d.x, axis=0)
+            x_c = (x_min + x_max) / 2.0
+        return x_c
+
+    bgcolor = Color((1.0, 1.0, 1.0))
+    fgcolor = Color((0.0, 0.0, 0.0))
+
     mlab = Property(depends_on='input_change')
     '''Get the mlab handle'''
 
@@ -28,18 +54,24 @@ class FormingTaskView3D(HasStrictTraits):
 
     def add(self, viz3d):
         '''Add a new visualization objectk.'''
+        viz3d.ftv = self
         self.viz3d_dict[viz3d.label] = viz3d
 
     def plot(self):
         '''Plot the current visualization objects.
         '''
+        fig = self.mlab.gcf()
+        self.mlab.figure(fig, bgcolor=self.bgcolor, fgcolor=self.fgcolor)
         for viz3d in self.viz3d_dict.values():
             viz3d.plot()
 
-    def update(self):
+    def update(self, vot=0.0, force=False):
         '''Update current visualization.
         '''
+        self.vot = vot
         for viz3d in self.viz3d_dict.values():
+            if force:
+                viz3d.vis3d_changed = True
             viz3d.update()
 
     def show(self, *args, **kw):
@@ -81,7 +113,7 @@ if __name__ == '__main__':
 
         def plot(self):
             x, y, z, s = self.vis3d.p
-            self._pipe = ftv.mlab.points3d(x, y, z, s)
+            self._pipe = self.ftv.mlab.points3d(x, y, z, s)
 
         def update(self):
             x, y, z, s = self.vis3d.p

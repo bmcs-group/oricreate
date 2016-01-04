@@ -8,11 +8,14 @@ from forming_tasks import \
     FormingTask, IFormingTask
 from mapping_tasks import \
     MappingTask, MapToSurface, RotateCopy
+from simulation_step import \
+    SimulationStep, SimulationConfig
 from simulation_tasks import \
+    SimulationHistory, \
     SimulationTask, \
     FoldRigidly
 from util.sym_vars import r_, s_, t_, x_, y_, z_
 from view import \
     FormingView
 from viz3d import \
-    FTV
+    FTV, FTA
