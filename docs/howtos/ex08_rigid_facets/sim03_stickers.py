@@ -52,47 +52,38 @@ class FoldedStickersFTV(FTV):
         return TwistFolding()
 
     fname_eft_front = File('family_small.png')
+
     fname_eft_back = File('family_back_small.png')
+
     back_offset = Float(0.02)
+
     front_offset = Float(0.02)
+
     tube_radius = Float(0.01)
+
     plane_offsets = Array(value=[0.2, -0.20], dtype='float_')
 
     F_ref = Array(value=[0, 2, 4, 6, 8, 16, 1, 12, 14, ], dtype='int_')
+
     N_ref = Array(value=[0, 3, 15, 12, 7, 4, 1, 11, 13], dtype='int_')
+
     F_covered = Array(value=[[0, 9], [2, 11], [4, 13], [6, 15],
                              [8, 17], [16, 7], [1, 10], [12, 3], [14, 5]], dtype='int_')
+
     atimes = Array(
         value=[90.0, 180.0, -90, 0, 45, 90, 90.0, -90.0, 0.0], dtype='float_')
+
     im_widths = Array(value=[4, 4, 4, 4, 4, 4, 4, 4, 4], dtype='float_')
 
     imfiles_front = List
 
     def _imfiles_front_default(self):
-        return [self.fname_eft_front,
-                self.fname_eft_front,
-                self.fname_eft_front,
-                self.fname_eft_front,
-                self.fname_eft_front,
-                self.fname_eft_front,
-                self.fname_eft_front,
-                self.fname_eft_front,
-                self.fname_eft_front]
+        return [self.fname_eft_front for i in range(len(self.F_ref))]
 
     imfiles_back = List
 
     def _imfiles_back_default(self):
-        return [
-            self.fname_eft_back,
-            self.fname_eft_back,
-            self.fname_eft_back,
-            self.fname_eft_back,
-            self.fname_eft_back,
-            self.fname_eft_back,
-            self.fname_eft_back,
-            self.fname_eft_back,
-            self.fname_eft_back,
-        ]
+        return [self.fname_eft_back for i in range(len(self.F_ref))]
 
     im_front_offsets = List
 
