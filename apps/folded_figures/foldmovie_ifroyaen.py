@@ -15,15 +15,15 @@ Visualization
        - dofconstraints, -targetsurface
 @todo: define the mapping objects for the image stickers specifying the covered facets
 @todo: generalize the simulation time loop - update constraints for time ``t``, get 
-        the solution and store it in the simulation history
-@todo: include camera path into the animation loop.
-@todo: provide a separate animator class with CameraStations and CameraTransitions.  
-
+        the solution and store it in the simulation history 
 '''
 
 from traits.api import \
     Instance, Property, cached_property, \
     File, Array, List, Float
+
+from folded_figures_viz3d import \
+    FacetsWithImageViz3D
 import numpy as np
 from oricreate.api import \
     FTV, FTA
@@ -32,8 +32,6 @@ from oricreate.crease_pattern import \
 from oricreate.crease_pattern.crease_pattern_viz3d import \
     CreasePatternThickViz3D
 from oricreate.viz3d.viz3d import Viz3D
-from sim03_eft_logo_viz3d import \
-    FacetsWithImageViz3D
 from sim_task_twist_folding import \
     TwistFolding
 
