@@ -17,12 +17,11 @@ from custom_factory_mpl import create_cp_factory
 def create_fu():
     cp_factory = create_cp_factory()
     # begin
-    from oricreate.fu import FuTargetFaces, TF
+    from oricreate.fu import FuTargetFaces
     from oricreate.api import r_, s_
     # Link the pattern factory with the goal function client.
-    target_face = TF(F=[r_, s_, 1.0])
-    fu_target_faces = FuTargetFaces(forming_task=cp_factory,
-                                    tf_lst=[(target_face, [0])])
+    fu_target_faces = FuTargetFaces(forming_task=cp_factory)
+    fu_target_faces.target_faces = [([r_, s_, 1.0], [0])]
     print 'fu:', fu_target_faces.get_f()
     print 'f_du:\n', fu_target_faces.get_f_du()
     # end

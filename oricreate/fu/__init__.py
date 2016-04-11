@@ -4,4 +4,4 @@ from fu_node_dist import \
 from fu_potential_energy import \
     FuPotentialEnergy
 from fu_target_face import \
-    FuTargetFaces, FuTargetFace, FuTF
+    FuTargetFaces, FuTargetFace, FuTF, FuFaceNodeDistance
