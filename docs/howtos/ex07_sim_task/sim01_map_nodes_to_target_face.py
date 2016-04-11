@@ -22,17 +22,17 @@ from oricreate.simulation_step import \
 def create_sim_step():
     cp_factory = create_cp_factory()
     # begin
-    from oricreate.fu import FuTargetFaces, TF
+    from oricreate.fu import FuTargetFaces, FuTF
     from oricreate.api import r_, s_, t_
     # Link the pattern factory with the goal function client.
     do_something = FormingTask(previous_task=cp_factory)
     # configure the forming task so that it uses
     # the rigid folding kinematics optimization framework RFKOF
-    target_face = TF(F=[r_, s_, t_ * r_ + 2.0])
-    fu_target_faces = FuTargetFaces(tf_lst=[(target_face, [0, 1, 2])])
-    sim_config = SimulationConfig(fu=fu_target_faces)
+    target_face = FuTF([r_, s_, r_ + 2.0], [0, 1, 2])
+    fu_target_faces = FuTargetFaces(tf_lst=[target_face])
+    sim_config = SimulationConfig(fu=fu_target_faces, acc=1e-8)
     sim_step = SimulationStep(forming_task=do_something,
-                              config=sim_config, acc=1e-8)
+                              config=sim_config)
     sim_step.t = 0.4
     print 'goal function for t = 0.4:', sim_step.get_f()
     sim_step.t = 0.8
@@ -43,8 +43,9 @@ def create_sim_step():
     print sim_step.get_G()
     print 'constraint derivatives'
     print sim_step.get_G_du()
-    sim_step._solve_fmin()
-    print 'target position:\n', sim_step.cp_state.u
+    sim_step.cp_state.u = sim_step.u_t
+    print 'target displacement:\n', sim_step.cp_state.u
+    print 'target position:\n', sim_step.cp_state.x
     # end
     return sim_step
 

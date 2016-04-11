@@ -6,7 +6,7 @@ Created on Aug 14, 2014
 
 from traits.api import \
     Property, cached_property, \
-    Str, List
+    Str, List, Instance
 
 from mapping_task import MappingTask
 from oricreate.fu import FuTargetFaces
@@ -27,16 +27,20 @@ class MapToSurface(MappingTask):
 
     name = Str('map to surface')
 
-    target_faces = List([], input=True)
+    fu_target_faces = Instance(FuTargetFaces, input=True)
     '''List of target surfaces.
     '''
 
-    fu_target_faces = Property(depends_on='+input')
+    target_faces = Property
     '''Goal function handling the distance to several target faces
     '''
-    @cached_property
-    def _get_fu_target_faces(self):
-        return FuTargetFaces(forming_task=self, tf_lst=self.target_faces)
+
+    def _set_target_faces(self, values):
+        self.fu_target_faces = FuTargetFaces(forming_task=self)
+        self.fu_target_faces.target_faces = values
+
+    def _get_target_faces(self):
+        return self.fu_target_faces
 
     dof_constraints = List([], input=True)
     '''List of dof constraints in the format
@@ -52,7 +56,7 @@ class MapToSurface(MappingTask):
         gu_dofs = GuDofConstraints(forming_task=self,
                                    dof_constraints=self.dof_constraints)
         return SimulationConfig(fu=self.fu_target_faces,
-                                gu={'dofs': gu_dofs})
+                                gu={'dofs': gu_dofs}, acc=1e-6)
 
     sim_step = Property(depends_on='+input')
     '''Simulation step object controlling the transition from time 0 to time 1
@@ -60,7 +64,7 @@ class MapToSurface(MappingTask):
     @cached_property
     def _get_sim_step(self):
         return SimulationStep(forming_task=self,
-                              config=self.sim_config, acc=1e-6)
+                              config=self.sim_config)
 
     u_1 = Property(depends_on='+input')
     '''Resulting displacement vector

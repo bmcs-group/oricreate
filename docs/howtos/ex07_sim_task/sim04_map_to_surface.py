@@ -41,15 +41,16 @@ def create_sim_step():
     cp_factory = CustomCPFactory(formed_object=cp)
 
     # begin
-    from oricreate.fu import TF
+    from oricreate.fu import FuTF
     from oricreate.api import r_, s_, t_
-    target_face = TF(F=[r_, s_, - 0.5 * (r_ - 1) * (r_ - 1) * t_ + 1.0])
+    target_face = FuTF([r_, s_, - 0.5 * (r_ - 1) * (r_ - 1) * t_ + 1.0],
+                       [0, 1, 2, 3, 4])
     # fix all nodes in x and y direction - let the z direction free
     dof_constraints = \
         [([(i, 0, 1.0)], 0.0) for i in range(0, 5)] +\
         [([(i, 1, 1.0)], 0.0) for i in range(0, 5)]
     sim_step = MapToSurface(previous_task=cp_factory,
-                            tf_lst=[(target_face, [0, 1, 2, 3, 4])],
+                            target_faces=[target_face],
                             dof_constraints=dof_constraints
                             )
     print 'initial position\n', cp_factory.formed_object.x

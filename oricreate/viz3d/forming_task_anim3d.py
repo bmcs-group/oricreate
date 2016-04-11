@@ -3,7 +3,7 @@ Created on Dec 3, 2015
 
 Animator module defines animation time ``t_a``.
 The time line consists of camera transitions connecting
-camera stations. Each station has a animation time stamp 
+camera stations. Each station has an animation time stamp 
 - ats.
 
 The animator is linked with the visualization objects via
@@ -20,7 +20,7 @@ the forming task time.
 
 Scene transition has an attached forming task view FTV object that
 contains a list of viz objects. Upon traveling through the scene, the 
-scene transition lets the FT view update itself for a new FT time.
+scene transition lets the FTV update itself for a new FTV time.
 The mapping between the movie time MT and the scene transition time STT
 is provided by the BST and EST - beginning scene time and ending scene time.
 Within these limits, a scene nominal time SNT - (0,1) is provided 
@@ -35,20 +35,14 @@ Should the animator be just an observer or should it actively control the state
 of the forming tasks? Should the scene transition traveling through the time
 send a reset time after finishing the scene transition?
 
-
- 
-
 Forming task time is passed to viz objects attached to 
-
 
 Forming sequences
 =================
 
-
 Interpolation
 =============
 
- 
 They should not need to define their
 loop on their own. The viz object declares the loop.
 
@@ -223,6 +217,7 @@ class CamMove(HasStrictTraits):
     def render_take(self, ftv, fname_base, format_, idx_offset):
         im_files = []
         for idx, (a, e, d, f, r, vot) in enumerate(zip(*self.transition_arr)):
+            print 'take for %g' % vot
             ftv.update(vot, force=True)
             # @todo: temporary focal point determination - make it optional
             ff = ftv.get_center()

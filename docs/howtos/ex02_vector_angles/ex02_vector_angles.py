@@ -14,7 +14,7 @@ Given are four nodes and two pairs of vectors
     \bm{x}_4 = \left[ 1, 1 \right]
 
 This example shows the evaluation of the angle cosines :math:`\gamma`
-and angles :math:`\theta` between the two pairs of vectors.
+and angles :math:`\theta` between two pairs of vectors.
 Further, the derivatives of the cosines :math:`\partial \gamma / \partial \bm{u}_1`
 and angles :math:`\partial \theta / \partial \bm{u}_1`
 with respect to the displacement of the node :math:`\bm{x}_1`

@@ -18,7 +18,7 @@ from scipy.optimize import \
 import time
 from traits.api import \
     HasStrictTraits, Event, Property, cached_property, \
-    Int, Float, Bool, DelegatesTo, \
+    Float, DelegatesTo, \
     Instance, WeakRef, Array
 
 import numpy as np
@@ -37,7 +37,6 @@ elif platform.system() == 'Windows':
 
 
 class SimulationStep(HasStrictTraits):
-
     r"""Class implementing the transition of the formed object 
     from its initial time to the target time :math:`t`.
     """
@@ -67,13 +66,6 @@ class SimulationStep(HasStrictTraits):
     @cached_property
     def _get_cp_state(self):
         return self.forming_task.formed_object
-
-    U = Property(Array(float))
-    r'''Displacement vector of the cp_state
-    '''
-
-    def _get_U(self):
-        return self.cp_state.U
 
     fu = Property(depends_on='source_config_changed')
     r'''Goal function object.
@@ -117,61 +109,116 @@ class SimulationStep(HasStrictTraits):
     r'''Target time within the step in the range (0,1).
     '''
 
-    show_iter = Bool(False, auto_set=False, enter_set=True)
-    r'''Saves the first 10 iteration steps, so they can be analyzed
+    # =========================================================================
+    # Output data
+    # =========================================================================
+
+    x_0 = Property
+    r'''Initial position of all nodes.
     '''
 
-    MAX_ITER = Int(100, auto_set=False, enter_set=True)
-    r'''Maximum number of iterations.
+    def _get_x_0(self):
+        return self.X_0.reshape(-1, self.n_D)
+
+    U = Property(Array(float))
+    r'''Intermediate displacement vector of the cp_state
     '''
 
-    acc = Float(1e-4, auto_set=False, enter_set=True)
-    r'''Required accuracy.
+    def _get_U(self):
+        return self.cp_state.U
+
+    def _set_U(self, value):
+        self.cp_state.U = value
+
+    U_t = Property(depends_on='t')
+    r'''Final displacement vector :math:`X` at target time :math:`t`.
+    '''
+    @cached_property
+    def _get_U_t(self):
+        U_t = self._solve()
+        return U_t
+
+    X_t = Property()
+    r'''Vector of node positions :math:`U` at target time :math:`t`.
     '''
 
-    use_G_du = Bool(True, auto_set=False, enter_set=True)
-    r'''Switch the use of constraint derivatives on.
+    def _get_X_t(self):
+        return self.X_0[np.newaxis, :] + self.U_t
+
+    x_t = Property()
+    r'''Array of node positions :math:`x_{ij}` at target time :math:`t` - [node, dim].
     '''
+
+    def _get_x_t(self):
+        n_t = self.X_t.shape[0]
+        return self.X_t.reshape(n_t, -1, self.n_D)
+
+    u_t = Property()
+    r'''Array of nodal displaceements :math:`x_{ij}`  [node, dim].
+    '''
+
+    def _get_u_t(self):
+        n_D = self.cp_state.n_D
+        return self.U_t.reshape(-1, n_D)
 
     # ===========================================================================
     # Iterative solvers
     # ===========================================================================
-    def _solve_nr(self, t):
+
+    def _solve(self):
+        '''Decide which solver to take and start it.
+        '''
+        if self.config.goal_function_type_ is not None:
+            U_t = self._solve_fmin()
+        else:
+            # no goal function - switch to an implicit time-stepping algorithm
+            U_t = self._solve_nr()
+
+        return U_t
+
+    def _solve_nr(self):
         '''Find the solution using the Newton-Raphson procedure.
         '''
         i = 0
-        U = self.cp_state.U
-        while i <= self.MAX_ITER:
-            dR = self.get_G_du(t)
-            R = self.get_G(t)
+        U_save = np.copy(self.U)
+        acc = self.config.acc
+        max_iter = self.config.MAX_ITER
+        while i <= max_iter:
+            dR = self.get_G_du_t(self.U)
+            R = self.get_G_t(self.U)
             nR = np.linalg.norm(R)
-            if nR < self.acc:
+            if nR < acc:
                 print '==== converged in ', i, 'iterations ===='
                 break
             try:
                 d_U = np.linalg.solve(dR, -R)
-                U += d_U
-                self.cp_state.U = U
+                self.U += d_U  # in-place increment
                 i += 1
             except Exception as inst:
                 print '=== Problems solving iteration step %d  ====' % i
                 print '=== Exception message: ', inst
+                self.U = U_save
                 raise inst
         else:
+            self.U = U_save
             print '==== did not converge in %d iterations ====' % i
 
-        return U
+        # update the state object with the new displacement vector
+        return self.U
 
     def _solve_fmin(self):
         '''Solve the problem using the
         Sequential Least Square Quadratic Programming method.
         '''
         print '==== solving with SLSQP optimization ===='
+        U_save = np.copy(self.U)
         d0 = self.get_f_t(self.U)
         eps = d0 * 1e-4
         get_G_du_t = None
+        acc = self.config.acc
+        max_iter = self.config.MAX_ITER
 
-        if self.use_G_du:
+        if self.config.use_G_du:
             get_G_du_t = self.get_G_du_t
 
         info = fmin_slsqp(self.get_f_t,
@@ -179,7 +226,7 @@ class SimulationStep(HasStrictTraits):
                           fprime=self.get_f_du_t,
                           f_eqcons=self.get_G_t,
                           fprime_eqcons=get_G_du_t,
-                          acc=self.acc, iter=self.MAX_ITER,
+                          acc=acc, iter=max_iter,
                           iprint=0,
                           full_output=True,
                           epsilon=eps)
@@ -187,6 +234,8 @@ class SimulationStep(HasStrictTraits):
         if imode == 0:
             print '(time: %g, iter: %d, f: %g)' % (self.t, n_iter, f)
         else:
+            # no convergence reached.
+            self.U = U_save
             print '(time: %g, iter: %d, f: %g, err: %d, %s)' % \
                 (self.t, n_iter, f, imode, smode)
         return U
@@ -237,7 +286,6 @@ class SimulationStep(HasStrictTraits):
 
     def get_G_du_t(self, U):
         self.cp_state.U = U
-        self.cp_state.U[:] = U[:]
         return self.get_G_du(self.t)
 
     def get_G_du(self, t=0):
@@ -249,51 +297,3 @@ class SimulationStep(HasStrictTraits):
             print 'G_du.shape:\n', g_du.shape
             print 'G_du:\n', [g_du]
         return g_du
-
-    # =========================================================================
-    # Output data
-    # =========================================================================
-
-    x_0 = Property
-    '''Initial position of all nodes.
-    '''
-
-    def _get_x_0(self):
-        return self.X_0.reshape(-1, self.n_D)
-
-    X_t = Property()
-    '''History of nodal positions [time, node*dim]).
-    '''
-
-    def _get_X_t(self):
-        return self.X_0[np.newaxis, :] + self.U_t
-
-    x_t = Property()
-    '''History of nodal positions [time, node, dim].
-    '''
-
-    def _get_x_t(self):
-        n_t = self.X_t.shape[0]
-        return self.X_t.reshape(n_t, -1, self.n_D)
-
-    x_1 = Property
-    '''Final position of all nodes.
-    '''
-
-    def _get_x_1(self):
-        return self.x_t[-1]
-
-    u_t = Property()
-    '''History of nodal positions [time, node, dim].
-    '''
-
-    def _get_u_t(self):
-        n_t = self.U_t.shape[0]
-        return self.U_t.reshape(n_t, -1, self.n_D)
-
-    u_1 = Property()
-    '''Final nodal positions [node, dim].
-    '''
-
-    def _get_u_1(self):
-        return self.u_t[-1]

@@ -1,3 +1,17 @@
+import math
+from traits.api import \
+    HasStrictTraits, Instance, Property, cached_property, \
+    Array, Int
+
+import matplotlib.pyplot as \
+    plt
+import numpy as np
+from oricreate.api import \
+    IFormingTask, SimulationHistory, \
+    SimulationStep, SimulationConfig
+from oricreate.gu import \
+    GuConstantLength, GuDofConstraints, fix
+from oricreate.simulation_tasks.simulation_task import SimulationTask
 r'''
 
 Construct a crease pattern for twist folding and simulate it 
@@ -15,18 +29,6 @@ Modeling
 @todo: check folding angle derivatives 
 
 '''
-
-from traits.api import \
-    HasStrictTraits, Instance, Property, cached_property, \
-    Array, Int
-import matplotlib.pyplot as \
-    plt
-import numpy as np
-from oricreate.api import \
-    IFormingTask, SimulationHistory, \
-    SimulationStep, SimulationConfig
-from oricreate.gu import \
-    GuConstantLength, GuDofConstraints, fix
 
 
 def damped_range(low, high, n):
@@ -131,19 +133,27 @@ def oricreate_mlab_label(m):
            color=(.7, .7, .7), width=atext_width)
 
 
-class TwistFolding(HasStrictTraits):
+class TwistFolding(SimulationTask):
 
-    cp_factory = Instance(IFormingTask)
-    '''Initial crease pattern.
-    '''
-
-    def _cp_factory_default(self):
+    def _previous_task_default(self):
         return create_cp_factory()
 
-    cp = Property
+    n_steps = Int(3)
 
-    def _get_cp(self):
-        return self.cp_factory.formed_object
+    config = Property(Instance(SimulationConfig))
+
+    @cached_property
+    def _get_config(self):
+        # Configure simulation
+        gu_constant_length = GuConstantLength()
+        dof_constraints = fix(
+            [0], [0, 1, 2]) + fix([1], [1, 2]) + fix([5], [2]) + \
+            fix([3], [0], lambda t: math.cos(math.pi * t) - 1)
+        gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
+        return SimulationConfig(goal_function_type='none',
+                                gu={'cl': gu_constant_length,
+                                    'dofs': gu_dof_constraints},
+                                acc=1e-5, MAX_ITER=1000)
 
     def plot2d(self):
         fig, ax = plt.subplots()
@@ -152,51 +162,10 @@ class TwistFolding(HasStrictTraits):
         plt.show()
         return
 
-    sim_step = Property(Instance(SimulationStep))
-
-    @cached_property
-    def _get_sim_step(self):
-        # Configure simulation
-        gu_constant_length = GuConstantLength()
-        dof_constraints = fix(
-            [0], [0, 1, 2]) + fix([1], [1, 2]) + fix([5], [2]) + fix([3], [0], -1.9599)
-        gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
-        sim_config = SimulationConfig(gu={'cl': gu_constant_length,
-                                          'dofs': gu_dof_constraints})
-        sim_step = SimulationStep(forming_task=self.cp_factory,
-                                  config=sim_config, acc=1e-5, MAX_ITER=1000)
-        return sim_step
-
-    n_u = Int(3)
-
-    phi_range = Array
-
-    def _phi_range_default(self):
-        return damped_range(0.01, np.pi - 0.01, self.n_u)
-
-    u_arr = Array
-    '''Control displacements.
-    '''
-
-    def _u_arr_default(self):
-        return np.cos(self.phi_range) - 1
-
-    sim_history = Property(Instance(SimulationHistory))
-    '''History of calculated displacements.
-    '''
-    @cached_property
-    def _get_sim_history(self):
-        cp = self.cp
-        L_selection = cp.L[cp.viz3d.L_selection]
-        sim_hist = SimulationHistory(x_0=cp.x_0, L=L_selection, F=cp.F)
-        for u in self.u_arr:
-            self.sim_step.gu['dofs'].dof_constraints[-1][-1] = u
-            U = self.sim_step._solve_nr(1.0)
-            sim_hist.u_t_list.append(U.reshape(-1, 3))
-        return sim_hist
-
 
 if __name__ == '__main__':
 
-    twist_folding = TwistFolding(n_u=40)
-    print twist_folding.sim_history.u_t[-1]
+    twist_folding = TwistFolding(n_steps=40)
+    print twist_folding.u_t
+    print twist_folding.u_1
+    # print twist_folding.sim_history.u_t[-1]

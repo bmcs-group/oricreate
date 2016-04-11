@@ -35,15 +35,9 @@ class SimulationHistory(CreasePattern):
 
     '''
 
-    u_t_list = List(Array(value=[], dtype='float_'), cp_input=True)
+    u_t = Array(dtype='float_', cp_input=True)
     r'''Displacement array with ``(n_t,n_N,n_D)`` values.
     '''
-
-    u_t = Property(Array(dtype='float_'), depends_on='+INPUT')
-
-    @cached_property
-    def _get_u_t(self):
-        return np.array(self.u_t_list, dtype='float_')
 
     x_t = Property(depends_on=INPUT)
     r'''Interim coordinates of the crease pattern
@@ -54,8 +48,10 @@ class SimulationHistory(CreasePattern):
 
     @on_trait_change('vot')
     def _set_time_step(self):
+        print 'VOT', self.vot
         n_t = len(self.x_t) - 1
         i_t = int(self.vot * n_t)
+        print 'SETTING TIME STEP TO', i_t
         self.time_step = i_t
 
     time_step = Int(0, cp_input=True)
@@ -66,12 +62,15 @@ class SimulationHistory(CreasePattern):
     '''
 
     def _get_x(self):
+        print 'getting x_t', self.time_step
+        print self.x_t[self.time_step]
         return self.x_t[self.time_step]
 
 if __name__ == '__main__':
 
     # trivial example with a single triangle positioned
 
+    from oricreate.api import CreasePatternState
     cp = CreasePatternState(x_0=[[0, 0, 0],
                                  [1, 0, 0],
                                  [1, 1, 0],

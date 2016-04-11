@@ -10,7 +10,7 @@
 #
 # Thanks for using Simvisage open source!
 #
-# Created on Jan 29, 2013 by: matthias
+# Created on Jan 29, 2015 by: rch
 
 from traits.api import \
     HasStrictTraits, Float, \

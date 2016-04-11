@@ -19,7 +19,11 @@ class ISimulationTask(IFormingTask):
     simulation step within the origami design process.
     '''
 
-    U_1 = Property(Array)
+    u_0 = Property(Array)
+    '''Method required by subsequent FormingTask steps
+    '''
+
+    u_1 = Property(Array)
     '''Method required by subsequent FormingTask steps
     '''
 
@@ -27,6 +31,6 @@ class ISimulationTask(IFormingTask):
     '''Crease pattern.
     '''
 
-    U_t = Property(Array)
+    u_t = Property(Array)
     '''Method required for visualization.
     '''

@@ -6,7 +6,7 @@ Created on Oct 29, 2014
 
 from traits.api import \
     HasStrictTraits, Property, cached_property, implements, \
-    Int, Trait, Instance, DelegatesTo, WeakRef, Dict, Str, Array, List
+    Int, Trait, Instance, Bool, Dict, Str, Array, List, Float
 
 import numpy as np
 from oricreate.fu import \
@@ -36,9 +36,24 @@ class SimulationConfig(HasStrictTraits):
     r'''Type of the goal function.
     '''
 
-    fu = Instance(IFu)
+    _fu = Instance(IFu)
+    '''Private trait with the goal function object.
+    '''
+
+    fu = Property(Instance(IFu), depends_on='goal_function_type')
     '''Goal function.
     '''
+
+    def _get_fu(self):
+        if self._fu == None:
+            self._fu = self.goal_function_type_()
+        return self._fu
+
+    def _set_fu(self, value):
+        if not value.__class__ is self.goal_function_type_:
+            raise TypeError, 'Goal function has type %s but should be %s' % \
+                (value.__class__, self.goal_function_type_)
+        self._fu = value
 
     gu = Dict(Str, IGu)
     '''Dictionary of equality constraints.
@@ -67,6 +82,22 @@ class SimulationConfig(HasStrictTraits):
     @cached_property
     def _get_hu_lst(self):
         return self.gu.values()
+
+    show_iter = Bool(False, auto_set=False, enter_set=True)
+    r'''Saves the first 10 iteration steps, so they can be analyzed
+    '''
+
+    MAX_ITER = Int(100, auto_set=False, enter_set=True)
+    r'''Maximum number of iterations.
+    '''
+
+    acc = Float(1e-4, auto_set=False, enter_set=True)
+    r'''Required accuracy.
+    '''
+
+    use_G_du = Bool(True, auto_set=False, enter_set=True)
+    r'''Switch the use of constraint derivatives on.
+    '''
 
     # ===========================================================================
     # Kinematic constraints

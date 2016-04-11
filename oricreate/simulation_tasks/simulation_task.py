@@ -24,7 +24,7 @@ import numpy as np
 from oricreate.crease_pattern import \
     CreasePattern
 from oricreate.forming_tasks import \
-    FormingTask, IFormingTask
+    FormingTask
 from oricreate.gu import \
     GuConstantLength, \
     GuDevelopability, \
@@ -37,8 +37,8 @@ from oricreate.mapping_tasks import \
 from oricreate.opt import \
     IGu
 from oricreate.simulation_step import \
-    SimulationStep
-
+    SimulationStep, SimulationConfig
+from oricreate.simulation_tasks.simulation_history import SimulationHistory
 
 if platform.system() == 'Linux':
     sysclock = time.time
@@ -58,37 +58,33 @@ class SimulationTask(FormingTask):
     '''
     implements(ISimulationTask)
 
-    source = Instance(IFormingTask)
+    config = Instance(SimulationConfig)
+    '''Configuration of the simulation
+    '''
+
+    def _config_default(self):
+        return SimulationConfig()
 
     n_steps = Int(1, auto_set=False, enter_set=True)
     '''Number of simulation steps.
     '''
 
-    sim_step = Instance(SimulationStep)
-    '''Simulation step realizing the transition
+    sim_step = Property(depends_on='sim_config')
+    '''Simulation step resim_step =alizing the transition
     from initial to final state for the increment
     of the time-dependent constraints.
     '''
+    @cached_property
+    def _get_sim_step(self):
+        return SimulationStep(forming_task=self,
+                              config=self.config, )
 
-    def _run(self):
-        '''Run the simulation within the time range and gather 
-        the resulting solution vector within the forming history..
-        '''
-
-    cp = Property(depends_on='source')
+    cp = Property
     '''Instance of a crease pattern.
     '''
-    @cached_property
-    def _get_cp(self):
-        return self.source.cp
 
-    def _set_cp(self, value):
-        if self.source:
-            msg = 'crease pattern already available in the source object'
-            raise ValueError(msg)
-        print 'No source: an initialization ',
-        print 'with the supplied crease pattern will be added.'
-        self.source = MapToSurface(cp=value)
+    def _get_cp(self):
+        return self.formed_object
 
     X_0 = Property(depends_on='source')
     '''Initial configuration given as the last
@@ -102,44 +98,30 @@ class SimulationTask(FormingTask):
     # Geometric data
     # =========================================================================
 
-    L = Property()
-    '''Array of crease_lines defined by pairs of node numbers.
-    '''
-
-    def _get_L(self):
-        return self.source.L
-
-    F = Property()
-    '''Array of crease facets defined by list of node numbers.
-    '''
-
-    def _get_F(self):
-        return self.source.F
-
-    U_0 = Property(Array(float))
+    u_0 = Property(Array(float))
     '''Attribute storing the optional user-supplied initial array.
     It is used as the trial vector of unknown displacements
     for the current FormingTask simulation.
     '''
 
-    def _get_U_0(self):
-        return self.source.U_1
+    def _get_u_0(self):
+        return np.copy(self.source_task.formed_object.u)
 
-    X_1 = Property(Array(float))
+    u_1 = Property(Array(float))
     '''Final state of the FormingTask process that can be used
     by further FormingTask controller.
     '''
 
-    def _get_X_1(self):
-        return self.X_0 + self.U_t[-1]
+    def _get_u_1(self):
+        return self.u_t[-1]
 
-    U_1 = Property(Array(float))
+    x_1 = Property(Array(float))
     '''Final state of the FormingTask process that can be used
     by further FormingTask controller.
     '''
 
-    def _get_U_1(self):
-        return np.zeros_like(self.X_t[-1])
+    def _get_x_1(self):
+        return self.x_0 + self.u_1
 
     # ==========================================================================
     # Solver parameters
@@ -173,63 +155,38 @@ class SimulationTask(FormingTask):
             t_arr = t_arr[::-1]
         return t_arr
 
-    U_t = Property(depends_on='source_config_changed, unfold')
+    sim_history = Property(Instance(SimulationHistory))
+    '''History of calculated displacements.
+    '''
+    @cached_property
+    def _get_sim_history(self):
+        cp = self.cp
+        return SimulationHistory(x_0=cp.x_0, L=cp.L, F=cp.F, u_t=self.u_t)
+
+    u_t = Property(depends_on='source_config_changed, unfold')
     '''Displacement history for the current FoldRigidly process.
     '''
     @cached_property
-    def _get_U_t(self):
+    def _get_u_t(self):
         '''Solve the problem with the appropriate solver
         '''
+        u_t_list = [self.cp.u]
         time_start = sysclock()
+        for t in self.t_arr[1:]:
+            print 'time: %g' % t
+            self.sim_step.t = t
+            U = self.sim_step.U_t
+            try:
+                U = self.sim_step.U_t
+            except Exception as inst:
+                print inst
+                break
 
-        if self.goal_function_type_ is not None:
-            U_t = self._solve_fmin(self.U_0, self.acc)
-        else:
-            U_t = self._solve_nr(self.U_0, self.acc)
+            u_t_list.append(U.reshape(-1, 3))
 
         time_end = sysclock()
         print '==== solved in ', time_end - time_start, '====='
-
-        return U_t
-
-    def _solve_nr(self, U_0, acc=1e-4):
-        '''Find the solution using the Newton - Raphson procedure.
-        '''
-        print '==== solving using Newton-Raphson ===='
-        U_t = [np.copy(self.U_0)]
-        # time loop without the initial time step
-        for t in self.t_arr[1:]:
-            print 'step', t,
-            U_t.append(np.copy(self.sim_step._solve_nr(t)))
-        return np.array(U_t, dtype='f')
-
-    def _solve_fmin(self, U_0, acc=1e-4):
-        '''Solve the problem using the
-        Sequential Least Square Quadratic Programming method.
-        '''
-        print '==== solving with SLSQP optimization ===='
-        U_t = [np.copy(self.U_0)]
-        # time loop without the initial time step
-        for t in self.t_arr[1:]:
-            print 'step', t,
-            U_t.append(np.copy(self.sim_step._solve_fmin(t)))
-        return np.array(U_t, dtype='f')
-
-    # =========================================================================
-    # Auxiliary elements that can be used interim steps of computation.
-    # They are not included in the crease pattern representation.
-    # =========================================================================
-    x_aux = Array(dtype=float, value=[])
-    '''Auxiliary nodes used for visualization.
-    '''
-
-    L_aux = Array(dtype=int, value=[])
-    '''Auxiliary lines used for visualization.
-    '''
-
-    F_aux = Array(dtype=int, value=[])
-    '''Auxiliary facets used for visualization.
-    '''
+        return np.array(u_t_list)
 
 
 class FindFormForGeometry(SimulationTask):
@@ -323,8 +280,8 @@ class Lift(SimulationTask):
 
 if __name__ == '__main__':
 
-    from view import FormingView
-    from util import t_, x_, z_
+    from oricreate.view import FormingView
+    from oricreate.util import t_, x_, z_
 
     cp = CreasePattern(X=[[0, 0, 0],
                           [1, 0, 0],

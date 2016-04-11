@@ -26,6 +26,7 @@ class CreasePatternViz3D(Viz3D):
 
     def _get_N_L_F(self):
         cp = self.vis3d
+        print 'viz-cp', cp
         x, L, F = cp.x, cp.L, cp.F
         if len(self.N_selection):
             x = x[self.N_selection]
@@ -35,9 +36,18 @@ class CreasePatternViz3D(Viz3D):
             F = F[self.F_selection]
         return x, L, F
 
+    min_max = Property
+    '''Rectangular bounding box. 
+    '''
+
+    def _get_min_max(self):
+        vis3d = self.vis3d
+        return np.min(vis3d.x, axis=0), np.max(vis3d.x, axis=0)
+
+    facet_color = Color((0.6, 0.625, 0.683))
 #    facet_color = Color((0.0, 0.425, 0.683))
-    facet_color = Color((0.4, 0.4, 0.7))
-    facet_color = Color((0.0 / 255.0, 84.0 / 255.0, 159.0 / 255.0))
+#    facet_color = Color((0.4, 0.4, 0.7))
+#    facet_color = Color((0.0 / 255.0, 84.0 / 255.0, 159.0 / 255.0))
 #   facet_color = Color((64.0 / 255.0, 127.0 / 255.0, 183.0 / 255.0))
 #    facet_color = Color((0.0 / 255.0, 97.0 / 255.0, 101.0 / 255.0))
 
@@ -72,7 +82,7 @@ class CreasePatternViz3D(Viz3D):
     def _get_max_length(self):
         return np.linalg.norm(self._get_bounding_box())
 
-    tube_radius = Float(0.013)
+    tube_radius = Float(0.03)
 
     line_width_factor = Float(0.0024)
 
@@ -133,6 +143,7 @@ class CreasePatternNormalsViz3D(Viz3D):
 class CreasePatternBasesViz3D(Viz3D):
     '''Visualize the crease Pattern
     '''
+    label = 'bases'
 
     def get_values(self):
         cp = self.vis3d
@@ -153,6 +164,8 @@ class CreasePatternBasesViz3D(Viz3D):
         self.quifer3d_pipe_blu = m.quiver3d(*args_blu, color=(0, 0, 1))
 
     def update(self):
+        '''Update positions of the bases.
+        '''
         Fa_r, F_L_bases = self.get_values()
         x, y, z = Fa_r.T
         u, v, w = F_L_bases[..., 0, :].T
@@ -161,3 +174,42 @@ class CreasePatternBasesViz3D(Viz3D):
         self.quifer3d_pipe_gre.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)
         u, v, w = F_L_bases[..., 2, :].T
         self.quifer3d_pipe_blu.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)
+
+
+class CreasePatternNodeNumbersViz3D(Viz3D):
+    '''Visualize the crease Pattern
+    '''
+
+    label = 'node numbers'
+    scale_factor = Float(1.0, auto_set=False, enter_set=True)
+    show_node_index = Bool(True)
+
+    def plot(self):
+        '''
+        This pipeline comprised the labels for all node Indexes
+        '''
+
+        m = self.ftv.mlab
+        cp = self.vis3d
+
+        text = np.array([])
+        pts = cp.x
+        x, y, z = cp.x.T
+        for i in range(len(pts)):
+            temp_text = m.text3d(
+                x[i], y[i], z[i] + 0.2 * self.scale_factor, str(i), scale=0.05)
+            temp_text.actor.actor.visibility = int(self.show_node_index)
+            text = np.hstack([text, temp_text])
+        self.text_entries = text
+
+    def update(self):
+        '''
+        Update the labels of nodeindexes (node_index_pipeline)
+        '''
+        cp = self.vis3d
+        x, y, z = cp.x.T
+        for i in range(len(self.text_entries)):
+            self.text_entries[i].actor.actor.visibility = int(
+                self.show_node_index)
+            self.text_entries[i].actor.actor.position = np.array(
+                [x[i], y[i], z[i] + 0.2 * self.scale_factor])

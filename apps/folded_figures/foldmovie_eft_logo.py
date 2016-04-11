@@ -12,6 +12,9 @@ This example shows quadrilateral facets with a twist fold.
 import os
 import string
 import tempfile
+
+from folded_figures_viz3d import \
+    FacetsWithTextViz3D, FacetsWithImageViz3D
 import matplotlib.pyplot as plt
 import numpy as np
 from oricreate.api import FTV, FTA
@@ -21,8 +24,6 @@ from oricreate.crease_pattern.crease_pattern_viz3d import CreasePatternThickViz3
 from oricreate.gu import GuConstantLength, GuDofConstraints, fix
 from oricreate.simulation_step import \
     SimulationStep, SimulationConfig
-from sim03_eft_logo_viz3d import \
-    FacetsWithTextViz3D, FacetsWithImageViz3D
 from sim_task_twist_folding import TwistFolding
 
 

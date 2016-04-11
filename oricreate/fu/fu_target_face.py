@@ -10,22 +10,27 @@
 #
 # Thanks for using Simvisage open source!
 #
-# Created on Nov 18, 2011 by: matthias
+# Created on Nov 18, 2011 by: rch
 
 from scipy.optimize import fsolve
 from traits.api import \
     implements, HasTraits, List, \
     Property, cached_property, Any,\
     DelegatesTo, Float, Str, Array, \
-    Instance
+    Instance, WeakRef
+from traits.has_traits import on_trait_change
 
 from fu import \
     Fu
 import numpy as np
+from oricreate.fu.fu_target_face_viz3d import \
+    FuTargetFaceViz3D
 from oricreate.opt import \
     IFu
 from oricreate.util import \
     x_, y_, z_, r_, s_, t_
+from oricreate.viz3d import \
+    Visual3D
 import sympy as sm
 
 
@@ -215,7 +220,7 @@ class ParamFaceOperator(HasTraits):
         return self.d_dist_xyz_fn(*args)
 
 
-class CnstrTargetFace(HasTraits):
+class FuFaceNodeDistance(HasTraits):
 
     '''Calculate and maintain distances between
     a set of points X_arr and parametrically
@@ -286,10 +291,24 @@ class CnstrTargetFace(HasTraits):
         ls_arr = self.ls_arr
         return ls_arr.reshape(x.shape)
 
-TF = CnstrTargetFace
+
+class FuTargetFace(Fu, Visual3D):
+    '''Target face linked with a set of nodes.
+    '''
+
+    control_face = Instance(FuFaceNodeDistance)
+    nodes = Array(int, value=[])
+
+    def _viz3d_dict_default(self):
+        return dict(default=FuTargetFaceViz3D(vis3d=self))
 
 
-class FuTargetFaces(Fu):
+def FuTF(expr, nodes):
+    return FuTargetFace(control_face=FuFaceNodeDistance(F=expr),
+                        nodes=nodes)
+
+
+class FuTargetFaces(Fu, Visual3D):
 
     '''Container of target faces
     '''
@@ -298,15 +317,38 @@ class FuTargetFaces(Fu):
 
     tf_lst = List([])
 
+    target_faces = Property
+
+    def _new_fu_target_face(self, value):
+        return FuTargetFace(forming_task=self.forming_task,
+                            control_face=FuFaceNodeDistance(F=value[0]),
+                            nodes=value[1])
+
+    def _set_target_faces(self, values):
+        self.tf_lst = [self._new_fu_target_face(value)
+                       for value in values]
+
+    def _get_target_faces(self):
+        return self.tf_lst
+
+    def __setitem__(self, idx, value):
+        self.tf_lst[idx] = self._new_fu_target_face(value)
+
+    def append(self, value):
+        self.tf_lst.append(self._new_fu_target_face(value))
+
+    def __getitem__(self, idx):
+        return self.tf_lst[idx]
+
     def get_f(self, t=0):
         '''Get the the norm of distances between the individual target faces and nodes.
         '''
         x = self.forming_task.formed_object.x
         d_arr = np.array([])
-        for caf, nodes in self.tf_lst:
-            caf.X_arr = x[nodes]
-            caf.t = t
-            d_arr = np.append(d_arr, caf.d_arr)
+        for tf in self.target_faces:
+            tf.control_face.X_arr = x[tf.nodes]
+            tf.control_face.t = t
+            d_arr = np.append(d_arr, tf.control_face.d_arr)
 
         return np.linalg.norm(d_arr)
 
@@ -316,16 +358,20 @@ class FuTargetFaces(Fu):
         x = self.forming_task.formed_object.x
         d_xyz = np.zeros_like(x)
         dist_arr = np.array([])
-        for caf, nodes in self.tf_lst:
-            caf.X_arr = x[nodes]
-            caf.t = t
-            d_arr = caf.d_arr
+        for tf in self.target_faces:
+            tf.control_face.X_arr = x[tf.nodes]
+            tf.control_face.t = t
+            d_arr = tf.control_face.d_arr
             dist_arr = np.append(dist_arr, d_arr)
-            d_xyz[nodes] += caf.d_arr[:, np.newaxis] * caf.d_xyz_arr
+            d_xyz[tf.nodes] += tf.control_face.d_arr[:, np.newaxis] * \
+                tf.control_face.d_xyz_arr
 
         dist_norm = np.linalg.norm(dist_arr)
         d_xyz[np.isnan(d_xyz)] = 0.0
         return d_xyz.flatten() / dist_norm
+
+    def _viz3d_dict_default(self):
+        raise NotImplemented
 
 if __name__ == '__main__':
     cp = ParamFaceOperator(F=[r_, s_, t_])
@@ -344,10 +390,10 @@ if __name__ == '__main__':
     print 'r_pnt:\t\t\t\t', r_pnt
     print 'distance x_pnt - r_pnt:\t\t', cp.get_dist(r_pnt, x_pnt, 0)
 
-    target_face = TF(F=[r_, s_, -r_ ** 2 - s_ ** 2],
-                     X_arr=[[0, 0.2, 1],
-                            [1, 4, -2],
-                            [7, 8, 9]])
+    target_face = FuFaceNodeDistance(F=[r_, s_, -r_ ** 2 - s_ ** 2],
+                                     X_arr=[[0, 0.2, 1],
+                                            [1, 4, -2],
+                                            [7, 8, 9]])
     print 'x_arr:\n', target_face.X_arr
     print 'r_arr:\n', target_face.r_arr
     print 'd_arr:\n', target_face.d_arr

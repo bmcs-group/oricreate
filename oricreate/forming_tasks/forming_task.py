@@ -16,7 +16,7 @@ import copy
 from traits.api import \
     HasStrictTraits, Event, Property, Str, \
     List, Instance, implements, \
-    cached_property
+    cached_property, Enum
 from traitsui.api import \
     View
 
@@ -37,6 +37,11 @@ class FormingTask(HasStrictTraits):
 
     node = Str('<unnamed>')
 
+    t = Enum([0, 1], enter_set=True, auto_set=False)
+    '''Time scale ranging between 0 and 1 by default.
+    The editing forming tasks have just initial and the final 
+    state. For simulation tasks float variable time is introduced.'''
+
     previous_task = Instance(IFormingTask)
     r'''Previous FormingTask simulation providing
     the source for the current one.
@@ -56,7 +61,8 @@ class FormingTask(HasStrictTraits):
     @cached_property
     def _get_formed_object(self):
         if self.previous_task:
-            return copy.deepcopy(self.previous_task.formed_object)
+            fo = copy.deepcopy(self.previous_task.formed_object)
+            return fo
         else:
             raise NotImplementedError('No pre-fabrication method'
                                       'for the object to form')
@@ -68,7 +74,7 @@ class FormingTask(HasStrictTraits):
 
     def _get_source_task(self):
         if self.previous_task:
-            return self.previous_task
+            return self.source_task
         else:
             return self
 

@@ -9,9 +9,13 @@ from traits.api import \
     Array, DelegatesTo, cached_property, Property
 
 from gu import Gu
+from gu_disp_control_viz3d import \
+    GuDofConstraintsViz3D
 import numpy as np
 from oricreate.opt import \
     IGu
+from oricreate.viz3d import \
+    Visual3D
 
 
 class GuGrabPoints(Gu):
@@ -256,7 +260,7 @@ class GuPointsOnLine(Gu):
         return dR
 
 
-class GuDofConstraints(Gu):
+class GuDofConstraints(Gu, Visual3D):
 
     '''Explicit constraints for selected of freedom.
     '''
@@ -280,28 +284,34 @@ class GuDofConstraints(Gu):
     '''
 
     def get_G(self, t=0):
-        ''' Calculate the residuum for given constraint equations
+        ''' Calculate the residue for given constraint equations
         '''
-        u = self.u
+        cp = self.formed_object
+        u = cp.u
         G = np.zeros((len(self.dof_constraints)), dtype='float_')
         for i, dof_cnstr in enumerate(self.dof_constraints):
             lhs, rhs = dof_cnstr
-            for n, d, c in lhs:
+            for n, d, c in lhs:  # @UnusedVariable
                 G[i] += c * u[n, d]
-            G[i] -= rhs * t
-
+            G[i] -= rhs(t) if rhs else 0
         return G
 
     def get_G_du(self, t=0.0):
         ''' Calculate the residue for given constraint equations
         '''
         cp = self.formed_object
-        G_du = np.zeros(
-            (len(self.dof_constraints), cp.n_dofs), dtype='float_')
+        G_du = np.zeros((len(self.dof_constraints), cp.n_dofs),
+                        dtype='float_')
         for i, dof_cnstr in enumerate(self.dof_constraints):
             lhs, rhs = dof_cnstr  # @UnusedVariable
-            for n, d, c in lhs:
+            for n, d, c in lhs:  # @UnusedVariable
                 dof = 3 * n + d
                 G_du[i, dof] += c
 
         return G_du
+
+    viz3d_dict = Property
+
+    @cached_property
+    def _get_viz3d_dict(self):
+        return dict(default=GuDofConstraintsViz3D(vis3d=self))

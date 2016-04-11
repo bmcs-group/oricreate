@@ -37,7 +37,7 @@ def _broadcast_nd(n, d):
     return np.broadcast(nodes[None, :], dirs[:, None])
 
 
-def fix(nodes, dirs, val=0):
+def fix(nodes, dirs, fn=None):
     '''Return constraints corresponding to the specified arrys of nodes and dirs.
 
     For example, given the call::
@@ -46,16 +46,16 @@ def fix(nodes, dirs, val=0):
 
     defines the dof_constraints of the form:
 
-    [([(2, 0, 1.0)], 0.0 ), ([(2, 1, 1.0)], 0.0 ),
-     ([(4, 0, 1.0)], 0.0 ), ([(4, 1, 1.0)], 0.0 ),]
+    [([(2, 0, 1.0)], 0.0, None ), ([(2, 1, 1.0)], 0.0, None ),
+     ([(4, 0, 1.0)], 0.0, None), ([(4, 1, 1.0)], 0.0, None ),]
 
     The structure of the dof_constraints list
     is explained here :class:`DofConstraints`
     '''
-    return [([(n, d, 1.0)], val) for n, d in _broadcast_nd(nodes, dirs)]
+    return [([(n, d, 1.0)], fn) for n, d in _broadcast_nd(nodes, dirs)]
 
 
-def link(nodes1, dirs1, c1, nodes2, dirs2, c2, value=0.0):
+def link(nodes1, dirs1, c1, nodes2, dirs2, c2, fn=None):
     '''Return constraints corresponding to the specified arrys of nodes and dirs.
 
     For example, given the call::
@@ -74,5 +74,5 @@ def link(nodes1, dirs1, c1, nodes2, dirs2, c2, value=0.0):
     bc_dofs2 = np.array([[n, d] for n, d in _broadcast_nd(nodes2, dirs2)])
     bc_linked_dofs = np.broadcast_arrays(bc_dofs1,
                                          bc_dofs2)
-    return [([(n1, d1, c1), (n2, d2, c2)], value)
+    return [([(n1, d1, c1), (n2, d2, c2)], fn)
             for (n1, d1), (n2, d2) in zip(*bc_linked_dofs)]

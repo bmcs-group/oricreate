@@ -22,7 +22,7 @@ from oricreate.simulation_step import \
 def create_sim_step():
     # begin
     from oricreate.api import CreasePatternState, CustomCPFactory
-    from oricreate.fu import FuTargetFaces, TF
+    from oricreate.fu import FuTargetFaces, FuTF
     from oricreate.gu import GuConstantLength
     from oricreate.api import r_, s_, t_
 
@@ -42,15 +42,16 @@ def create_sim_step():
     do_something = FormingTask(previous_task=cp_factory)
     # configure the forming task so that it uses
     # the rigid folding kinematics optimization framework RFKOF
-    target_face = TF(F=[r_, s_, t_])
-    fu_target_faces = FuTargetFaces(tf_lst=[(target_face, [0, 1, 4])])
+    target_face = FuTF([r_, s_, t_], [0, 1, 4])
+    fu_target_faces = FuTargetFaces(tf_lst=[target_face])
     # Link the crease factory it with the constraint client
     gu_constant_length = GuConstantLength()
 
     sim_config = SimulationConfig(fu=fu_target_faces,
-                                  gu={'cl': gu_constant_length})
+                                  gu={'cl': gu_constant_length},
+                                  acc=1e-5)
     sim_step = SimulationStep(forming_task=do_something,
-                              config=sim_config, acc=1e-5)
+                              config=sim_config)
 
     sim_step.t = 0.4
     print 'goal function for t = 0.4:', sim_step.get_f()

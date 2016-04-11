@@ -18,7 +18,6 @@ from traits.api import \
 from traitsui.api import \
     View, Item, TabularEditor
 from traitsui.tabular_adapter import TabularAdapter
-
 from crease_pattern_export import \
     CreasePatternExport
 from crease_pattern_operators import \

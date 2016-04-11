@@ -5,7 +5,7 @@ Created on Dec 3, 2015
 '''
 
 from traits.api import \
-    HasTraits, WeakRef, Str, Event
+    HasTraits, WeakRef, Str, Event, Property
 
 from visual3d import \
     Visual3D
@@ -51,3 +51,10 @@ class Viz3D(HasTraits):
         '''Update the visualization within the view3d object.
         '''
         return
+
+    min_max = Property
+    '''Bounding box limits set to none by default. 
+    '''
+
+    def _get_min_max(self):
+        return None, None

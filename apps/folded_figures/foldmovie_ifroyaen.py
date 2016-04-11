@@ -196,7 +196,7 @@ class FoldedStickersFTV(FTV):
         oricreate_mlab_label(m)
 
 if __name__ == '__main__':
-    twist_folding = TwistFolding(n_u=40)
+    twist_folding = TwistFolding(n_steps=40)
     ftv = FoldedStickersFTV(sim_task=twist_folding)
     fta = FTA(ftv=ftv)
     fta.init_view(a=110, e=35, d=11, f=(0, 0, 0), r=160)

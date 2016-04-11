@@ -13,10 +13,10 @@
 # Created on Sep 7, 2011 by: rch
 
 from traits.api import \
-    Float, Property
+    Float, Property, cached_property
 
 from crease_pattern_viz3d import \
-    CreasePatternViz3D
+    CreasePatternViz3D, CreasePatternNodeNumbersViz3D
 import numpy as np
 from oricreate.viz3d import \
     Visual3D
@@ -119,8 +119,12 @@ class CreasePatternPlotHelper(Visual3D):
             cp_pipe.mlab_source.dataset.lines = self.L
         return cp_pipe.mlab_source
 
-    def _viz3d_dict_default(self):
-        return dict(default=CreasePatternViz3D(vis3d=self))
+    viz3d_dict = Property
+
+    @cached_property
+    def _get_viz3d_dict(self):
+        return dict(default=CreasePatternViz3D(vis3d=self),
+                    node_numbers=CreasePatternNodeNumbersViz3D(vis3d=self))
 
     def get_cnstr_pos(self, iteration_step):
         r'''
