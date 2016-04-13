@@ -35,7 +35,7 @@ class AddBoundaryTask(MappingTask):
     '''
     '''
 
-    def _add_boundary_facet(self, N1, N2, dir_=-1, delta=0.1, N_start_idx=0):
+    def x_add_boundary_facet(self, N1, N2, dir_=-1, delta=0.1, N_start_idx=0):
         cp = self.previous_task.formed_object
         x1, x2 = cp.x_0[N1, :], cp.x_0[N2, :]
         dx = x1[:, 0] - x2[:, 0]
@@ -66,7 +66,7 @@ class AddBoundaryTask(MappingTask):
 
         return x_add, L_add, F_add
 
-    def x_add_boundary_facet(self, N1, N2, dir_=-1, delta=0.1, N_start_idx=0):
+    def _add_boundary_facet(self, N1, N2, dir_=-1, delta=0.1, N_start_idx=0):
         cp = self.previous_task.formed_object
         x1, x2 = cp.x_0[N1, :], cp.x_0[N2, :]
         dx = x1[:, 0] - x2[:, 0]
@@ -223,7 +223,8 @@ class BikeShellterFormingProcess(HasTraits):
         sim_config = SimulationConfig(goal_function_type='potential_energy',
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
-                                      acc=1e-5, MAX_ITER=500)
+                                      acc=1e-5, MAX_ITER=500,
+                                      debug_level=0)
         return SimulationTask(previous_task=self.init_displ_task,
                               config=sim_config, n_steps=self.n_steps)
 
@@ -237,9 +238,9 @@ if __name__ == '__main__':
     bsf_process = BikeShellterFormingProcess(L_x=3.0, L_y=2.41, n_x=4,
                                              n_y=12, n_steps=40)
 
-    it = bsf_process.init_displ_task
     mt = bsf_process.mask_task
     ab = bsf_process.add_boundary_task
+    it = bsf_process.init_displ_task
     ft = bsf_process.fold_task
 
 #     import pylab as p
@@ -257,12 +258,10 @@ if __name__ == '__main__':
     ft.sim_history.viz3d.set(tube_radius=0.002)
 
     ftv.add(ft.sim_history.viz3d)
-    ftv.add(ft.config.gu['dofs'].viz3d)
+#    ftv.add(ft.config.gu['dofs'].viz3d)
 #
     it.u_1
     ft.u_1
-
-    # @todo: change the surface to a reasonable value.
 
 #     ftv.plot()
 #     ftv.update(vot=1, force=True)
