@@ -223,7 +223,8 @@ class BikeShellterFormingProcess(HasTraits):
         sim_config = SimulationConfig(goal_function_type='potential_energy',
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
-                                      acc=1e-5, MAX_ITER=500)
+                                      acc=1e-5, MAX_ITER=500,
+                                      debug_level=1)
         return SimulationTask(previous_task=self.init_displ_task,
                               config=sim_config, n_steps=self.n_steps)
 
@@ -240,7 +241,6 @@ if __name__ == '__main__':
     it = bsf_process.init_displ_task
     mt = bsf_process.mask_task
     ab = bsf_process.add_boundary_task
-    mb = bsf_process.mask_boundary_task
     ft = bsf_process.fold_task
 
 #     import pylab as p
