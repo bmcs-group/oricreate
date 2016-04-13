@@ -240,7 +240,6 @@ if __name__ == '__main__':
     it = bsf_process.init_displ_task
     mt = bsf_process.mask_task
     ab = bsf_process.add_boundary_task
-    mb = bsf_process.mask_boundary_task
     ft = bsf_process.fold_task
 
 #     import pylab as p
