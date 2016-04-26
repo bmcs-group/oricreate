@@ -168,8 +168,10 @@ class GuDofConstraintsViz3D(Viz3D):
 
         # spacefactor is giving space between constrains an real node
         # position
-        spacefactor = 0.2 * self.scale_factor
-        scale = self.scale_factor * 2
+
+        spacefactor = 0.02 * self.scale_factor
+        scale = self.scale_factor * 1.0
+        line_width = self.scale_factor * 2
         # fixed cnstr
         cp_f = x_t[cn_f]
         x, y, z = cp_f.T
@@ -183,13 +185,13 @@ class GuDofConstraintsViz3D(Viz3D):
 
         self.cf_arrow = m.quiver3d(x, y, z, U, V, W,
                                    mode='2darrow', color=(0.0, 0.0, 1.0),
-                                   scale_mode='vector', scale_factor=1.0,
-                                   line_width=scale)
+                                   scale_mode='vector', scale_factor=self.scale_factor,
+                                   line_width=line_width)
         self.cf_cross = m.quiver3d(x, y, z, U, V, W, mode='2dcross',
                                    color=(0.0, 0.0, 1.0),
                                    scale_mode='vector',
-                                   scale_factor=1.0,
-                                   line_width=scale)
+                                   scale_factor=self.scale_factor,
+                                   line_width=line_width)
 
         m.pipeline.surface(self.cf_cross)
         m.pipeline.surface(self.cf_arrow)
@@ -210,7 +212,8 @@ class GuDofConstraintsViz3D(Viz3D):
         self.cl_arrow = m.quiver3d(x, y, z, U, V, W, mode='arrow',
                                    color=(1.0, 0.0, 0.0),
                                    scale_mode='vector',
-                                   scale_factor=1.0)
+                                   line_width=line_width,
+                                   scale_factor=self.scale_factor)
         m.pipeline.surface(self.cl_arrow)
 
         # connected contrains
@@ -228,15 +231,15 @@ class GuDofConstraintsViz3D(Viz3D):
 
         self.cc_arrow = m.quiver3d(x, y, z, U, V, W,
                                    mode='2darrow',
-                                   line_width=scale * 0.5,
+                                   line_width=line_width,
                                    color=(0.0, 1.0, 0.0),
                                    scale_mode='vector',
-                                   scale_factor=1.0)
+                                   scale_factor=self.scale_factor)
 
         self.cc_arrow.mlab_source.dataset.lines = cc_c
 
         m.pipeline.surface(self.cc_arrow, color=(0.0, 0.7, 0.0),
-                           line_width=scale * 0.5)
+                           line_width=line_width)
 
     def update(self):
 
@@ -247,8 +250,8 @@ class GuDofConstraintsViz3D(Viz3D):
 
         cn_f, cd_f, cn_c, cc_c, cd_c, cn_l, cd_l = self.cnstr
 
-        spacefactor = 0.2 * self.scale_factor
-        scale = self.scale_factor * 2
+        spacefactor = 0.02 * self.scale_factor
+        scale = self.scale_factor * 0.5
 
         # fixed cnstr
         cp_f = x_t[cn_f]

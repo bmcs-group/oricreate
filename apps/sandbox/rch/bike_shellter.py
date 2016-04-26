@@ -32,39 +32,8 @@ def get_fr(var_, L, H):
 
 
 class AddBoundaryTask(MappingTask):
+    '''Boundary facet to stiffen the shell
     '''
-    '''
-
-    def x_add_boundary_facet(self, N1, N2, dir_=-1, delta=0.1, N_start_idx=0):
-        cp = self.previous_task.formed_object
-        x1, x2 = cp.x_0[N1, :], cp.x_0[N2, :]
-        dx = x1[:, 0] - x2[:, 0]
-        dy = x1[:, 1] - x2[:, 1]
-        dz = np.zeros_like(dy)
-        dirvec = np.c_[dx, dy, dz]
-
-        x4 = x2[:, :]
-        x4[:, 1] += dir_ * delta
-        x3 = np.copy(x4)
-        x3[:, :] += dirvec * 0.82
-
-        x_add = np.vstack([x3, x4])
-        N3 = N_start_idx + np.arange(len(x3))
-        N4 = N_start_idx + len(x3) + np.arange(len(x4))
-
-        L_add = np.vstack([
-            np.array([N1, N3]).T,
-            np.array([N2, N3]).T,
-            np.array([N3, N4]).T,
-            np.array([N2, N4]).T
-        ])
-
-        F_add = np.vstack([
-            np.array([N1, N3, N2]).T,
-            np.array([N3, N4, N2]).T
-        ])
-
-        return x_add, L_add, F_add
 
     def _add_boundary_facet(self, N1, N2, dir_=-1, delta=0.1, N_start_idx=0):
         cp = self.previous_task.formed_object
@@ -72,6 +41,7 @@ class AddBoundaryTask(MappingTask):
         dx = x1[:, 0] - x2[:, 0]
         dy = x1[:, 1] - x2[:, 1]
         dz = np.zeros_like(dy)
+        # direction vector
         dirvec = np.c_[dx, dy, dz]
 
         x4 = x2[:, :]

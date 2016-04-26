@@ -202,10 +202,8 @@ class CamMove(HasStrictTraits):
         return trans_arr
 
     def reset_cam(self, m, a, e, d, f, r):
-        print 'a', a, 'e', e
         m.view(azimuth=a, elevation=e, distance=d, focalpoint=tuple(f))
         m.roll(r)
-        print m.view(), m.roll()
 
     def take(self, ftv):
         for a, e, d, f, r, vot in zip(*self.transition_arr):
@@ -217,7 +215,6 @@ class CamMove(HasStrictTraits):
     def render_take(self, ftv, fname_base, format_, idx_offset):
         im_files = []
         for idx, (a, e, d, f, r, vot) in enumerate(zip(*self.transition_arr)):
-            print 'take for %g' % vot
             ftv.update(vot, force=True)
             # @todo: temporary focal point determination - make it optional
             ff = ftv.get_center()
@@ -314,7 +311,6 @@ FTA = FormingTaskAnim3D
 if __name__ == '__main__':
 
     from visual3d import Visual3D
-    import numpy as np
 
     class PointCloud(Visual3D):
         '''State object

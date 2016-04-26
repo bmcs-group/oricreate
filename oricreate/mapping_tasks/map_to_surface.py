@@ -23,6 +23,8 @@ class MapToSurface(MappingTask):
 
     t_init (float): Time step which is used for the final mapping.
     default = 0.001
+
+
     '''
 
     name = Str('map to surface')
