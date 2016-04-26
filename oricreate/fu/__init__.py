@@ -1,4 +1,6 @@
 
+from fu_bending_energy import \
+    FuBendingEnergy
 from fu_node_dist import \
     FuNodeDist
 from fu_potential_energy import \

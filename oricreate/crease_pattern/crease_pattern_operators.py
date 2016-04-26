@@ -175,6 +175,15 @@ class CreaseLineOperators(HasStrictTraits):
         F_L_vectors = self.F_L_vectors
         return F_L_vectors[self.iL_within_F0]
 
+    iL_vectors_0 = Property(Array, depends_on=INPUT)
+    r'''Get the line vector of an interior line oriented in the
+    sense of counter-clockwise direction of its first adjacent facet.
+    '''
+    @cached_property
+    def _get_iL_vectors_0(self):
+        F_L_vectors = self.F_L_vectors_0
+        return F_L_vectors[self.iL_within_F0]
+
     norm_iL_vectors = Property(Array, depends_on=INPUT)
     r'''Get the normed line vector of an interior line oriented in the
     sense of counter-clockwise direction of its first adjacent facet.
@@ -182,6 +191,17 @@ class CreaseLineOperators(HasStrictTraits):
 
     def _get_norm_iL_vectors(self):
         iL_vectors = self.iL_vectors
+        mag_iL_vectors = np.sqrt(np.einsum('...i,...i->...',
+                                           iL_vectors, iL_vectors))
+        return iL_vectors / mag_iL_vectors[:, np.newaxis]
+
+    norm_iL_vectors_0 = Property(Array, depends_on=INPUT)
+    r'''Get the normed line vector of an interior line oriented in the
+    sense of counter-clockwise direction of its first adjacent facet.
+    '''
+
+    def _get_norm_iL_vectors_0(self):
+        iL_vectors = self.iL_vectors_0
         mag_iL_vectors = np.sqrt(np.einsum('...i,...i->...',
                                            iL_vectors, iL_vectors))
         return iL_vectors / mag_iL_vectors[:, np.newaxis]
@@ -194,12 +214,28 @@ class CreaseLineOperators(HasStrictTraits):
         F_normals = self.F_normals
         return F_normals[self.iL_F]
 
+    iL_F_normals_0 = Property(Array, depends_on=INPUT)
+    r'''Get normals of facets adjacent to an interior line.
+    '''
+    @cached_property
+    def _get_iL_F_normals_0(self):
+        F_normals = self.F_normals_0
+        return F_normals[self.iL_F]
+
     norm_iL_F_normals = Property(Array, depends_on=INPUT)
     r'''Get normed normals of facets adjacent to an interior line.
     '''
     @cached_property
     def _get_norm_iL_F_normals(self):
         norm_F_normals = self.norm_F_normals
+        return norm_F_normals[self.iL_F]
+
+    norm_iL_F_normals_0 = Property(Array, depends_on=INPUT)
+    r'''Get normed normals of facets adjacent to an interior line.
+    '''
+    @cached_property
+    def _get_norm_iL_F_normals_0(self):
+        norm_F_normals = self.norm_F_normals_0
         return norm_F_normals[self.iL_F]
 
     iL_psi = Property(Array, depends_on=INPUT)
@@ -226,6 +262,21 @@ class CreaseLineOperators(HasStrictTraits):
     def _get_iL_psi2(self):
         l = self.norm_iL_vectors
         n = self.norm_iL_F_normals
+        n0, n1 = np.einsum('ijk->jik', n)
+        lxn0 = np.einsum('...i,...j,...kij->...k', l, n0, EPS)
+        T = np.concatenate([l[:, np.newaxis, :],
+                            n0[:, np.newaxis, :],
+                            lxn0[:, np.newaxis, :]], axis=1)
+        n1_ = np.einsum('...ij,...j->...i', T, n1)
+        return np.arcsin(n1_[:, -1])
+
+    iL_psi_0 = Property(Array, depends_on=INPUT)
+    r'''Calculate the dihedral angle for the intermediate configuration.
+    '''
+    @cached_property
+    def _get_iL_psi_0(self):
+        l = self.norm_iL_vectors_0
+        n = self.norm_iL_F_normals_0
         n0, n1 = np.einsum('ijk->jik', n)
         lxn0 = np.einsum('...i,...j,...kij->...k', l, n0, EPS)
         T = np.concatenate([l[:, np.newaxis, :],
@@ -282,12 +333,29 @@ class CreaseFacetOperators(HasStrictTraits):
         n = self.Fa_normals
         return np.sum(n, axis=1)
 
+    F_normals_0 = Property(Array, depends_on=INPUT)
+    r'''Get the normals of the facets.
+    '''
+    @cached_property
+    def _get_F_normals_0(self):
+        n = self.Fa_normals_0
+        return np.sum(n, axis=1)
+
     norm_F_normals = Property(Array, depends_on=INPUT)
     r'''Get the normed normals of the facets.
     '''
     @cached_property
     def _get_norm_F_normals(self):
         n = self.F_normals
+        mag_n = np.sqrt(np.einsum('...i,...i', n, n))
+        return n / mag_n[:, np.newaxis]
+
+    norm_F_normals_0 = Property(Array, depends_on=INPUT)
+    r'''Get the normed normals of the facets.
+    '''
+    @cached_property
+    def _get_norm_F_normals_0(self):
+        n = self.F_normals_0
         mag_n = np.sqrt(np.einsum('...i,...i', n, n))
         return n / mag_n[:, np.newaxis]
 
@@ -341,6 +409,21 @@ class CreaseFacetOperators(HasStrictTraits):
     # =========================================================================
     # Line vectors
     # =========================================================================
+
+    F_L_vectors_0 = Property(Array, depends_on=INPUT)
+    r'''Get the cycled line vectors around the facet
+    The cycle is closed - the first and last vector are identical.
+
+    .. math::
+        v_{pld} \;\mathrm{where} \; p\in\mathcal{F}, l\in (0,1,2), d\in (0,1,2)
+
+    with the indices :math:`p,l,d` representing the facet, line vector around
+    the facet and and vector component, respectively.
+    '''
+    @cached_property
+    def _get_F_L_vectors_0(self):
+        F_N = self.F_N  # F_N is cycled counter clockwise
+        return self.x_0[F_N[:, (1, 2, 0)]] - self.x_0[F_N[:, (0, 1, 2)]]
 
     F_L_vectors = Property(Array, depends_on=INPUT)
     r'''Get the cycled line vectors around the facet
@@ -543,6 +626,17 @@ class CreaseFacetOperators(HasStrictTraits):
 
     def _get_Fa_normals(self):
         x_F = self.x[self.F_N]
+        N_deta_ip = self.Na_deta
+        r_deta = np.einsum('ajK,IKi->Iaij', N_deta_ip, x_F)
+        return np.einsum('Iai,Iaj,ijk->Iak',
+                         r_deta[..., 0], r_deta[..., 1], EPS)
+
+    Fa_normals_0 = Property
+    '''Get normals of the facets.
+    '''
+
+    def _get_Fa_normals_0(self):
+        x_F = self.x_0[self.F_N]
         N_deta_ip = self.Na_deta
         r_deta = np.einsum('ajK,IKi->Iaij', N_deta_ip, x_F)
         return np.einsum('Iai,Iaj,ijk->Iak',
