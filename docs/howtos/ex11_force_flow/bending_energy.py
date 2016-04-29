@@ -1,6 +1,6 @@
 '''
 '''
-from traits.api import implements, Bool
+from traits.api import implements
 
 from custom_factory_mpl import create_cp_factory
 import numpy as np
