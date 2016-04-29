@@ -1,8 +1,8 @@
 r'''
 
-Given are four nodes and two pairs of vectors
+Given are five nodes and two pairs of vectors
 
-.. image:: figs/ex01_vector_angles.png
+.. image:: figs/ex01_vector_acos.png
 
 .. math::
     \bm{x}_1 = \left[ 0, 0 \right]
@@ -13,9 +13,11 @@ Given are four nodes and two pairs of vectors
 
     \bm{x}_4 = \left[ 1, 1 \right]
 
-This example shows the evaluation of the angle cosines :math:`\gamma`
+    \bm{x}_5 = \left[ 1, -1 \right]
+
+This example shows the evaluation of the angle sines :math:`\gamma`
 and angles :math:`\theta` between two pairs of vectors.
-Further, the derivatives of the cosines :math:`\partial \gamma / \partial \bm{u}_1`
+Further, the derivatives of the sines :math:`\partial \gamma / \partial \bm{u}_1`
 and angles :math:`\partial \theta / \partial \bm{u}_1`
 with respect to the displacement of the node :math:`\bm{x}_1`
 are evaluated.
@@ -70,29 +72,9 @@ if __name__ == '__main__':
 
     import numpy as np
     from oricreate.util import \
-        get_gamma, get_gamma_du, get_theta, get_theta_du
+        get_sin_theta
 
-    a = np.array([[1, 0], [1, 0]], dtype='f')
-    b = np.array([[0, 1], [1, 1]], dtype='f')
+    a = np.array([[1, 0, 0], [1, 0, 0], [1, 0, 0]], dtype='f')
+    b = np.array([[0, 1, 0], [1, 1, 0], [1, -1, 0]], dtype='f')
 
-    print('gamma')
-    print(get_gamma(a, b))
-    print('theta')
-    print(get_theta(a, b))
-
-    I = np.diag(np.ones((2,), dtype='f'))
-    # dimensions of the derivatives are stored as:
-    # index of a vector,
-    # component of the vector,
-    # index of a node,
-    # component of a node.
-    a_du = np.array([[[[-1, 0]], [[0, -1]]],
-                     [[[-1, 0]], [[0, -1]]]], dtype='f')
-
-    b_du = np.array([[[[-1, 0]], [[0, -1]]],
-                     [[[-1, 0]], [[0, -1]]]], dtype='f')
-
-    print('gamma_du')
-    print(get_gamma_du(a, a_du, b, b_du))
-    print 'theta_du'
-    print(get_theta_du(a, a_du, b, b_du))
+    print 'gamma', get_sin_theta(a, b)

@@ -214,16 +214,19 @@ class SimulationStep(HasStrictTraits):
         U_save = np.copy(self.U)
         d0 = self.get_f_t(self.U)
         eps = d0 * 1e-4
+        get_f_du_t = None
         get_G_du_t = None
         acc = self.config.acc
         max_iter = self.config.MAX_ITER
 
+        if self.config.use_f_du:
+            get_f_du_t = self.get_f_du_t
         if self.config.use_G_du:
             get_G_du_t = self.get_G_du_t
 
         info = fmin_slsqp(self.get_f_t,
                           self.U,
-                          fprime=self.get_f_du_t,
+                          fprime=get_f_du_t,
                           f_eqcons=self.get_G_t,
                           fprime_eqcons=get_G_du_t,
                           acc=acc, iter=max_iter,

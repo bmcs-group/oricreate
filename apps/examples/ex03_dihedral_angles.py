@@ -2,7 +2,7 @@ r'''
 
 Given are four nodes and two pairs of vectors
 
-.. image:: figs/ex01_vector_angles.png
+.. image:: figs/ex01_vector_acos.png
 
 .. math::
     \bm{x}_1 = \left[ 0, 0 \right]
@@ -58,7 +58,7 @@ Given the vectors above as::
 the cosines between the vector pairs obtained using the methods
 defined above deliver the following values::
 
-    In [3]: print get_gamma(a, b)
+    In [3]: print get_cos_theta(a, b)
     [ 0.          0.70710677]
 
 The values of angles between the vector pairs are::
@@ -69,7 +69,7 @@ The values of angles between the vector pairs are::
 The derivatives of the cosines with respect to the displacement of the
 node :math:`\bm{u}_1` are::
 
-    In [5]: print get_gamma_du(a, a_du, b, b_du)
+    In [5]: print get_cos_theta_du(a, a_du, b, b_du)
     [[[-1.         -1.        ]]
      [[-0.35355338 -0.35355338]]]
 
@@ -85,12 +85,12 @@ if __name__ == '__main__':
 
     import numpy as np
     from oricreate.util import \
-        get_gamma, get_gamma_du, get_theta, get_theta_du
+        get_cos_theta, get_cos_theta_du, get_theta, get_theta_du
 
     a = np.array([[1, 0], [1, 0]], dtype='f')
     b = np.array([[0, 1], [1, 1]], dtype='f')
 
-    print get_gamma(a, b)
+    print get_cos_theta(a, b)
     print get_theta(a, b)
 
     a_du = np.array([[
@@ -114,6 +114,6 @@ if __name__ == '__main__':
         dtype='f')
 
     print 'gamma_du'
-    print get_gamma_du(a, a_du, b, b_du)
+    print get_cos_theta_du(a, a_du, b, b_du)
 
     print(get_theta_du(a, a_du, b, b_du))

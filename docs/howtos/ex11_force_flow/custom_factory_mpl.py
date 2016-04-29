@@ -13,7 +13,7 @@ def create_cp_factory():
     cp = CreasePatternState(X=[[0, 0, 0],
                                [1, 0, 0],
                                [1, 1, 0],
-                               [2, 1, 0.5]
+                               [2, 1, 0]
                                ],
                             L=[[0, 1], [1, 2], [2, 0], [1, 3], [3, 2]],
                             F=[[0, 1, 2], [1, 3, 2]]
@@ -22,6 +22,7 @@ def create_cp_factory():
     cp_factory = CustomCPFactory(formed_object=cp)
     # end
     return cp_factory
+
 
 if __name__ == '__main__':
     cp_factory = create_cp_factory()

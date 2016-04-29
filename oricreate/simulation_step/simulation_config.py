@@ -95,6 +95,10 @@ class SimulationConfig(HasStrictTraits):
     r'''Required accuracy.
     '''
 
+    use_f_du = Bool(True, auto_set=False, enter_set=True)
+    r'''Switch the use of goal function derivatives on.
+    '''
+
     use_G_du = Bool(True, auto_set=False, enter_set=True)
     r'''Switch the use of constraint derivatives on.
     '''

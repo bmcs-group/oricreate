@@ -7,11 +7,11 @@ Created on Aug 28, 2014
 import numpy as np
 
 
-def get_gamma(a, b):
+def get_cos_theta(a, b):
     r'''Get the cosine of an angle between two vectors :math:`a` and :math:`b`
 
     .. math::
-        \gamma =
+        \gamma_c =
         \cos{(\theta)}
         =
         \frac{ \dotp{a}{b} }
@@ -33,7 +33,7 @@ def get_gamma(a, b):
     <http://docs.scipy.org/doc/numpy/reference/generated/numpy.einsum.html>`_.
     Given two compatible arrays (n-dimensional) :math:`a`
     and :math:`b` of vectors with last index :math:`d`
-    labeling their spatial component the array :math:`\gamma`
+    labeling their spatial component the array :math:`\gamma_c`
     of angle cosines between each pair of vectors in :math:`a`, :math:`b`.
     gets calculated as::
 
@@ -50,7 +50,8 @@ def get_gamma(a, b):
     c_ab = ab / (sqrt_aa * sqrt_bb)
     return c_ab
 
-def get_gamma_du(a, a_du, b, b_du):
+
+def get_cos_theta_du(a, a_du, b, b_du):
     r'''Get the derivatives of directional cosines
     between two vectors :math:`a` and :math:`b`.
 
@@ -60,7 +61,7 @@ def get_gamma_du(a, a_du, b, b_du):
     a and b with respect to the node displacement du.
 
     .. math::
-        \pard{ \gamma }
+        \pard{ \gamma_c }
             {u_{Ie}}
         =
         \frac{1}
@@ -80,7 +81,7 @@ def get_gamma_du(a, a_du, b, b_du):
     the expression reduces to a form
 
     .. math::
-        \pard{ \gamma }
+        \pard{ \gamma_c }
             {u_{Ie}}
         =
         \frac{1}
@@ -91,7 +92,7 @@ def get_gamma_du(a, a_du, b, b_du):
             -
             \pard{ \left( \norm{a}\norm{b} \right) }
                 {u_{Ie}}\;
-            \gamma
+            \gamma_c
         \right]
         :label: gamma_du
 
@@ -157,7 +158,7 @@ def get_gamma_du(a, a_du, b, b_du):
     ab_du = (np.einsum('...dIe,...d->...Ie', a_du, b) +
              np.einsum('...dIe,...d->...Ie', b_du, a))
     gamma_norm_a_du_x_norm_b = np.einsum('...,...dIe,...d->...Ie',
-                                     gamma * norm_b / norm_a, a_du, a)
+                                         gamma * norm_b / norm_a, a_du, a)
     gamma_norm_b_du_x_norm_a = np.einsum('...,...dIe,...d->...Ie',
                                          gamma * norm_a / norm_b, b_du, b)
     gamma_norm_a_x_norm_b_du = (gamma_norm_a_du_x_norm_b +
@@ -168,7 +169,8 @@ def get_gamma_du(a, a_du, b, b_du):
 
     return gamma_du
 
-def get_gamma_du2(a, a_du, b, b_du):
+
+def get_cos_theta_du2(a, a_du, b, b_du):
     r'''Given two arrays (n-dimensional) of vectors a, b and their
     derivatives a_du and b_du with respect to the nodal displacments du
     return the derivatives of the mutual angles theta between
@@ -185,60 +187,64 @@ def get_gamma_du2(a, a_du, b, b_du):
     gamma_bb__aa = gamma * sqrt_bb / sqrt_aa
     gamma_aa__bb = gamma * sqrt_aa / sqrt_bb
     gamma_aa_bb_du = (np.einsum('...,...iKj,...i->...Kj',
-                               gamma_bb__aa, a_du, a) +
-                     np.einsum('...,...iKj,...i->...Kj',
-                               gamma_aa__bb, b_du, b))
+                                gamma_bb__aa, a_du, a) +
+                      np.einsum('...,...iKj,...i->...Kj',
+                                gamma_aa__bb, b_du, b))
 
-    gamma_du = np.einsum('...,...Kj->...Kj', 1. / sqrt_aa_x_sqrt_bb, (ab_du - gamma_aa_bb_du))
+    gamma_du = np.einsum(
+        '...,...Kj->...Kj', 1. / sqrt_aa_x_sqrt_bb, (ab_du - gamma_aa_bb_du))
     return gamma_du
+
 
 def get_theta(a, b):
     r'''
     Get the angle between two vectors :math:`a` and :math:`b`.
-    Using the function ``get_gamma(a,b)`` delivering the cosine of the angle
+    Using the function ``get_cos_theta(a,b)`` delivering the cosine of the angle
     this method just evaluates the expression
 
     .. math::
-        \theta = \arccos{( \gamma )}
+        \theta = \arccos{( \gamma_c )}
         :label: theta
 
     realized by calling the vectorized numpy function::
 
-        theta = np.arccos(\gamma)
+        theta = np.arccos(gamma_c)
 
     '''
-    gamma = get_gamma(a, b)
-    theta = np.arccos(gamma)
+    gamma_c = get_cos_theta(a, b)
+    theta = np.arccos(gamma_c)
     return theta
+
 
 def get_theta_du(a, a_du, b, b_du):
     r'''
     Get the derivative of the angle between two vectors :math:`a` and :math:`b`
     with respect to ``du`` using the supplied chain derivatives ``a_du, b_du``.
-    Using the function ``get_gamma(a,b)`` delivering the cosine of the angle
+    Using the function ``get_cos_theta(a,b)`` delivering the cosine of the angle
     this method evaluates the expression
 
     .. math::
         \frac{\partial \theta}{\partial u_{Ie}}
         =
-        \frac{\partial \theta}{\partial \gamma}
+        \frac{\partial \theta}{\partial \gamma_c}
         \cdot
-        \frac{\partial \gamma}{\partial u_{Ie}}
+        \frac{\partial \gamma_c}{\partial u_{Ie}}
         :label: theta_du
 
     where
 
     .. math::
 
-        \frac{\partial \theta}{\partial \gamma}
+        \frac{\partial \theta}{\partial \gamma_c}
         =
-        - \frac{1}{ \sqrt{ 1 - (\gamma^2}}
+        - \frac{1}{ \sqrt{ 1 - \gamma_c^2}}
 
     ::
 
         theta_du = - 1 / np.sqrt(1 - gamma * gamma) * gamma_du
     '''
-    gamma = get_gamma(a, b)
-    gamma_du = get_gamma_du(a, a_du, b, b_du)
-    theta_du = np.einsum('...,...Ie->...Ie', -1. / np.sqrt(1. - gamma ** 2), gamma_du)
+    gamma = get_cos_theta(a, b)
+    gamma_du = get_cos_theta_du(a, a_du, b, b_du)
+    theta_du = np.einsum(
+        '...,...Ie->...Ie', -1. / np.sqrt(1. - gamma ** 2), gamma_du)
     return theta_du
