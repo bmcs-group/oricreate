@@ -161,7 +161,7 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
     '''
     @cached_property
     def _get_fold_task(self):
-        x_1 = self.init_displ_task.x_1
+        self.init_displ_task.x_1
 #        cp = self.init_displ_task.formed_object
 
 #        print 'nodes', x_1[(0, 1, 2, 20, 21, 22), 2]
@@ -193,6 +193,33 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
                                       debug_level=0)
         return SimulationTask(previous_task=self.init_displ_task,
                               config=sim_config, n_steps=self.n_steps)
+
+    def generate_scaffolding(self):
+        ft = self.fold_task
+        cp = ft.formed_object
+        x_1 = ft.x_1
+        L = cp.L
+        x_L = x_1[L]
+        xx_L = x_L[:, :, 0]
+        print 'x_L', x_L.shape
+        x_L_ordered = np.array([np.min(xx_L, axis=1), np.max(xx_L, axis=1)])
+        x_m = self.L_x / 2.0
+        print x_L_ordered.shape
+        L_mid_idx = np.where(
+            (x_L_ordered[0, :] < x_m) & (x_L_ordered[1, :] > x_m))
+        print 'line indexes', L_mid_idx
+        x_L_cut_idx = cp.L[L_mid_idx[0]]
+        x_L_cut = x_1[x_L_cut_idx]
+        print 'line end nodes', x_L_cut.shape
+        x_values = x_L_cut[:, :, 1].flatten()
+        y_values = x_L_cut[:, :, 2].flatten()
+        print x_values
+        print 'y'
+        print y_values
+        import pylab as p
+        ax = p.axes()
+        ax.plot(x_values, y_values)
+        p.show()
 
 
 class DoublyCurvedYoshiFormingProcessFTV(FTV):
@@ -235,6 +262,8 @@ if __name__ == '__main__':
 #
     it.u_1
     ft.u_1
+
+    bsf_process.generate_scaffolding()
 
     ftv.plot()
     ftv.update(vot=1, force=True)

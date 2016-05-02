@@ -86,14 +86,6 @@ class SimulationTask(FormingTask):
     def _get_cp(self):
         return self.formed_object
 
-    X_0 = Property(depends_on='source')
-    '''Initial configuration given as the last
-    configuration of the previous FormingTask step.
-    '''
-    @cached_property
-    def _get_X_0(self):
-        return self.source.X_1
-
     # =========================================================================
     # Geometric data
     # =========================================================================
@@ -121,7 +113,8 @@ class SimulationTask(FormingTask):
     '''
 
     def _get_x_1(self):
-        return self.x_0 + self.u_1
+        x_0 = self.cp.x_0
+        return x_0 + self.u_1
 
     # ==========================================================================
     # Solver parameters
