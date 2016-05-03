@@ -222,14 +222,10 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
         svects = right_points - left_points
         norm_svects = np.linalg.norm(svects, axis=1)
         l_idx = np.where(norm_svects > 0.01)[0]
-        svects[l_idx]
-        print norm_svects[l_idx]
 
         last_x = sx_values[l_idx[-1] + 1]
         last_y = sy_values[l_idx[-1] + 1]
         x, y = sx_values[l_idx], sy_values[l_idx]
-
-#        print 'last', last_x, last_y
 
         return np.hstack([x, [last_x]]), np.hstack([y, [last_y]])
 

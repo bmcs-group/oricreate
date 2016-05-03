@@ -1,46 +1,14 @@
 '''
 '''
-from traits.api import implements
+from traits.api import \
+    implements, List, Tuple, Float
 
 from custom_factory_mpl import create_cp_factory
 import numpy as np
 from oricreate.api import GuConstantLength, GuDofConstraints, \
     SimulationConfig, SimulationTask, fix, FTV
-from oricreate.fu.fu import \
-    Fu
-from oricreate.opt import \
-    IFu
-
-
-class FuStoredEnergy(Fu):
-
-    '''Optimization criteria based on minimum potential energy of gravity.
-
-    This plug-in class lets the crease pattern operators evaluate the
-    integral over the spatial domain in an instantaneous configuration
-    '''
-
-    implements(IFu)
-
-    def get_f(self, t=0):
-        '''Get the potential energy of gravity.
-        '''
-        cp = self.forming_task.formed_object
-        phi_iL = cp.iL_psi2 - cp.iL_psi_0
-        stored_energy = np.einsum(
-            '...i,...i->...', phi_iL**2, cp.L_lengths) / 2.0
-        F_ext = np.zeros_like(cp.u, dtype='float_')
-        F_ext[3, 2] = -4.0
-        ext_energy = np.einsum(
-            '...i,...i->...', F_ext.flatten(), cp.u.flatten())
-        tot_energy = stored_energy - ext_energy
-        print 'tot_energy', tot_energy
-        return tot_energy
-
-    def get_f_du(self, t=0):
-        '''Get the derivatives with respect to individual displacements.
-        '''
-        return self.forming_task.formed_object.V_du
+from oricreate.fu import \
+    FuTotalPotentialEnergy
 
 if __name__ == '__main__':
     cp_factory_task = create_cp_factory()
@@ -60,16 +28,28 @@ if __name__ == '__main__':
                                   gu={'cl': gu_constant_length,
                                       'dofs': gu_dof_constraints},
                                   acc=1e-5, MAX_ITER=100)
-    sim_config._fu = FuStoredEnergy()
+    fu_tot_poteng = FuTotalPotentialEnergy(kappa=10,
+                                           F_ext_list=[(3, 2, -1), (4, 2, -1)])
+    sim_config._fu = fu_tot_poteng
     sim_task = SimulationTask(previous_task=cp_factory_task,
                               config=sim_config,
                               n_steps=1)
 
-    cp.u[3, 2] = 0.001
+    cp.u[4, 2] = 0.001
     print 'kinematic simulation: u', sim_task.u_1
+
+    cp = sim_task.formed_object
+    iL_phi = cp.iL_psi2 - cp.iL_psi_0
+    print 'phi',  iL_phi
+    iL_length = np.linalg.norm(cp.iL_vectors, axis=1)
+    iL_m = sim_config._fu.kappa * iL_phi * iL_length
+
+    print 'moments', iL_m
 
     ftv = FTV()
     ftv.add(sim_task.formed_object.viz3d)
+    ftv.add(gu_dof_constraints.viz3d)
+    ftv.add(fu_tot_poteng.viz3d)
     ftv.plot()
     ftv.update(vot=1, force=True)
     ftv.show()
