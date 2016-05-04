@@ -232,17 +232,39 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
     scaff_positions = Array
 
     def _scaff_positions_default(self):
+
         pos = np.array(
             [-1.065, -0.77, -0.45, -0.25, 0.25, 0.45, 0.77, 1.065], dtype='float_')
         return pos
 
+    scaff_ref_nodes = Array
+
+    def _scaff_ref_nodes_default(self):
+        return np.array([14, 41, 18, 45, 21], dtype='int_')
+
     def generate_scaffoldings(self):
 
         L_mid = 1.5
-        pos = self.scaff_positions
-        middle = (pos[-1] + pos[0]) / 2.0
-        offset = L_mid - middle
-        centered_pos = pos + offset
+
+        ft = self.fold_task
+        x_1 = ft.x_1
+        x_42 = x_1[42][0]
+
+        ref_lines = np.c_[self.scaff_ref_nodes[:-1], self.scaff_ref_nodes[1:]]
+        print 'ref', ref_lines
+        ref_midpoints = (x_1[ref_lines[:, 1]] + x_1[ref_lines[:, 0]]) / 2.0
+        print 'mp', ref_midpoints[:, 0]
+
+        scaff_positions = ref_midpoints[:, 0] - L_mid
+        print 'sp', scaff_positions
+
+        #scaff_positions = self.scaff_positions
+        scaff_positions = np.hstack([[0, x_42 - L_mid], scaff_positions])
+
+        #centered_pos = pos + offset
+
+        centered_pos = np.hstack([[L_mid, x_42], ref_midpoints[:, 0]])
+        print 'cp', centered_pos
 
         scaff_plates = []
         min_max = []
@@ -268,7 +290,7 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
         import pylab as p
 
         tdir = tempfile.mkdtemp()
-        for idx, (x_y, s_pos) in enumerate(zip(scaff_plates_0, self.scaff_positions)):
+        for idx, (x_y, s_pos) in enumerate(zip(scaff_plates_0, scaff_positions)):
             x, y = x_y
             x_close = [np.max(x), np.min(x)]
             y_close = [0, 0]
@@ -284,7 +306,7 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
             for x_v, y_v in zip(x, y):
                 ax.annotate('%5.3f,%5.3f' %
                             (x_v, y_v), xy=(x_v, y_v), rotation=90)
-            ax.annotate('scaffold x - position %5.3f' % s_pos, xy=(0, 0.04))
+            ax.annotate('scaffold x - position %5.3f' % -s_pos, xy=(0, 0.04))
 
             fname_path = os.path.join(tdir, 'scaff%d.pdf' % idx)
             print 'saving in %s', fname_path
@@ -319,7 +341,7 @@ if __name__ == '__main__':
 #     ftv.add(it.formed_object.viz3d)
 #     ftv.add(it.formed_object.viz3d_dict['node_numbers'], order=5)
     ft.formed_object.viz3d.set(tube_radius=0.002)
-#    ftv.add(ft.formed_object.viz3d_dict['node_numbers'], order=5)
+    ftv.add(ft.formed_object.viz3d_dict['node_numbers'], order=5)
     ftv.add(ft.formed_object.viz3d)
     ft.config.gu['dofs'].viz3d.scale_factor = 0.5
     ftv.add(ft.config.gu['dofs'].viz3d)
