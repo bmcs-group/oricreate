@@ -155,7 +155,7 @@ class CreaseLineOperators(HasStrictTraits):
         L_vectors_du[L_idx, :, L_N1_idx, :] = -DELTA
         return L_vectors_du
 
-    iL_within_F0 = Property
+    iL_within_F0 = Property(Array, depends_on=INPUT)
     r'''Index of a crease line within the first adjacent facet
     '''
     @cached_property
@@ -163,8 +163,11 @@ class CreaseLineOperators(HasStrictTraits):
         iL_F0 = self.iL_F[:, 0]
         L_of_F0_of_iL = self.F_L[iL_F0, :]
         iL = self.iL
-        iL_within_F0 = np.where(iL[:, np.newaxis] == L_of_F0_of_iL)
-        return iL_within_F0
+        #iL_within_F0 = np.where(iL[:, np.newaxis] == L_of_F0_of_iL)
+        L_within_F0, ell_within_F0 = np.where(
+            iL[:, np.newaxis] == L_of_F0_of_iL)
+        F0_iL = (iL_F0[L_within_F0], ell_within_F0)
+        return F0_iL
 
     iL_vectors = Property(Array, depends_on=INPUT)
     r'''Get the line vector of an interior line oriented in the

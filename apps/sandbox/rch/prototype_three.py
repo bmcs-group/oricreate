@@ -16,6 +16,8 @@ from oricreate.api import YoshimuraCPFactory, \
     FTV, FTA
 from oricreate.crease_pattern.crease_pattern_state import CreasePatternState
 from oricreate.forming_tasks.forming_task import FormingTask
+from oricreate.fu import \
+    FuTotalPotentialEnergy
 from oricreate.mapping_tasks.mask_task import MaskTask
 import sympy as sp
 
@@ -194,6 +196,49 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
         return SimulationTask(previous_task=self.init_displ_task,
                               config=sim_config, n_steps=self.n_steps)
 
+    load_task = Property(Instance(FormingTask))
+    '''Configure the simulation task.
+    '''
+    @cached_property
+    def _get_load_task(self):
+        self.fold_task.x_1
+        u_max = self.u_x
+        cp = self.fold_task.formed_object
+
+#         print 'F', cp.F.shape
+#         iL_F0 = cp.iL_F[:, 0]
+#         print 'iL_F0', iL_F0.shape
+#         L_of_F0_of_iL = cp.F_L[iL_F0, :]
+#         print 'L_of_F0_of_iL', L_of_F0_of_iL
+#         iL = cp.iL
+#         print 'iL', iL
+#         L_within_F0, ell_within_F0 = np.where(
+#             iL[:, np.newaxis] == L_of_F0_of_iL)
+#         print 'iL_within_F0', L_within_F0
+#         F0_iL = (iL_F0[L_within_F0], ell_within_F0)
+#         print 'F0_iL', F0_iL
+#         print 'F_L_vectors', cp.F_L_vectors.shape
+#         print 'iF_L_vectors', cp.F_L_vectors[F0_iL].shape
+        fixed_nodes = fix(
+            [0, 1, 2, 20, 21, 22], (0, 1, 2))
+
+        dof_constraints = fixed_nodes
+        gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
+        gu_constant_length = GuConstantLength()
+        sim_config = SimulationConfig(goal_function_type='potential_energy',
+                                      gu={'cl': gu_constant_length,
+                                          'dofs': gu_dof_constraints},
+                                      acc=1e-1, MAX_ITER=1000,
+                                      debug_level=0)
+        F_ext_list = [(11, 2, -0.1)]
+        fu_tot_poteng = FuTotalPotentialEnergy(kappa=100000,
+                                               F_ext_list=F_ext_list)  # (2 * n, 2, -1)])
+        sim_config._fu = fu_tot_poteng
+        st = SimulationTask(previous_task=self.init_displ_task,
+                            config=sim_config, n_steps=1)
+        fu_tot_poteng.forming_task = st
+        return st
+
     def generate_scaffolding(self, x_scaff_position):
 
         ft = self.fold_task
@@ -329,6 +374,7 @@ if __name__ == '__main__':
     ab = bsf_process.add_boundary_task
     it = bsf_process.init_displ_task
     ft = bsf_process.fold_task
+    lt = bsf_process.load_task
 
 #     import pylab as p
 #     ax = p.axes()
@@ -346,6 +392,8 @@ if __name__ == '__main__':
     ft.config.gu['dofs'].viz3d.scale_factor = 0.5
     ftv.add(ft.config.gu['dofs'].viz3d)
 
+    ftv.add(lt.config.fu.viz3d)
+
 #    ftv.add(ft.sim_history.viz3d_dict['node_numbers'], order=5)
 #    ft.sim_history.viz3d.set(tube_radius=0.002)
 
@@ -355,8 +403,9 @@ if __name__ == '__main__':
 #
     it.u_1
     ft.u_1
+    lt.u_1
 
-    bsf_process.generate_scaffoldings()
+    # bsf_process.generate_scaffoldings()
 
     ftv.plot()
     ftv.update(vot=1, force=True)
