@@ -7,7 +7,7 @@ Created on Apr 3, 2015
 
 import matplotlib.pyplot as plt
 from oricreate.api import YoshimuraCPFactory
-cp_factory = YoshimuraCPFactory(L_x=4, L_y=1, n_x=2, n_y=2)
+cp_factory = YoshimuraCPFactory(L_x=4, L_y=1, n_x=5, n_y=2)
 cp = cp_factory.formed_object
 print 'list of sector angle arrays\n', cp.iN_theta
 print 'facet area', cp.F_area

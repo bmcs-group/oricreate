@@ -61,7 +61,8 @@ class FormingTask(HasStrictTraits):
     @cached_property
     def _get_formed_object(self):
         if self.previous_task:
-            fo = copy.deepcopy(self.previous_task.formed_object)
+            prev_fo = self.previous_task.formed_object
+            fo = copy.deepcopy(prev_fo)
             return fo
         else:
             raise NotImplementedError('No pre-fabrication method'
