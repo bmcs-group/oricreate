@@ -13,7 +13,6 @@ from oricreate.fu import \
 if __name__ == '__main__':
     cp_factory_task = create_cp_factory()
     cp = cp_factory_task.formed_object
-    print 'x', cp.x
 
     # Link the crease factory it with the constraint client
     gu_constant_length = GuConstantLength()
