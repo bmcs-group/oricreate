@@ -204,7 +204,7 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
         self.fold_task.x_1
 
         fixed_nodes = fix(
-            [0, 1, 2, 20, 21, 22], (0, 1, 2))
+            [0, 2, 20, 22], (0, 1, 2))
 
         dof_constraints = fixed_nodes
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
@@ -214,13 +214,16 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
                                           'dofs': gu_dof_constraints},
                                       acc=1e-3, MAX_ITER=1000,
                                       debug_level=0)
-        F_ext_list = [(11, 2, -0.001)]
-        fu_tot_poteng = FuTotalPotentialEnergy(kappa=10000,
+        F_ext_list = []  # (10, 0, 10)]
+        fu_tot_poteng = FuTotalPotentialEnergy(kappa=100,
                                                F_ext_list=F_ext_list)  # (2 * n, 2, -1)])
         sim_config._fu = fu_tot_poteng
         st = SimulationTask(previous_task=self.fold_task,
                             config=sim_config, n_steps=1)
         fu_tot_poteng.forming_task = st
+        cp = st.formed_object
+        cp.x_0 = self.fold_task.x_1
+        cp.u[:, :] = 0.0000
         return st
 
     def generate_scaffolding(self, x_scaff_position):
@@ -387,6 +390,10 @@ if __name__ == '__main__':
 #
     it.u_1
     ft.u_1
+
+    cp = lt.formed_object
+    cp.u[:, :] = 0.00001
+
     lt.u_1
 
     # bsf_process.generate_scaffoldings()

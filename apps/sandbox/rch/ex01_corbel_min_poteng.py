@@ -133,29 +133,9 @@ def create_cp_factory(n=4):
 
 if __name__ == '__main__':
 
-    n = 10
+    n = 6
     cp_factory_task = create_cp_factory(n=n)
     cp = cp_factory_task.formed_object
-
-#     import matplotlib.pyplot as plt
-#     fig, ax = plt.subplots()
-#     cp.plot_mpl(ax, facets=True)
-#     plt.tight_layout()
-#     plt.show()
-
-    iL_F0 = cp.iL_F[:, 0]
-    print 'iL_F0', iL_F0.shape
-    L_of_F0_of_iL = cp.F_L[iL_F0, :]
-    print 'L_of_F0_of_iL.shape', L_of_F0_of_iL.shape
-    print 'L_of_F0_of_iL', L_of_F0_of_iL
-    iL = cp.iL
-    print 'iL', iL
-    iL_within_F0 = np.where(iL[:, np.newaxis] == L_of_F0_of_iL)
-    print 'F', cp.F.shape
-    print 'F_L_vectors', cp.F_L_vectors.shape
-    print 'iL_within_F0', iL_within_F0
-    print 'iL_vectors', cp.iL_vectors.shape
-    print 'iF_L_vectors', cp.F_L_vectors[iL_within_F0]
 
     # Link the crease factory it with the constraint client
     gu_constant_length = GuConstantLength()
@@ -180,6 +160,10 @@ if __name__ == '__main__':
     sim_task = SimulationTask(previous_task=cp_factory_task,
                               config=sim_config,
                               n_steps=1)
+    cp = sim_task.formed_object
+    cp.x_0 = sim_task.previous_task.x_1
+    cp.u[:, :] = 0.0
+    fu_tot_poteng.forming_task = sim_task
 
     cp.u[1:n + 1, 2] = np.linspace(0, -0.001, n)
     cp.u[n + 1:(2 * n) + 1, 2] = np.linspace(0, -0.0005, n)
