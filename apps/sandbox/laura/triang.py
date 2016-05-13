@@ -2,7 +2,7 @@ import numpy as np
 
 #define quantity of facets 
 #number of facets=2n-1
-n = 4
+n = 3
 
 #create coordinates
         
