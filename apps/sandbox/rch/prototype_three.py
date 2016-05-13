@@ -202,23 +202,7 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
     @cached_property
     def _get_load_task(self):
         self.fold_task.x_1
-        u_max = self.u_x
-        cp = self.fold_task.formed_object
 
-#         print 'F', cp.F.shape
-#         iL_F0 = cp.iL_F[:, 0]
-#         print 'iL_F0', iL_F0.shape
-#         L_of_F0_of_iL = cp.F_L[iL_F0, :]
-#         print 'L_of_F0_of_iL', L_of_F0_of_iL
-#         iL = cp.iL
-#         print 'iL', iL
-#         L_within_F0, ell_within_F0 = np.where(
-#             iL[:, np.newaxis] == L_of_F0_of_iL)
-#         print 'iL_within_F0', L_within_F0
-#         F0_iL = (iL_F0[L_within_F0], ell_within_F0)
-#         print 'F0_iL', F0_iL
-#         print 'F_L_vectors', cp.F_L_vectors.shape
-#         print 'iF_L_vectors', cp.F_L_vectors[F0_iL].shape
         fixed_nodes = fix(
             [0, 1, 2, 20, 21, 22], (0, 1, 2))
 
@@ -228,13 +212,13 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
         sim_config = SimulationConfig(goal_function_type='potential_energy',
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
-                                      acc=1e-1, MAX_ITER=1000,
+                                      acc=1e-3, MAX_ITER=1000,
                                       debug_level=0)
-        F_ext_list = [(11, 2, -0.1)]
-        fu_tot_poteng = FuTotalPotentialEnergy(kappa=100000,
+        F_ext_list = [(11, 2, -0.001)]
+        fu_tot_poteng = FuTotalPotentialEnergy(kappa=10000,
                                                F_ext_list=F_ext_list)  # (2 * n, 2, -1)])
         sim_config._fu = fu_tot_poteng
-        st = SimulationTask(previous_task=self.init_displ_task,
+        st = SimulationTask(previous_task=self.fold_task,
                             config=sim_config, n_steps=1)
         fu_tot_poteng.forming_task = st
         return st
@@ -386,11 +370,11 @@ if __name__ == '__main__':
 #     it.formed_object.viz3d.set(tube_radius=0.002)
 #     ftv.add(it.formed_object.viz3d)
 #     ftv.add(it.formed_object.viz3d_dict['node_numbers'], order=5)
-    ft.formed_object.viz3d.set(tube_radius=0.002)
-    ftv.add(ft.formed_object.viz3d_dict['node_numbers'], order=5)
-    ftv.add(ft.formed_object.viz3d)
-    ft.config.gu['dofs'].viz3d.scale_factor = 0.5
-    ftv.add(ft.config.gu['dofs'].viz3d)
+    lt.formed_object.viz3d.set(tube_radius=0.002)
+    ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
+    ftv.add(lt.formed_object.viz3d)
+    lt.config.gu['dofs'].viz3d.scale_factor = 0.5
+    ftv.add(lt.config.gu['dofs'].viz3d)
 
     ftv.add(lt.config.fu.viz3d)
 
