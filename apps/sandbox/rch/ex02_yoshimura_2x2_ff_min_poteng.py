@@ -140,7 +140,7 @@ if __name__ == '__main__':
     cp = lt.formed_object
     print 'lt_x0', cp.x_0
     print 'lt_u', cp.u
-    cp.u[(2, 3), 2] = -0.001
+    cp.u[(2, 3), 2] = 0.001
     print 'lt.u_1', lt.u_1
 
     cp = lt.formed_object
