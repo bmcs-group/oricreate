@@ -133,10 +133,9 @@ def create_cp_factory(n=4):
 
 if __name__ == '__main__':
 
-    n = 2
+    n = 6
     cp_factory_task = create_cp_factory(n=n)
     cp = cp_factory_task.formed_object
-    cp.x_0[4, 2] = 0.3
 
     # Link the crease factory it with the constraint client
     gu_constant_length = GuConstantLength()
@@ -161,10 +160,13 @@ if __name__ == '__main__':
     sim_task = SimulationTask(previous_task=cp_factory_task,
                               config=sim_config,
                               n_steps=1)
+    cp = sim_task.formed_object
+    cp.x_0 = sim_task.previous_task.x_1
+    cp.u[:, :] = 0.0
+    fu_tot_poteng.forming_task = sim_task
 
-    #cp.u[1:n + 1, 2] = np.linspace(0, 0.001, n)
-    cp.u[:, :] = 0.001
-    #cp.u[n + 1:(2 * n) + 1, 2] = np.linspace(0, -0.0005, n)
+    cp.u[1:n + 1, 2] = np.linspace(0, -0.001, n)
+    cp.u[n + 1:(2 * n) + 1, 2] = np.linspace(0, -0.0005, n)
     print 'kinematic simulation: u', sim_task.u_1
 
     cp = sim_task.formed_object
@@ -177,7 +179,6 @@ if __name__ == '__main__':
 
     ftv = FTV()
     ftv.add(sim_task.formed_object.viz3d)
-    ftv.add(sim_task.formed_object.viz3d_dict['node_numbers'], order=5)
     ftv.add(gu_dof_constraints.viz3d)
     ftv.add(fu_tot_poteng.viz3d)
     ftv.plot()
