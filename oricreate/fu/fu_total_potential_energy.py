@@ -14,7 +14,7 @@
 
 from traits.api import \
     implements,  List, Tuple, Float, \
-    cached_property, Property
+    cached_property, Property, Array
 
 from fu import \
     Fu
@@ -39,7 +39,27 @@ class FuTotalPotentialEnergy(Fu, Visual3D):
 
     F_ext_list = List(Tuple, [])
 
-    kappa = Float(1.0)
+    _kappa_arr = Array(float, value=[])
+    _kappa = Float(1.0)
+
+    kappa = Property()
+
+    def _set_kappa(self, value):
+        if isinstance(value, np.ndarray):
+            self._kappa_arr = value
+        elif isinstance(value, float):
+            self._kappa = value
+        else:
+            raise ValueError, 'wrong type of kappa value - must be float or array'
+
+    def _get_kappa(self):
+        if len(self._kappa_arr):
+            return self._kappa_arr
+        else:
+            cp = self.forming_task.formed_object
+            return np.ones((cp.n_iL,), dtype='float_') * self._kappa
+
+    fu_factor = Float(1.0)
 
     def get_f(self, t=0):
         '''Get the total potential energy.
@@ -48,8 +68,8 @@ class FuTotalPotentialEnergy(Fu, Visual3D):
         iL_phi = cp.iL_psi2 - cp.iL_psi_0
         iL_length = np.linalg.norm(cp.iL_vectors, axis=1)
 
-        stored_energy = self.kappa * np.einsum(
-            '...i,...i->...', iL_phi**2, iL_length) / 2.0
+        stored_energy = np.einsum(
+            '...i,...i,...i->...', self.kappa, iL_phi**2, iL_length) / 2.0
 
         F_ext = np.zeros_like(cp.u, dtype='float_')
         for node, dim, value in self.F_ext_list:
@@ -57,7 +77,7 @@ class FuTotalPotentialEnergy(Fu, Visual3D):
 
         ext_energy = np.einsum(
             '...i,...i->...', F_ext.flatten(), cp.u.flatten())
-        tot_energy = stored_energy - ext_energy
+        tot_energy = self.fu_factor * (stored_energy - ext_energy)
         print 'tot_energy', tot_energy
         return tot_energy
 
