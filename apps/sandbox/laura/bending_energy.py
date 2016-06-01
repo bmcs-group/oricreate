@@ -3,7 +3,7 @@
 from traits.api import \
     implements, List, Tuple, Float
 
-from custom_factory_mpl import create_cp_factory
+from apps.sandbox.laura.custom_factory_corbel_yoshimura import create_cp_factory
 import numpy as np
 from oricreate.api import GuConstantLength, GuDofConstraints, \
     SimulationConfig, SimulationTask, fix, FTV

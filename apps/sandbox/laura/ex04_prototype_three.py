@@ -6,7 +6,7 @@ Created on Jan 20, 2016
 
 from traits.api import \
     Float, HasTraits, Property, cached_property, Int, \
-    Instance
+    Instance, Array
 
 import numpy as np
 from oricreate.api import MappingTask
@@ -16,6 +16,8 @@ from oricreate.api import YoshimuraCPFactory, \
     FTV, FTA
 from oricreate.crease_pattern.crease_pattern_state import CreasePatternState
 from oricreate.forming_tasks.forming_task import FormingTask
+from oricreate.fu import \
+    FuTotalPotentialEnergy
 from oricreate.mapping_tasks.mask_task import MaskTask
 import sympy as sp
 
@@ -161,13 +163,13 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
     '''
     @cached_property
     def _get_fold_task(self):
-        x_1 = self.init_displ_task.x_1
-#        cp = self.init_displ_task.formed_object
+        self.init_displ_task.x_1
+        cp = self.init_displ_task.formed_object
 
-#        print 'nodes', x_1[(0, 1, 2, 20, 21, 22), 2]
-
-#        cp.u[(26, 25, 24, 23), 2] = -0.01
-#        cp.x[(0, 1, 2, 20, 21, 22), 2] = 0.0
+#         print 'nodes', x_1[(0, 1, 2, 20, 21, 22), 2]
+# 
+#         cp.u[(26, 25, 24, 23), 2] = -0.01
+#         cp.x[(0, 1, 2, 20, 21, 22), 2] = 0.0
         u_max = self.u_x
         fixed_nodes_z = fix(
             [0, 1, 2, 20, 21, 22], (2))
@@ -194,6 +196,156 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
         return SimulationTask(previous_task=self.init_displ_task,
                               config=sim_config, n_steps=self.n_steps)
 
+    load_task = Property(Instance(FormingTask))
+    '''Configure the simulation task.
+    '''
+    @cached_property
+    def _get_load_task(self):
+        self.fold_task.x_1
+
+        fixed_nodes = fix(
+            [0, 2, 20, 22], (0, 1, 2))
+
+        dof_constraints = fixed_nodes
+        gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
+        gu_constant_length = GuConstantLength()
+        sim_config = SimulationConfig(goal_function_type='potential_energy',
+                                      gu={'cl': gu_constant_length,
+                                          'dofs': gu_dof_constraints},
+                                      acc=1e-3, MAX_ITER=1000,
+                                      debug_level=0)
+        F_ext_list = []  # (10, 0, 10)]
+        fu_tot_poteng = FuTotalPotentialEnergy(kappa=100,
+                                               F_ext_list=F_ext_list)  # (2 * n, 2, -1)])
+        sim_config._fu = fu_tot_poteng
+        st = SimulationTask(previous_task=self.fold_task,
+                            config=sim_config, n_steps=1)
+        fu_tot_poteng.forming_task = st
+        cp = st.formed_object
+        cp.x_0 = self.fold_task.x_1
+        cp.u[:, :] = 0.0000
+        return st
+
+    def generate_scaffolding(self, x_scaff_position):
+
+        ft = self.fold_task
+        cp = ft.formed_object
+        x_1 = ft.x_1
+        L = cp.L
+
+        p_0 = np.array([x_scaff_position, 0, 0], dtype='float_')
+        l_0 = x_1[L[:, 0]]
+        l = cp.L_vectors
+        n = np.array([1.0, 0, 0], dtype='float_')
+
+        p_0_l_0 = p_0[np.newaxis, :] - l_0
+        nom = np.einsum('...i,...i->...', p_0_l_0, n[np.newaxis, :])
+        denom = np.einsum('...i,...i->...', l, n[np.newaxis, :])
+        d = nom / denom
+
+        l_idx = np.where((d < 1.001) & (d > -0.001))[0]
+        p = d[l_idx, np.newaxis] * l[l_idx, :] + l_0[l_idx, :]
+
+        x_values, y_values = p[:, (1, 2)].T
+        six = np.argsort(x_values)
+        sx_values, sy_values = x_values[six], y_values[six]
+        spoints = np.c_[sx_values, sy_values]
+        left_points, right_points = spoints[:-1, :], spoints[1:, :]
+        svects = right_points - left_points
+        norm_svects = np.linalg.norm(svects, axis=1)
+        l_idx = np.where(norm_svects > 0.01)[0]
+
+        last_x = sx_values[l_idx[-1] + 1]
+        last_y = sy_values[l_idx[-1] + 1]
+        x, y = sx_values[l_idx], sy_values[l_idx]
+
+        return np.hstack([x, [last_x]]), np.hstack([y, [last_y]])
+
+    scaff_positions = Array
+
+    def _scaff_positions_default(self):
+
+        pos = np.array(
+            [-1.065, -0.77, -0.45, -0.25, 0.25, 0.45, 0.77, 1.065], dtype='float_')
+        return pos
+
+    scaff_ref_nodes = Array
+
+    def _scaff_ref_nodes_default(self):
+        return np.array([14, 41, 18, 45, 21], dtype='int_')
+
+    def generate_scaffoldings(self):
+
+        L_mid = 1.5
+
+        ft = self.fold_task
+        x_1 = ft.x_1
+        x_42 = x_1[42][0]
+
+        ref_lines = np.c_[self.scaff_ref_nodes[:-1], self.scaff_ref_nodes[1:]]
+        print 'ref', ref_lines
+        ref_midpoints = (x_1[ref_lines[:, 1]] + x_1[ref_lines[:, 0]]) / 2.0
+        print 'mp', ref_midpoints[:, 0]
+
+        scaff_positions = ref_midpoints[:, 0] - L_mid
+        print 'sp', scaff_positions
+
+        #scaff_positions = self.scaff_positions
+        scaff_positions = np.hstack([[0, x_42 - L_mid], scaff_positions])
+
+        #centered_pos = pos + offset
+
+        centered_pos = np.hstack([[L_mid, x_42], ref_midpoints[:, 0]])
+        print 'cp', centered_pos
+
+        scaff_plates = []
+        min_max = []
+        for s_pos in centered_pos:
+            x, y = self.generate_scaffolding(s_pos)
+            min_max.append([np.min(x), np.max(x), np.min(y), np.max(y)])
+            scaff_plates.append(np.array([x, y]))
+
+        min_max_arr = np.array(min_max)
+        min_x = np.min(min_max_arr[:, 0])
+        max_x = np.max(min_max_arr[:, 1])
+        min_y = np.min(min_max_arr[:, 2])
+#        max_y = np.max(min_max_arr[:, 3])
+        min_scaff_height = 0.05
+
+        x_0 = (min_x + max_x) / 2.0
+        y_0 = min_y + min_scaff_height
+
+        scaff_plates_0 = [[x - x_0, y - y_0] for x, y in scaff_plates]
+
+        import tempfile
+        import os.path
+        import pylab as p
+
+        tdir = tempfile.mkdtemp()
+        for idx, (x_y, s_pos) in enumerate(zip(scaff_plates_0, scaff_positions)):
+            x, y = x_y
+            x_close = [np.max(x), np.min(x)]
+            y_close = [0, 0]
+
+            p.clf()
+            x_p = np.hstack([x, x_close, [x[0]]])
+            y_p = np.hstack([y, y_close, [y[0]]])
+
+            ax = p.axes()
+            ax.axis('equal')
+
+            ax.plot(x_p, y_p)
+            for x_v, y_v in zip(x, y):
+                ax.annotate('%5.3f,%5.3f' %
+                            (x_v, y_v), xy=(x_v, y_v), rotation=90)
+            ax.annotate('scaffold x - position %5.3f' % -s_pos, xy=(0, 0.04))
+
+            fname_path = os.path.join(tdir, 'scaff%d.pdf' % idx)
+            print 'saving in %s', fname_path
+            p.savefig(fname_path)
+
+        p.show()
+
 
 class DoublyCurvedYoshiFormingProcessFTV(FTV):
 
@@ -209,6 +361,7 @@ if __name__ == '__main__':
     ab = bsf_process.add_boundary_task
     it = bsf_process.init_displ_task
     ft = bsf_process.fold_task
+    lt = bsf_process.load_task
 
 #     import pylab as p
 #     ax = p.axes()
@@ -220,11 +373,13 @@ if __name__ == '__main__':
 #     it.formed_object.viz3d.set(tube_radius=0.002)
 #     ftv.add(it.formed_object.viz3d)
 #     ftv.add(it.formed_object.viz3d_dict['node_numbers'], order=5)
-    ft.formed_object.viz3d.set(tube_radius=0.002)
-#    ftv.add(ft.formed_object.viz3d_dict['node_numbers'], order=5)
-    ftv.add(ft.formed_object.viz3d)
-    ft.config.gu['dofs'].viz3d.scale_factor = 0.5
-    ftv.add(ft.config.gu['dofs'].viz3d)
+    lt.formed_object.viz3d.set(tube_radius=0.002)
+    ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
+    ftv.add(lt.formed_object.viz3d)
+    lt.config.gu['dofs'].viz3d.scale_factor = 0.5
+    ftv.add(lt.config.gu['dofs'].viz3d)
+
+    ftv.add(lt.config.fu.viz3d)
 
 #    ftv.add(ft.sim_history.viz3d_dict['node_numbers'], order=5)
 #    ft.sim_history.viz3d.set(tube_radius=0.002)
@@ -235,6 +390,13 @@ if __name__ == '__main__':
 #
     it.u_1
     ft.u_1
+
+    cp = lt.formed_object
+    cp.u[:, :] = 0.00001
+
+    lt.u_1
+
+    # bsf_process.generate_scaffoldings()
 
     ftv.plot()
     ftv.update(vot=1, force=True)

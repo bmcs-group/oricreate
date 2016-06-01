@@ -59,7 +59,10 @@ class BarrellVaultGravityFormingProcess(HasTraits):
         n_l_h = cp.N_h[0, :].flatten()
         n_r_h = cp.N_h[-1, :].flatten()
         n_lr_h = cp.N_h[(0, -1), :].flatten()
+        print 'n_lr_h', n_lr_h
         n_fixed_y = cp.N_h[(0, -1), 1].flatten()
+        print 'n_fixed_y', n_fixed_y
+        
 
         u_max = self.u_x
         dof_constraints = fix(n_l_h, [0], lambda t: t * u_max) + fix(n_lr_h, [2]) + \

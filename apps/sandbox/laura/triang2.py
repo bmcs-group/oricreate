@@ -1,6 +1,6 @@
 import numpy as np
 
-n=4
+n=1
     
 x, y = np.mgrid[0:n + 1, 0:2]
 z = np.zeros_like(x)
@@ -14,3 +14,4 @@ L = np.vstack([L1, L2, L3, L4])
 F1 = np.c_[N[:-1, 0], N[1:, 0], N[1:, 1]]
 F2 = np.c_[N[:-1, 0], N[1:, 1], N[:-1, 1]]
 F = np.vstack([F1, F2])
+print 'F', F
