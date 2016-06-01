@@ -155,11 +155,11 @@ def get_cos_theta_du(a, a_du, b, b_du):
     norm_a_x_norm_b = norm_a * norm_b
     gamma = ab / norm_a_x_norm_b
 
-    ab_du = (np.einsum('...dIe,...d->...Ie', a_du, b) +
-             np.einsum('...dIe,...d->...Ie', b_du, a))
-    gamma_norm_a_du_x_norm_b = np.einsum('...,...dIe,...d->...Ie',
+    ab_du = (np.einsum('...eId,...d->...Ie', a_du, b) +
+             np.einsum('...eId,...d->...Ie', b_du, a))
+    gamma_norm_a_du_x_norm_b = np.einsum('...,...eId,...d->...Ie',
                                          gamma * norm_b / norm_a, a_du, a)
-    gamma_norm_b_du_x_norm_a = np.einsum('...,...dIe,...d->...Ie',
+    gamma_norm_b_du_x_norm_a = np.einsum('...,...eId,...d->...Ie',
                                          gamma * norm_a / norm_b, b_du, b)
     gamma_norm_a_x_norm_b_du = (gamma_norm_a_du_x_norm_b +
                                 gamma_norm_b_du_x_norm_a)

@@ -610,10 +610,10 @@ class CreaseFacetOperators(HasStrictTraits):
     def _get_Fa_normals_du(self):
         x_F = self.x[self.F_N]
         N_deta_ip = self.Na_deta
-        NN_delta_eps_x1 = np.einsum('aK,aL,KJ,jli,ILl->IaJji',
+        NN_delta_eps_x1 = np.einsum('aK,aL,KJ,jli,ILl->IaiJj',
                                     N_deta_ip[:, 0, :], N_deta_ip[:, 1, :],
                                     DELTA, EPS, x_F)
-        NN_delta_eps_x2 = np.einsum('aK,aL,LJ,kji,IKk->IaJji',
+        NN_delta_eps_x2 = np.einsum('aK,aL,LJ,kji,IKk->IaiJj',
                                     N_deta_ip[:, 0, :], N_deta_ip[:, 1, :],
                                     DELTA, EPS, x_F)
         n_du = NN_delta_eps_x1 + NN_delta_eps_x2

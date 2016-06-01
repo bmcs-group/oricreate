@@ -16,7 +16,7 @@ def create_cp_factory():
     cp = CreasePatternState(X=[[0, 0, 0],
                                [1, 0, 0],
                                [1, 1, 0],
-                               [1, 1, 1]],
+                               [2, 1, 1]],
                             L=[[0, 1],
                                [1, 2],
                                [2, 0],
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     print('gamma')
     print(get_cos_theta(a, b))
     print('theta')
-    print(get_theta(a, b))
+    print(get_theta(a, b)) * 4.0
 
     print('gamma_du')
     print(get_cos_theta_du(a, a_du, b, b_du))
