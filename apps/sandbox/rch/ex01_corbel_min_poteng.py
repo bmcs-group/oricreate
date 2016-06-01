@@ -137,11 +137,13 @@ if __name__ == '__main__':
     cp_factory_task = create_cp_factory(n=n)
     cp = cp_factory_task.formed_object
 
+    #cp.x_0[4, 2] = 0.3
+
     # Link the crease factory it with the constraint client
     gu_constant_length = GuConstantLength()
 
     dof_constraints = fix([0], [0, 1, 2]) + fix([1], [1, 2]) \
-        + fix([n + 1], [2])
+        + fix([n + 1], [2])  # + fix([n * 2], [1])
     gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
 
     sim_config = SimulationConfig(goal_function_type='potential_energy',
@@ -149,12 +151,13 @@ if __name__ == '__main__':
                                   use_f_du=False,
                                   gu={'cl': gu_constant_length,
                                       'dofs': gu_dof_constraints},
-                                  acc=1e-5, MAX_ITER=1000)
+                                  acc=1e-7, MAX_ITER=1000)
 
     F_nodes = np.linspace(0, -10, n)
-    F_ext_list = [(i + 1, 2, F_n) for i, F_n in enumerate(F_nodes)]
+    #F_ext_list = [(i + 1, 2, F_n) for i, F_n in enumerate(F_nodes)]
+    F_ext_list = [(2 * n, 2, -10)]
 
-    fu_tot_poteng = FuTotalPotentialEnergy(kappa=1000,
+    fu_tot_poteng = FuTotalPotentialEnergy(kappa=10000.0, fu_factor=1,
                                            F_ext_list=F_ext_list)  # (2 * n, 2, -1)])
     sim_config._fu = fu_tot_poteng
     sim_task = SimulationTask(previous_task=cp_factory_task,

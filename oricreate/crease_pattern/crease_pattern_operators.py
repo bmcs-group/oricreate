@@ -217,6 +217,14 @@ class CreaseLineOperators(HasStrictTraits):
         F_normals = self.F_normals
         return F_normals[self.iL_F]
 
+    iL_F_normals_du = Property(Array, depends_on=INPUT)
+    r'''Get normals of facets adjacent to an interior line.
+    '''
+    @cached_property
+    def _get_iL_F_normals_du(self):
+        F_normals_du = self.F_normals_du
+        return F_normals_du[self.iL_F]
+
     iL_F_normals_0 = Property(Array, depends_on=INPUT)
     r'''Get normals of facets adjacent to an interior line.
     '''

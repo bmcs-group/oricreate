@@ -327,6 +327,13 @@ class CreasePattern(CreaseNodeOperators,
     def _get_iL(self):
         return np.where(np.bincount(self.L_F_map[0]) == 2)[0]
 
+    n_iL = Property
+    '''Number of interior lines
+    '''
+
+    def _get_n_iL(self):
+        return len(self.iL)
+
     eL = Property(depends_on=INPUT)
     '''Array of edge lines ``(n_eL,)``.
     Edge lines are associated to one facet only.

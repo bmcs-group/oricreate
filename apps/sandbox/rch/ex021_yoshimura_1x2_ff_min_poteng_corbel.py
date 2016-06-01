@@ -1,7 +1,7 @@
 from traits.api import \
     HasTraits, Float, Property, cached_property, Instance, \
     Int
-
+import numpy as np
 from oricreate.api import \
     YoshimuraCPFactory,     fix, link, r_, s_, MapToSurface,\
     GuConstantLength, GuDofConstraints, SimulationConfig, SimulationTask, \
@@ -92,18 +92,20 @@ class BarrellVaultGravityFormingProcess(HasTraits):
         sim_config = SimulationConfig(goal_function_type='potential_energy',
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
-                                      acc=1e-4, MAX_ITER=1000,
+                                      acc=1e-5, MAX_ITER=1000,
                                       debug_level=0)
         F_ext_list = [(n, 2, -1) for n in [1, 3]]
 
         print 'F_ext_list', F_ext_list
-        fu_tot_poteng = FuTotalPotentialEnergy(kappa=10000,
+        kappa = np.array([0, 0, 0, 0, 10, 10])
+        fu_tot_poteng = FuTotalPotentialEnergy(kappa=kappa, fu_factor=0.1,
                                                F_ext_list=F_ext_list)
         sim_config._fu = fu_tot_poteng
         st = SimulationTask(previous_task=self.fold_task,
                             config=sim_config, n_steps=1)
         cp = st.formed_object
         cp.x_0 = self.fold_task.x_1
+        cp.u[(4, 5), 2] = 0.001
         cp.u[(1, 3), 2] = -0.001
         fu_tot_poteng.forming_task = st
         return st
@@ -116,7 +118,7 @@ class BikeShellterFormingProcessFTV(FTV):
 
 if __name__ == '__main__':
     bsf_process = BarrellVaultGravityFormingProcess(
-        L_x=1.0, n_x=1, n_steps=1, u_x=0.00001)
+        L_x=2.0, L_y=2.0, n_x=1, n_steps=1, u_x=0.0000001)
     #it = bsf_process.init_displ_task
     #ft = bsf_process.fold_task
     lt = bsf_process.load_task
@@ -146,7 +148,9 @@ if __name__ == '__main__':
 
     cp = lt.formed_object
     iL_phi = cp.iL_psi2 - cp.iL_psi_0
-    print 'phi',  iL_phi
+    print 'iL_phi',  iL_phi
+
+    print 'lengths', cp.L_lengths
 
     ftv.plot()
     ftv.update(vot=1, force=True)
