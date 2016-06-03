@@ -6,17 +6,13 @@ Calculate the derivatives of a dihedral angle.
 
 import numpy as np
 from oricreate.api import CreasePatternState, CustomCPFactory
-from oricreate.api import GuConstantLength, GuDofConstraints, \
-    SimulationConfig, SimulationTask, fix, FTV
-from oricreate.fu import \
-    FuTotalPotentialEnergy
 
 
 def create_cp_factory():
-    cp = CreasePatternState(X=[[0, 0, 0],
+    cp = CreasePatternState(X=[[0, 0.5, 0.1],
                                [1, 0, 0],
                                [1, 1, 0],
-                               [2, 1, 1]],
+                               [2, 0.5, 0.1]],
                             L=[[0, 1],
                                [1, 2],
                                [2, 0],
@@ -35,32 +31,77 @@ if __name__ == '__main__':
 
     cp_factory = create_cp_factory()
 
-    from oricreate.util import \
-        get_cos_theta, get_cos_theta_du, get_theta, get_theta_du
-
     cp = cp_factory.formed_object
 
+    # get normal vectors and their derivativews with respect to node displ.
     a, b = np.einsum('fi...->if...', cp.iL_F_normals)
     a_du, b_du = np.einsum('fi...->if...', cp.iL_F_normals_du)
 
-    print 'x', cp.x[cp.F].shape
-    print cp.x[cp.F]
-    print 'F_normals', cp.F_normals.shape
-    print cp.F_normals
-    print 'F_normals_du', cp.F_normals_du.shape
-    print cp.F_normals_du
+    print 'x'
+    print cp.x_0[cp.F[cp.iL_F]]
 
-    print 'a', a
-    print 'b', b
-    print 'a_du', a_du
-    print 'b_du', b_du
+    print 'a', a.shape
+    print a
+    print 'a_du', a_du.shape
+    print a_du
+    print 'b', b.shape
+    print b
+    print 'b_du', b_du.shape
+    print b_du
 
-    print('gamma')
-    print(get_cos_theta(a, b))
-    print('theta')
-    print(get_theta(a, b)) * 4.0
+    # calculate the angle between the two vectors using arccos
+    ab = np.einsum('...i,...i->...', a, b)
+    mag_a = np.sqrt(np.einsum('...i,...i->...', a, a))
+    mag_b = np.sqrt(np.einsum('...i,...i->...', b, b))
+    mag_ab = mag_a * mag_b
+    gamma = ab / mag_ab
+    print 'gamma', gamma
+    theta = np.arccos(gamma)
+    print 'theta', theta
 
-    print('gamma_du')
-    print(get_cos_theta_du(a, a_du, b, b_du))
+    # calculate the derivatives of the angle between the two normal vectors
+    iL_Fa_x = b - gamma * mag_b / mag_a * a
+    iL_Fb_x = a - gamma * mag_a / mag_b * b
+    # run the contraction along the component index of vectors a and b
+    # (index i) - preserve the indexes I and d.
+    iL_Fa_gamma_du = 1 / mag_ab * \
+        np.einsum('...iId,...i->...Id', a_du, iL_Fa_x)
+    iL_Fb_gamma_du = 1 / mag_ab * \
+        np.einsum('...iId,...i->...Id', b_du, iL_Fb_x)
+
+    # Keep the terms for left (a) and right (b) facets in separate arrays
+    # this is necessary to be able to incrementally derivatives add up
+    # contributions from left and right facets to shared nodes
+    # of the interior line.
+
+    # get the map of facet nodes attached to interior lines
+    iL_Fa_N_map = cp.F[cp.iL_F[:, 0]].reshape(cp.n_iL, -1)
+    iL_Fb_N_map = cp.F[cp.iL_F[:, 1]].reshape(cp.n_iL, -1)
+    # enumerate the interior lines and broadcast it N and D into dimensions
+    iL_map = np.arange(cp.n_iL)[:, np.newaxis, np.newaxis]
+    # broadcast the facet node map into D dimension
+    Na_map = iL_Fa_N_map[:, :, np.newaxis]
+    Nb_map = iL_Fb_N_map[:, :, np.newaxis]
+    # broadcast the spatial dimension map into iL and N dimensions
+    D_map = np.arange(3)[np.newaxis, np.newaxis, :]
+    # allocate the gamma derivatives of iL with respect to N and D dimensions
+    gamma_du = np.zeros((cp.n_iL, cp.n_N, cp.n_D), dtype='float_')
+    # add the contributions gamma_du from the left and right facet
+    # Note: this cannot be done in a single step since the incremental
+    # assembly is not possible within a single index expression.
+    gamma_du[iL_map, Na_map, D_map] += iL_Fa_gamma_du
+    gamma_du[iL_map, Nb_map, D_map] += iL_Fb_gamma_du
+    print 'Na_map'
+    print Na_map
+    print Nb_map
+    print 'iL_Fa_gamma_du'
+    print iL_Fa_gamma_du
+    print iL_Fb_gamma_du
+    print 'gamma_du'
+    print gamma_du
+
+    theta_du = np.einsum(
+        '...,...Ie->...Ie', -1. / np.sqrt(1. - gamma ** 2), gamma_du)
+
     print 'theta_du'
-    print(get_theta_du(a, a_du, b, b_du))
+    print theta_du
