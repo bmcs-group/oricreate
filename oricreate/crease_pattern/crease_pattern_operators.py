@@ -155,6 +155,17 @@ class CreaseLineOperators(HasStrictTraits):
         L_vectors_du[L_idx, :, L_N1_idx, :] = -DELTA
         return L_vectors_du
 
+    L_vectors_dul = Property(Array, depends_on=INPUT)
+
+    @cached_property
+    def _get_L_vectors_dul(self):
+        L_vectors_du = np.zeros((self.n_L, self.n_D, 2, self.n_D),
+                                dtype='float_')
+        L_idx = np.arange(self.n_L)
+        L_vectors_du[L_idx, :, 0, :] = DELTA
+        L_vectors_du[L_idx, :, 1, :] = -DELTA
+        return L_vectors_du
+
     iL_within_F0 = Property(Array, depends_on=INPUT)
     r'''Index of a crease line within the first adjacent facet
     '''
@@ -177,6 +188,25 @@ class CreaseLineOperators(HasStrictTraits):
     def _get_iL_vectors(self):
         F_L_vectors = self.F_L_vectors
         return F_L_vectors[self.iL_within_F0]
+
+    iL_vectors_du = Property(Array, depends_on=INPUT)
+    r'''Get the line vector of an interior line oriented in the
+    sense of counter-clockwise direction of its first adjacent facet.
+    '''
+    @cached_property
+    def _get_iL_vectors_du(self):
+        F_L_vectors_du = self.F_L_vectors_du
+        return F_L_vectors_du[self.iL_within_F0]
+
+    iL_vectors_dul = Property(Array, depends_on=INPUT)
+    r'''Get the derivatives with respect to the node coordinates 
+    of a  line vector of an interior line oriented in the
+    sense of counter-clockwise direction of its first adjacent facet.
+    '''
+    @cached_property
+    def _get_iL_vectors_dul(self):
+        F_L_vectors_dul = self.F_L_vectors_dul
+        return F_L_vectors_dul[self.iL_within_F0]
 
     iL_vectors_0 = Property(Array, depends_on=INPUT)
     r'''Get the line vector of an interior line oriented in the
@@ -492,6 +522,11 @@ class CreaseFacetOperators(HasStrictTraits):
 
     def _get_F_L_vectors_du(self):
         return self.L_vectors_du[self.F_L]
+
+    F_L_vectors_dul = Property(Array, depends_on=INPUT)
+
+    def _get_F_L_vectors_dul(self):
+        return self.L_vectors_dul[self.F_L]
 
     norm_F_L_vectors = Property(Array, depends_on=INPUT)
     r'''Get the cycled line vectors around the facet

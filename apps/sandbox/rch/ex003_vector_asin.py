@@ -7,14 +7,18 @@ Calculate the derivatives of a dihedral angle.
 import numpy as np
 from oricreate.api import CreasePatternState, CustomCPFactory
 
-z_e = 1e-7
+
+from oricreate.util.einsum_utils import \
+    DELTA, EPS
+
+z_e = 0.0
 
 
 def create_cp_factory():
     cp = CreasePatternState(X=[[0, 0, z_e],
-                               [2, 0, 0],
-                               [2, 1, 0],
-                               [4, 1, z_e]],
+                               [1, 0, 0],
+                               [1, 1, 0],
+                               [2, 1, z_e]],
                             L=[[0, 1],
                                [1, 2],
                                [2, 0],
@@ -23,6 +27,7 @@ def create_cp_factory():
                             F=[[0, 1, 2],
                                [1, 3, 2]]
                             )
+
     cp_factory = CustomCPFactory(formed_object=cp)
     return cp_factory
 
@@ -34,29 +39,46 @@ if __name__ == '__main__':
 
     cp = cp_factory.formed_object
 
-    # get normal vectors and their derivativews with respect to node displ.
     a, b = np.einsum('fi...->if...', cp.iL_F_normals)
     a_du, b_du = np.einsum('fi...->if...', cp.iL_F_normals_du)
 
-    # calculate the angle between the two vectors using arccos
-    ab = np.einsum('...i,...i->...', a, b)
+    c = np.einsum('...i,...j,...ijk->...k', a, b, EPS)
+    print 'c'
+    print c
+
     mag_a = np.sqrt(np.einsum('...i,...i->...', a, a))
     mag_b = np.sqrt(np.einsum('...i,...i->...', b, b))
+    mag_c = np.sqrt(np.einsum('...i,...i->...', c, c))
     mag_ab = mag_a * mag_b
-    gamma = ab / mag_ab
+
+    mag_c[np.where(mag_c == 0)] = 1.e-19
+    normed_c = c / mag_c
+    gamma = mag_c / mag_ab
     print 'gamma', gamma
-    theta = np.arccos(gamma)
+    theta = np.arcsin(gamma)
     print 'theta', theta
 
+    print 'psi'
+    print cp.iL_psi
+    iL_Fa_c_du = \
+        np.einsum('...iIe,...j,...ijk,...k->...Ie', a_du, b, EPS, normed_c)
+    print 'Fa_c_du', iL_Fa_c_du.shape
+    print iL_Fa_c_du
+    iL_Fb_c_du = \
+        np.einsum('...i,...jIe,...ijk,...k->...Ie', a, b_du, EPS, normed_c)
+    print 'Fb_c_du', iL_Fb_c_du.shape
+    print iL_Fb_c_du
+
     # calculate the derivatives of the angle between the two normal vectors
-    iL_Fa_x = b - gamma * mag_b / mag_a * a
-    iL_Fb_x = a - gamma * mag_a / mag_b * b
+    iL_Fa_x_du = gamma * mag_b / mag_a * \
+        np.einsum('...iId,...i->...Id', a_du, a)
+    print 'iL_Fa_x_du', iL_Fa_x_du.shape
+    iL_Fb_x_du = gamma * mag_a / mag_b * \
+        np.einsum('...iId,...i->...Id', b_du, b)
     # run the contraction along the component index of vectors a and b
     # (index i) - preserve the indexes I and d.
-    iL_Fa_gamma_du = 1 / mag_ab * \
-        np.einsum('...iId,...i->...Id', a_du, iL_Fa_x)
-    iL_Fb_gamma_du = 1 / mag_ab * \
-        np.einsum('...iId,...i->...Id', b_du, iL_Fb_x)
+    iL_Fa_gamma_du = 1 / mag_ab * (iL_Fa_c_du - iL_Fa_x_du)
+    iL_Fb_gamma_du = 1 / mag_ab * (iL_Fb_c_du - iL_Fb_x_du)
 
     # Keep the terms for left (a) and right (b) facets in separate arrays
     # this is necessary to be able to incrementally derivatives add up
@@ -90,7 +112,7 @@ if __name__ == '__main__':
     print gamma_du
 
     theta_du = np.einsum(
-        '...,...Ie->...Ie', -1. / np.sqrt(1. - gamma ** 2), gamma_du)
+        '...,...Ie->...Ie', 1. / np.sqrt(1. - gamma ** 2), gamma_du)
 
     print 'theta_du'
     print theta_du

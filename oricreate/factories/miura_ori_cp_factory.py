@@ -181,8 +181,8 @@ if __name__ == '__main__':
 
     yf = MiuraOriCPFactory(L_x=3,
                            L_y=3,
-                           n_x=2,
-                           n_y=2,
+                           n_x=4,
+                           n_y=4,
                            d_x=0.5)
 
     cp = yf.formed_object

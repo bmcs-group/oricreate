@@ -331,6 +331,13 @@ class CreasePattern(CreaseNodeOperators,
     '''Number of interior lines
     '''
 
+    iL_N = Property(depends_on=INPUT)
+    '''End nodes of a line.
+    '''
+    @cached_property
+    def _get_iL_N(self):
+        return self.L_N[self.iL]
+
     def _get_n_iL(self):
         return len(self.iL)
 
