@@ -175,14 +175,18 @@ if __name__ == '__main__':
     # add the contributions gamma_du from the left and right facet
     # Note: this cannot be done in a single step since the incremental
     # assembly is not possible within a single index expression.
+    psi_du[iL_map, l_map, D_map] += unit_nl01_dul
     print 'l_map', l_map.shape
     print l_map
+    print 'psi_du', psi_du.shape
+    print psi_du
+    psi_du[iL_map, l0_map, D_map] += unit_nl01_dul0
     print 'l0_map', l0_map.shape
     print l0_map
+    print 'psi_du', psi_du.shape
+    print psi_du
+    psi_du[iL_map, l1_map, D_map] += unit_nl01_dul1
     print 'l1_map', l1_map.shape
     print l1_map
-    psi_du[iL_map, l_map, D_map] += unit_nl01_dul
-    psi_du[iL_map, l0_map, D_map] += unit_nl01_dul0
-    psi_du[iL_map, l1_map, D_map] += unit_nl01_dul1
     print 'psi_du', psi_du.shape
     print psi_du
