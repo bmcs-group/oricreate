@@ -11,11 +11,11 @@ from oricreate.api import CreasePatternState, CustomCPFactory
 from oricreate.util.einsum_utils import \
     DELTA, EPS
 
-z_e = 0
+z_e = 0.5
 
 
 def create_cp_factory():
-    cp = CreasePatternState(X=[[0, 0, z_e],
+    cp = CreasePatternState(X=[[0, 0, 0],
                                [1, 0, 0],
                                [1, 1, 0],
                                [2, 1, z_e]],
@@ -64,11 +64,13 @@ if __name__ == '__main__':
     print 'unit_nl1', unit_nl1.shape
     print unit_nl1
 
-    Tl0 = np.vstack(
-        [unit_vl,
-         unit_nl0,
-         np.einsum('...j,...k,...ijk->...i', unit_vl, unit_nl0, EPS)]
-    )
+    Tl0 = np.einsum('ij...->ji...',
+                    np.array(
+                        [unit_vl,
+                         unit_nl0,
+                         np.einsum('...j,...k,...ijk->...i',
+                                   unit_vl, unit_nl0, EPS)]
+                    ))
 
     print 'Tl0', Tl0.shape
     print Tl0
@@ -87,9 +89,9 @@ if __name__ == '__main__':
     print cp.iL_N.shape
     print 'vl_dul', vl_dul.shape
     print vl_dul
-    print 'nl0', nl0_dul0.shape
+    print 'nl0_dul0', nl0_dul0.shape
     print nl0_dul0
-    print 'nl1', nl1_dul1.shape
+    print 'nl1_dul1', nl1_dul1.shape
     print nl1_dul1
 
     unit_nl0_dul0 = 1 / norm_nl0[:, np.newaxis, np.newaxis, np.newaxis] * (
@@ -112,22 +114,27 @@ if __name__ == '__main__':
     print 'unit_vl_dul', unit_vl_dul.shape
     print unit_vl_dul
 
-    Tl0_dul0 = np.vstack(
-        [np.zeros_like(unit_nl0_dul0),
-         unit_nl0_dul0,
-         np.einsum('...j,...kNd,...ijk->...iNd', unit_vl, unit_nl0_dul0, EPS)
-         ]
-    )
+    Tl0_dul0 = np.einsum('ij...->ji...',
+                         np.array([np.zeros_like(unit_nl0_dul0),
+                                   unit_nl0_dul0,
+                                   np.einsum(
+                                  '...j,...kNd,...ijk->...iNd',
+                                  unit_vl, unit_nl0_dul0, EPS)
+                         ]
+                         ))
 
     print 'Tl0_dul0', Tl0_dul0.shape
     print Tl0_dul0
 
-    Tl0_dul = np.vstack(
-        [unit_vl_dul,
-         np.zeros_like(unit_vl_dul),
-         np.einsum('...jNd,...k,...ijk->...iNd', unit_vl_dul, unit_nl0, EPS)
-         ]
-    )
+    Tl0_dul = np.einsum('ij...->ji...',
+                        np.array([unit_vl_dul,
+                                  np.zeros_like(unit_vl_dul),
+                                  np.einsum(
+                                      '...jNd,...k,...ijk->...iNd',
+                                      unit_vl_dul, unit_nl0, EPS)
+                                  ]
+                                 )
+                        )
 
     print 'Tl0_dul0', Tl0_dul.shape
     print Tl0_dul
@@ -137,11 +144,11 @@ if __name__ == '__main__':
     print 'rho', unit_nl01[:, 2]
 
     unit_nl01_dul = np.einsum(
-        '...,...j,...ijNd->...iNd', rho, unit_nl1, Tl0_dul)
+        '...,...j,...ijNd->...iNd', rho, unit_nl1, Tl0_dul)[:, 2, ...]
     unit_nl01_dul0 = np.einsum(
-        '...,...j,...ijNd->...iNd', rho, unit_nl1, Tl0_dul0)
+        '...,...j,...ijNd->...iNd', rho, unit_nl1, Tl0_dul0)[:, 2, ...]
     unit_nl01_dul1 = np.einsum(
-        '...,...jNd,...ij->...iNd', rho, unit_nl1_dul1, Tl0)
+        '...,...jNd,...ij->...iNd', rho, unit_nl1_dul1, Tl0)[:, 2, ...]
 
     print 'unit_nl01_dul', unit_nl01_dul.shape
     print unit_nl01_dul
@@ -149,3 +156,33 @@ if __name__ == '__main__':
     print unit_nl01_dul0
     print 'unit_nl01_dul1', unit_nl01_dul1.shape
     print unit_nl01_dul1
+
+    # get the map of facet nodes attached to interior lines
+    iL0_N_map = cp.F[cp.iL_F[:, 0]].reshape(cp.n_iL, -1)
+    iL1_N_map = cp.F[cp.iL_F[:, 1]].reshape(cp.n_iL, -1)
+    iL_N_map = cp.iL_N
+
+    # enumerate the interior lines and broadcast it N and D into dimensions
+    iL_map = np.arange(cp.n_iL)[:, np.newaxis, np.newaxis]
+    # broadcast the facet node map into D dimension
+    l0_map = iL0_N_map[:, :, np.newaxis]
+    l1_map = iL1_N_map[:, :, np.newaxis]
+    l_map = iL_N_map[:, :, np.newaxis]
+    # broadcast the spatial dimension map into iL and N dimensions
+    D_map = np.arange(3)[np.newaxis, np.newaxis, :]
+    # allocate the gamma derivatives of iL with respect to N and D dimensions
+    psi_du = np.zeros((cp.n_iL, cp.n_N, cp.n_D), dtype='float_')
+    # add the contributions gamma_du from the left and right facet
+    # Note: this cannot be done in a single step since the incremental
+    # assembly is not possible within a single index expression.
+    print 'l_map', l_map.shape
+    print l_map
+    print 'l0_map', l0_map.shape
+    print l0_map
+    print 'l1_map', l1_map.shape
+    print l1_map
+    psi_du[iL_map, l_map, D_map] += unit_nl01_dul
+    psi_du[iL_map, l0_map, D_map] += unit_nl01_dul0
+    psi_du[iL_map, l1_map, D_map] += unit_nl01_dul1
+    print 'psi_du', psi_du.shape
+    print psi_du
