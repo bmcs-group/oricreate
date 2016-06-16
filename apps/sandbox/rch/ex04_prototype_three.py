@@ -373,13 +373,13 @@ if __name__ == '__main__':
 #     it.formed_object.viz3d.set(tube_radius=0.002)
 #     ftv.add(it.formed_object.viz3d)
 #     ftv.add(it.formed_object.viz3d_dict['node_numbers'], order=5)
-    lt.formed_object.viz3d.set(tube_radius=0.002)
-    ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
-    ftv.add(lt.formed_object.viz3d)
-    lt.config.gu['dofs'].viz3d.scale_factor = 0.5
-    ftv.add(lt.config.gu['dofs'].viz3d)
+    ft.formed_object.viz3d.set(tube_radius=0.002)
+    ftv.add(ft.formed_object.viz3d_dict['node_numbers'], order=5)
+    ftv.add(ft.formed_object.viz3d)
+    ft.config.gu['dofs'].viz3d.scale_factor = 0.5
+    ftv.add(ft.config.gu['dofs'].viz3d)
 
-    ftv.add(lt.config.fu.viz3d)
+    ftv.add(ft.config.fu.viz3d)
 
 #    ftv.add(ft.sim_history.viz3d_dict['node_numbers'], order=5)
 #    ft.sim_history.viz3d.set(tube_radius=0.002)
@@ -391,10 +391,10 @@ if __name__ == '__main__':
     it.u_1
     ft.u_1
 
-    cp = lt.formed_object
-    cp.u[:, :] = 0.00001
-
-    lt.u_1
+#     cp = lt.formed_object
+#     cp.u[:, :] = 0.00001
+#
+#     lt.u_1
 
     # bsf_process.generate_scaffoldings()
 

@@ -15,10 +15,10 @@ z_e = 0.5
 
 
 def create_cp_factory():
-    cp = CreasePatternState(X=[[0, 0, 0],
+    cp = CreasePatternState(X=[[0, 0.5, 0],
                                [1, 0, 0],
                                [1, 1, 0],
-                               [2, 1, z_e]],
+                               [2, 0.5, z_e]],
                             L=[[0, 1],
                                [1, 2],
                                [2, 0],
@@ -82,6 +82,15 @@ if __name__ == '__main__':
     psi = np.arcsin(unit_nl01[:, 2])
 
     print 'psi', psi
+
+    print 'L_vectors', cp.L_vectors.shape
+    print cp.L_vectors[1]
+    print 'L_vectors_du', cp.L_vectors_dul.shape
+    print cp.L_vectors_dul[1]
+    print 'iL_within_F0'
+    print cp.iL_within_F0
+    print 'F_L_vectors_dul', cp.F_L_vectors_dul.shape
+    print cp.F_L_vectors_dul
 
     vl_dul = cp.iL_vectors_dul
     nl0_dul0, nl1_dul1 = np.einsum('fi...->if...', cp.iL_F_normals_du)
