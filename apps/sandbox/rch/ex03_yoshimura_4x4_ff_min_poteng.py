@@ -1,7 +1,7 @@
 from traits.api import \
     HasTraits, Float, Property, cached_property, Instance, \
     Int
-
+import numpy as np
 from oricreate.api import \
     YoshimuraCPFactory,     fix, link, r_, s_, t_, MapToSurface,\
     GuConstantLength, GuDofConstraints, SimulationConfig, SimulationTask, \
@@ -99,7 +99,7 @@ class BarrellVaultGravityFormingProcess(HasTraits):
                                       debug_level=0)
         F_ext_list = [(n, 2, 100.0) for n in cp.N_h[2, :]]
         print 'F_ext_list', F_ext_list
-        fu_tot_poteng = FuTotalPotentialEnergy(kappa=10,
+        fu_tot_poteng = FuTotalPotentialEnergy(kappa=np.array([10]),
                                                F_ext_list=F_ext_list)
         sim_config._fu = fu_tot_poteng
         st = SimulationTask(previous_task=self.fold_task,
@@ -133,13 +133,13 @@ if __name__ == '__main__':
 #     it.formed_object.viz3d.set(tube_radius=0.002)
 #     ftv.add(it.formed_object.viz3d)
 #     ftv.add(it.formed_object.viz3d_dict['node_numbers'], order=5)
-    lt.formed_object.viz3d.set(tube_radius=0.002)
+    ft.formed_object.viz3d.set(tube_radius=0.002)
     #ftv.add(ft.formed_object.viz3d_dict['node_numbers'], order=5)
-    ftv.add(lt.formed_object.viz3d)
-    lt.config.gu['dofs'].viz3d.scale_factor = 0.5
-    ftv.add(lt.config.gu['dofs'].viz3d)
+    ftv.add(ft.formed_object.viz3d)
+    ft.config.gu['dofs'].viz3d.scale_factor = 0.5
+    ftv.add(ft.config.gu['dofs'].viz3d)
 
-    ftv.add(lt.config.fu.viz3d)
+#    ftv.add(lt.config.fu.viz3d)
 
 #    ftv.add(ft.sim_history.viz3d_dict['node_numbers'], order=5)
 #    ft.sim_history.viz3d.set(tube_radius=0.002)
@@ -150,18 +150,18 @@ if __name__ == '__main__':
     it.u_1
     ft.u_1
     print 'ft_x1', ft.x_1
-    cp = lt.formed_object
-    print 'lt_x0', cp.x_0
-    print 'lt_u', cp.u
-    cp.u[7, 2] = 0.001
-    print 'lt.u_1', lt.u_1
-
-    print 'fu', lt.sim_step.get_f()
-    print 'Gu', lt.sim_step.get_G()
-
-    cp = lt.formed_object
-    iL_phi = cp.iL_psi2 - cp.iL_psi_0
-    print 'phi',  iL_phi
+#     cp = lt.formed_object
+#     print 'lt_x0', cp.x_0
+#     print 'lt_u', cp.u
+#     cp.u[7, 2] = 0.001
+#     print 'lt.u_1', lt.u_1
+#
+#     print 'fu', lt.sim_step.get_f()
+#     print 'Gu', lt.sim_step.get_G()
+#
+#     cp = lt.formed_object
+#     iL_phi = cp.iL_psi2 - cp.iL_psi_0
+#     print 'phi',  iL_phi
 
     ftv.plot()
     ftv.update(vot=1, force=True)

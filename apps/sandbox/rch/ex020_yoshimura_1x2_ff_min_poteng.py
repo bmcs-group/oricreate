@@ -1,7 +1,7 @@
 from traits.api import \
     HasTraits, Float, Property, cached_property, Instance, \
     Int
-
+import numpy as np
 from oricreate.api import \
     YoshimuraCPFactory,     fix, link, r_, s_, MapToSurface,\
     GuConstantLength, GuDofConstraints, SimulationConfig, SimulationTask, \
@@ -102,7 +102,7 @@ class BarrellVaultGravityFormingProcess(HasTraits):
         F_ext_list = [(n, 1, -1) for n in n_t_h]
 
         print 'F_ext_list', F_ext_list
-        fu_tot_poteng = FuTotalPotentialEnergy(kappa=10000,
+        fu_tot_poteng = FuTotalPotentialEnergy(kappa=np.array([10000]),
                                                F_ext_list=F_ext_list)
         sim_config._fu = fu_tot_poteng
         st = SimulationTask(previous_task=self.fold_task,

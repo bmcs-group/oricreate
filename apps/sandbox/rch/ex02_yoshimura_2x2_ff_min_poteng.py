@@ -1,7 +1,7 @@
 from traits.api import \
     HasTraits, Float, Property, cached_property, Instance, \
     Int
-
+import numpy as np
 from oricreate.api import \
     YoshimuraCPFactory,     fix, link, r_, s_, MapToSurface,\
     GuConstantLength, GuDofConstraints, SimulationConfig, SimulationTask, \
@@ -86,7 +86,7 @@ class BarrellVaultGravityFormingProcess(HasTraits):
         n_l_h = cp.N_h[0, (0, -1)].flatten()
         n_r_h = cp.N_h[-1, (0, -1)].flatten()
 
-        dof_constraints = fix(n_l_h, [0, 1, 2]) + fix(n_r_h, [0, 1, 2])
+        dof_constraints = fix(n_l_h, [0, 1, 2]) + fix(n_r_h, [0, 2])
 
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
@@ -97,7 +97,7 @@ class BarrellVaultGravityFormingProcess(HasTraits):
                                       debug_level=0)
         F_ext_list = [(n, 2, 100.0) for n in cp.N_h[1, :]]
         print 'F_ext_list', F_ext_list
-        fu_tot_poteng = FuTotalPotentialEnergy(kappa=10,
+        fu_tot_poteng = FuTotalPotentialEnergy(kappa=np.array([10]),
                                                F_ext_list=F_ext_list)
         sim_config._fu = fu_tot_poteng
         st = SimulationTask(previous_task=self.fold_task,
@@ -121,6 +121,9 @@ if __name__ == '__main__':
     ft = bsf_process.fold_task
     lt = bsf_process.load_task
 
+    it.u_1
+    ft.u_1
+
     ftv = BikeShellterFormingProcessFTV(model=bsf_process)
 #     ftv.add(it.target_faces[0].viz3d)
 #     it.formed_object.viz3d.set(tube_radius=0.002)
@@ -134,8 +137,6 @@ if __name__ == '__main__':
 
     ftv.add(lt.config.fu.viz3d)
 
-    it.u_1
-    ft.u_1
     print 'ft_x1', ft.x_1
     cp = lt.formed_object
     print 'lt_x0', cp.x_0

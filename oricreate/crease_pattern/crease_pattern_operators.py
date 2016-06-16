@@ -151,8 +151,8 @@ class CreaseLineOperators(HasStrictTraits):
         L_idx = np.arange(self.n_L)
         L_N0_idx = self.L[L_idx, 0]
         L_N1_idx = self.L[L_idx, 1]
-        L_vectors_du[L_idx, :, L_N0_idx, :] = DELTA
-        L_vectors_du[L_idx, :, L_N1_idx, :] = -DELTA
+        L_vectors_du[L_idx, :, L_N0_idx, :] = -DELTA
+        L_vectors_du[L_idx, :, L_N1_idx, :] = DELTA
         return L_vectors_du
 
     L_vectors_dul = Property(Array, depends_on=INPUT)
@@ -162,8 +162,8 @@ class CreaseLineOperators(HasStrictTraits):
         L_vectors_du = np.zeros((self.n_L, self.n_D, 2, self.n_D),
                                 dtype='float_')
         L_idx = np.arange(self.n_L)
-        L_vectors_du[L_idx, :, 0, :] = DELTA
-        L_vectors_du[L_idx, :, 1, :] = -DELTA
+        L_vectors_du[L_idx, :, 0, :] = -DELTA
+        L_vectors_du[L_idx, :, 1, :] = DELTA
         return L_vectors_du
 
     iL_within_F0 = Property(Array, depends_on=INPUT)
