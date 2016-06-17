@@ -21,9 +21,9 @@ from oricreate.opt import \
     IFu
 
 
-class FuBendingEnergy(Fu):
+class FuPotEngGravity(Fu):
 
-    '''Optimization criteria based on minimum Bending energy of gravity.
+    '''Optimization criteria based on minimum potential energy of gravity.
 
     This plug-in class lets the crease pattern operators evaluate the
     integral over the spatial domain in an instantaneous configuration
@@ -32,7 +32,7 @@ class FuBendingEnergy(Fu):
     implements(IFu)
 
     def get_f(self, t=0):
-        '''Get the bending energy of gravity.
+        '''Get the potential energy of gravity.
         '''
         return self.forming_task.formed_object.V
 

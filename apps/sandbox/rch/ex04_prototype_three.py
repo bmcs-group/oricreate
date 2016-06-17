@@ -17,7 +17,7 @@ from oricreate.api import YoshimuraCPFactory, \
 from oricreate.crease_pattern.crease_pattern_state import CreasePatternState
 from oricreate.forming_tasks.forming_task import FormingTask
 from oricreate.fu import \
-    FuTotalPotentialEnergy
+    FuPotEngTotal
 from oricreate.mapping_tasks.mask_task import MaskTask
 import sympy as sp
 
@@ -188,7 +188,7 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
             control_left + control_right
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
-        sim_config = SimulationConfig(goal_function_type='potential_energy',
+        sim_config = SimulationConfig(goal_function_type='gravity potential energy',
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
                                       acc=1e-5, MAX_ITER=500,
@@ -209,14 +209,14 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
         dof_constraints = fixed_nodes
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
-        sim_config = SimulationConfig(goal_function_type='potential_energy',
+        sim_config = SimulationConfig(goal_function_type='total potential energy',
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
                                       acc=1e-3, MAX_ITER=1000,
                                       debug_level=0)
-        F_ext_list = []  # (10, 0, 10)]
-        fu_tot_poteng = FuTotalPotentialEnergy(kappa=100,
-                                               F_ext_list=F_ext_list)  # (2 * n, 2, -1)])
+        F_ext_list = [(11, 2, 10)]
+        fu_tot_poteng = FuPotEngTotal(kappa=np.array([100]),
+                                      F_ext_list=F_ext_list)  # (2 * n, 2, -1)])
         sim_config._fu = fu_tot_poteng
         st = SimulationTask(previous_task=self.fold_task,
                             config=sim_config, n_steps=1)
@@ -373,13 +373,13 @@ if __name__ == '__main__':
 #     it.formed_object.viz3d.set(tube_radius=0.002)
 #     ftv.add(it.formed_object.viz3d)
 #     ftv.add(it.formed_object.viz3d_dict['node_numbers'], order=5)
-    ft.formed_object.viz3d.set(tube_radius=0.002)
-    ftv.add(ft.formed_object.viz3d_dict['node_numbers'], order=5)
-    ftv.add(ft.formed_object.viz3d)
-    ft.config.gu['dofs'].viz3d.scale_factor = 0.5
-    ftv.add(ft.config.gu['dofs'].viz3d)
+    lt.formed_object.viz3d.set(tube_radius=0.002)
+    ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
+    ftv.add(lt.formed_object.viz3d)
+    lt.config.gu['dofs'].viz3d.scale_factor = 0.5
+    ftv.add(lt.config.gu['dofs'].viz3d)
 
-    ftv.add(ft.config.fu.viz3d)
+    ftv.add(lt.config.fu.viz3d)
 
 #    ftv.add(ft.sim_history.viz3d_dict['node_numbers'], order=5)
 #    ft.sim_history.viz3d.set(tube_radius=0.002)
@@ -394,7 +394,7 @@ if __name__ == '__main__':
 #     cp = lt.formed_object
 #     cp.u[:, :] = 0.00001
 #
-#     lt.u_1
+    lt.u_1
 
     # bsf_process.generate_scaffoldings()
 

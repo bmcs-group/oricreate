@@ -15,7 +15,7 @@ import numpy as np
 from oricreate.viz3d import Viz3D
 
 
-class FuBendingEnergyViz3D(Viz3D):
+class FuPotEngBendingViz3D(Viz3D):
     '''Visualize the crease Pattern
     '''
 

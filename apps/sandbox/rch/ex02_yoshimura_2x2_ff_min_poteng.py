@@ -8,7 +8,7 @@ from oricreate.api import \
     FTV
 from oricreate.forming_tasks.forming_task import FormingTask
 from oricreate.fu import \
-    FuTotalPotentialEnergy
+    FuPotEngTotal
 
 
 class BarrellVaultGravityFormingProcess(HasTraits):
@@ -67,7 +67,7 @@ class BarrellVaultGravityFormingProcess(HasTraits):
 
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
-        sim_config = SimulationConfig(goal_function_type='potential_energy',
+        sim_config = SimulationConfig(goal_function_type='gravity potential energy',
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
                                       acc=1e-5, MAX_ITER=500,
@@ -90,15 +90,15 @@ class BarrellVaultGravityFormingProcess(HasTraits):
 
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
-        sim_config = SimulationConfig(goal_function_type='potential_energy',
+        sim_config = SimulationConfig(goal_function_type='total potential energy',
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
+                                      use_f_du=True,
                                       acc=1e-4, MAX_ITER=1000,
                                       debug_level=0)
         F_ext_list = [(n, 2, 100.0) for n in cp.N_h[1, :]]
-        print 'F_ext_list', F_ext_list
-        fu_tot_poteng = FuTotalPotentialEnergy(kappa=np.array([10]),
-                                               F_ext_list=F_ext_list)
+        fu_tot_poteng = FuPotEngTotal(kappa=np.array([10]),
+                                      F_ext_list=F_ext_list)
         sim_config._fu = fu_tot_poteng
         st = SimulationTask(previous_task=self.fold_task,
                             config=sim_config, n_steps=1)

@@ -24,7 +24,8 @@ from oricreate.crease_pattern.crease_pattern_viz3d import CreasePatternThickViz3
 from oricreate.gu import GuConstantLength, GuDofConstraints, fix
 from oricreate.simulation_step import \
     SimulationStep, SimulationConfig
-from sim_task_twist_folding import TwistFolding
+from sim_task_twist_folding import \
+    TwistFolding, create_cp_factory, oricreate_mlab_label
 
 
 def run_sim():
@@ -45,9 +46,10 @@ def run_sim():
         [0], [0, 1, 2]) + fix([1], [1, 2]) + fix([5], [2]) + fix([3], [0], -1.9599)
     gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
     sim_config = SimulationConfig(gu={'cl': gu_constant_length,
-                                      'dofs': gu_dof_constraints})
+                                      'dofs': gu_dof_constraints},
+                                  acc=1e-5, MAX_ITER=1000)
     sim_step = SimulationStep(forming_task=cp_factory,
-                              config=sim_config, acc=1e-5, MAX_ITER=1000)
+                              config=sim_config)
 
     if False:
         # Configure rendering visualization operators

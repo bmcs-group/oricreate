@@ -3,7 +3,7 @@ from oricreate.api import CreasePatternState, CustomCPFactory
 from oricreate.api import GuConstantLength, GuDofConstraints, \
     SimulationConfig, SimulationTask, fix, FTV
 from oricreate.fu import \
-    FuTotalPotentialEnergy
+    FuPotEngTotal
 
 
 def create_cp_factory02(n=4):
@@ -28,7 +28,7 @@ def create_cp_factory02(n=4):
     return cp_factory
 
 
-def create_cp_factory(n=4):
+def create_cp_factory(n=4, b=1):
     '''
     define quantity of facets
     number of facets=2n-1
@@ -43,7 +43,7 @@ def create_cp_factory(n=4):
     # create array
     X = np.zeros((num_coord, 3))
 
-    X[n + 1:2 * n + 1, 1] = 1
+    X[n + 1:2 * n + 1, 1] = b
 
     i = 1
 
@@ -133,8 +133,8 @@ def create_cp_factory(n=4):
 
 if __name__ == '__main__':
 
-    n = 6
-    cp_factory_task = create_cp_factory(n=n)
+    n = 30
+    cp_factory_task = create_cp_factory(n=n, b=10.0)
     cp = cp_factory_task.formed_object
 
     #cp.x_0[4, 2] = 0.3
@@ -146,25 +146,25 @@ if __name__ == '__main__':
         + fix([n + 1], [2])  # + fix([n * 2], [1])
     gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
 
-    sim_config = SimulationConfig(goal_function_type='potential_energy',
+    sim_config = SimulationConfig(goal_function_type='total potential energy',
                                   debug_level=0,
-                                  use_f_du=False,
+                                  use_f_du=True,
                                   gu={'cl': gu_constant_length,
                                       'dofs': gu_dof_constraints},
                                   acc=1e-7, MAX_ITER=1000)
 
     F_nodes = np.linspace(0, -10, n)
-    #F_ext_list = [(i + 1, 2, F_n) for i, F_n in enumerate(F_nodes)]
-    F_ext_list = [(2 * n, 2, -10)]
+    F_ext_list = [(i + 1, 2, F_n) for i, F_n in enumerate(F_nodes)]
+    #F_ext_list = [(2 * n, 2, -10)]
 
-    fu_tot_poteng = FuTotalPotentialEnergy(kappa=10000.0, fu_factor=1,
-                                           F_ext_list=F_ext_list)  # (2 * n, 2, -1)])
+    fu_tot_poteng = FuPotEngTotal(kappa=5000.0, fu_factor=1,
+                                  F_ext_list=F_ext_list)  # (2 * n, 2, -1)])
     sim_config._fu = fu_tot_poteng
     sim_task = SimulationTask(previous_task=cp_factory_task,
                               config=sim_config,
                               n_steps=1)
     cp = sim_task.formed_object
-    cp.x_0 = sim_task.previous_task.x_1
+    cp.x_0 = np.copy(sim_task.previous_task.formed_object.X)
     cp.u[:, :] = 0.0
     fu_tot_poteng.forming_task = sim_task
 
