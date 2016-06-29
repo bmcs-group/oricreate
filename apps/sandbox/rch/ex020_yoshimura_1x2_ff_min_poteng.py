@@ -67,7 +67,7 @@ class BarrellVaultGravityFormingProcess(HasTraits):
         sim_config = SimulationConfig(goal_function_type='gravity potential energy',
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
-                                      acc=1e-5, MAX_ITER=500,
+                                      acc=1e-7, MAX_ITER=500,
                                       debug_level=0)
 
         st = SimulationTask(previous_task=self.init_displ_task,
@@ -98,7 +98,7 @@ class BarrellVaultGravityFormingProcess(HasTraits):
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
                                       use_f_du=True,
-                                      acc=1e-3, MAX_ITER=500,
+                                      acc=1e-5, MAX_ITER=500,
                                       debug_level=0)
         F_ext_list = [(n, 1, -1) for n in n_t_h]
 
@@ -122,7 +122,7 @@ class BikeShellterFormingProcessFTV(FTV):
 
 if __name__ == '__main__':
     bsf_process = BarrellVaultGravityFormingProcess(
-        L_x=1.0, n_x=1, n_steps=1, u_x=0.1)
+        L_x=1.0, n_x=1, n_steps=1, u_x=0.01)
     it = bsf_process.init_displ_task
     ft = bsf_process.fold_task
     lt = bsf_process.load_task
@@ -134,7 +134,7 @@ if __name__ == '__main__':
 #     ftv.add(it.formed_object.viz3d_dict['node_numbers'], order=5)
     lt.formed_object.viz3d.set(tube_radius=0.002)
     ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
-    ftv.add(lt.formed_object.viz3d)
+    ftv.add(lt.formed_object.viz3d_dict['displ'])
     lt.config.gu['dofs'].viz3d.scale_factor = 0.5
     ftv.add(lt.config.gu['dofs'].viz3d)
 
@@ -148,10 +148,6 @@ if __name__ == '__main__':
     print 'lt_u', cp.u
     cp.u[:, 1] = -0.001
     print 'lt.u_1', lt.u_1
-
-    cp = lt.formed_object
-    iL_phi = cp.iL_psi2 - cp.iL_psi_0
-    print 'phi',  iL_phi
 
     ftv.plot()
     ftv.update(vot=1, force=True)

@@ -131,7 +131,7 @@ if __name__ == '__main__':
 #     ftv.add(it.formed_object.viz3d_dict['node_numbers'], order=5)
     lt.formed_object.viz3d.set(tube_radius=0.002)
     ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
-    ftv.add(lt.formed_object.viz3d)
+    ftv.add(lt.formed_object.viz3d_dict['displ'])
     lt.config.gu['dofs'].viz3d.scale_factor = 0.5
     ftv.add(lt.config.gu['dofs'].viz3d)
 

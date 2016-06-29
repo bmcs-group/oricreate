@@ -203,19 +203,19 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
     def _get_load_task(self):
         self.fold_task.x_1
 
-        fixed_nodes = fix(
-            [0, 2, 20, 22], (0, 1, 2))
-
+        fixed_nodes = fix([0, 2, 20,  22], (0, 1, 2)) + \
+            fix([1, 21], [0, 2])
         dof_constraints = fixed_nodes
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
         sim_config = SimulationConfig(goal_function_type='total potential energy',
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
-                                      acc=1e-3, MAX_ITER=1000,
+                                      acc=1e-5, MAX_ITER=1000,
                                       debug_level=0)
-        F_ext_list = [(11, 2, 10)]
-        fu_tot_poteng = FuPotEngTotal(kappa=np.array([100]),
+        nodes = [11]
+        F_ext_list = [(n, 2, 20) for n in nodes]
+        fu_tot_poteng = FuPotEngTotal(kappa=np.array([1000]),
                                       F_ext_list=F_ext_list)  # (2 * n, 2, -1)])
         sim_config._fu = fu_tot_poteng
         st = SimulationTask(previous_task=self.fold_task,
@@ -223,7 +223,8 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
         fu_tot_poteng.forming_task = st
         cp = st.formed_object
         cp.x_0 = self.fold_task.x_1
-        cp.u[:, :] = 0.0000
+        cp.u[:, :] = 0.0
+        cp.u[tuple(nodes), 2] = 0.00001
         return st
 
     def generate_scaffolding(self, x_scaff_position):
@@ -375,7 +376,7 @@ if __name__ == '__main__':
 #     ftv.add(it.formed_object.viz3d_dict['node_numbers'], order=5)
     lt.formed_object.viz3d.set(tube_radius=0.002)
     ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
-    ftv.add(lt.formed_object.viz3d)
+    ftv.add(lt.formed_object.viz3d_dict['displ'])
     lt.config.gu['dofs'].viz3d.scale_factor = 0.5
     ftv.add(lt.config.gu['dofs'].viz3d)
 
