@@ -167,9 +167,12 @@ if __name__ == '__main__':
     print unit_nl01_dul1
 
     # get the map of facet nodes attached to interior lines
-    iL0_N_map = cp.F[cp.iL_F[:, 0]].reshape(cp.n_iL, -1)
-    iL1_N_map = cp.F[cp.iL_F[:, 1]].reshape(cp.n_iL, -1)
-    iL_N_map = cp.iL_N
+    iL0_N_map = cp.F_N[cp.iL_F[:, 0]].reshape(cp.n_iL, -1)
+    iL1_N_map = cp.F_N[cp.iL_F[:, 1]].reshape(cp.n_iL, -1)
+    #iL_N_map = cp.iL_N
+    iL_N_map = cp.F_L_N[cp.iL_within_F0]
+    print 'iL_N_map', iL_N_map.shape
+    print iL_N_map
 
     # enumerate the interior lines and broadcast it N and D into dimensions
     iL_map = np.arange(cp.n_iL)[:, np.newaxis, np.newaxis]

@@ -86,7 +86,7 @@ class BarrellVaultGravityFormingProcess(HasTraits):
         n_l_h = cp.N_h[0, (0, -1)].flatten()
         n_r_h = cp.N_h[-1, (0, -1)].flatten()
 
-        dof_constraints = fix(n_l_h, [0, 1, 2]) + fix(n_r_h, [0, 2])
+        dof_constraints = fix(n_l_h, [0, 1, 2]) + fix(n_r_h, [0, 1, 2])
 
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
@@ -132,6 +132,7 @@ if __name__ == '__main__':
     lt.formed_object.viz3d.set(tube_radius=0.002)
     ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
     ftv.add(lt.formed_object.viz3d)
+    ftv.add(lt.formed_object.viz3d_dict['displ'])
     lt.config.gu['dofs'].viz3d.scale_factor = 0.5
     ftv.add(lt.config.gu['dofs'].viz3d)
 

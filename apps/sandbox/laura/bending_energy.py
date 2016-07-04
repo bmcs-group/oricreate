@@ -3,15 +3,16 @@
 from traits.api import \
     implements, List, Tuple, Float
 
-from apps.sandbox.laura.custom_factory_corbel_yoshimura import create_cp_factory
+from apps.sandbox.laura.custom_factory_corbel_yoshimura import \
+    create_cp_factory
 import numpy as np
 from oricreate.api import GuConstantLength, GuDofConstraints, \
     SimulationConfig, SimulationTask, fix, FTV
 from oricreate.fu import \
-    FuTotalPotentialEnergy
+    FuPotEngTotal
 
 if __name__ == '__main__':
-    cp_factory_task = create_cp_factory()
+    cp_factory_task = create_cp_factory(n=9)
     cp = cp_factory_task.formed_object
     print 'x', cp.x
 
@@ -22,14 +23,14 @@ if __name__ == '__main__':
         + fix([6], [0, 2]) + fix([8], [2])
     gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
 
-    sim_config = SimulationConfig(goal_function_type='potential_energy',
+    sim_config = SimulationConfig(goal_function_type='total potential energy',
                                   debug_level=0,
                                   use_f_du=False,
                                   gu={'cl': gu_constant_length,
                                       'dofs': gu_dof_constraints},
                                   acc=1e-5, MAX_ITER=100)
-    fu_tot_poteng = FuTotalPotentialEnergy(kappa=10,
-                                           F_ext_list=[(5, 2, -1), (7, 2, -1), (4, 2, -1)])
+    fu_tot_poteng = FuPotEngTotal(kappa=10,
+                                  F_ext_list=[(5, 2, -1), (7, 2, -1), (4, 2, -1)])
     sim_config._fu = fu_tot_poteng
     sim_task = SimulationTask(previous_task=cp_factory_task,
                               config=sim_config,

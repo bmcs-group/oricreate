@@ -203,18 +203,18 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
     def _get_load_task(self):
         self.fold_task.x_1
 
-        fixed_nodes = fix([0, 2, 20,  22], (0, 1, 2)) + \
-            fix([1, 21], [0, 2])
+        fixed_nodes = fix([0, 2, 20,  22], (0, 1, 2))  # + \
+        #fix([1, 21], [0, 2])
         dof_constraints = fixed_nodes
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
         sim_config = SimulationConfig(goal_function_type='total potential energy',
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
-                                      acc=1e-5, MAX_ITER=1000,
+                                      acc=1e-6, MAX_ITER=1000,
                                       debug_level=0)
-        nodes = [11]
-        F_ext_list = [(n, 2, 20) for n in nodes]
+        nodes = [10, 11, 12]
+        F_ext_list = [(n, 2, 0.1) for n in nodes]
         fu_tot_poteng = FuPotEngTotal(kappa=np.array([1000]),
                                       F_ext_list=F_ext_list)  # (2 * n, 2, -1)])
         sim_config._fu = fu_tot_poteng

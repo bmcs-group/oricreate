@@ -212,9 +212,9 @@ class FuPotEngTotal(Fu, Visual3D):
             print unit_nl01_dul1
 
         # get the map of facet nodes attached to interior lines
-        iL0_N_map = cp.F[cp.iL_F[:, 0]].reshape(cp.n_iL, -1)
-        iL1_N_map = cp.F[cp.iL_F[:, 1]].reshape(cp.n_iL, -1)
-        iL_N_map = cp.iL_N
+        iL0_N_map = cp.F_N[cp.iL_F[:, 0]].reshape(cp.n_iL, -1)
+        iL1_N_map = cp.F_N[cp.iL_F[:, 1]].reshape(cp.n_iL, -1)
+        iL_N_map = cp.F_L_N[cp.iL_within_F0]
 
         # enumerate the interior lines and broadcast it N and D into dimensions
         iL_map = np.arange(cp.n_iL)[:, np.newaxis, np.newaxis]

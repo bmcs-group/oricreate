@@ -402,12 +402,21 @@ class CreasePattern(CreaseNodeOperators,
     '''
     @cached_property
     def _get_F_L(self):
+        # get cycled  node numbers around a facet
+        F_L_N = self.F_L_N
+        # use the NN_L map to get line numbers
+        return self.NN_L[F_L_N[..., 0], F_L_N[..., 1]]
+
+    F_L_N = Property(depends_on=INPUT)
+    '''Facets with lines enumerated counterclockwise.
+    Array with the shape ``(n_F, 3, 2)``
+    '''
+    @cached_property
+    def _get_F_L_N(self):
         # cycle indexes around the nodes of a facet
         ix_arr = np.array([[0, 1], [1, 2], [2, 0]])
         # get cycled  node numbers around a facet
-        F_N = self.F_N[:, ix_arr]
-        # use the NN_L map to get line numbers
-        return self.NN_L[F_N[..., 0], F_N[..., 1]]
+        return self.F_N[:, ix_arr]
 
     def _get_nbr_cycle(self, neighbors):
         '''Auxiliary private methods identifying cycles around a node.

@@ -93,20 +93,19 @@ class BarrellVaultGravityFormingProcess(HasTraits):
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
                                       use_f_du=True,
-                                      acc=1e-5, MAX_ITER=1000,
+                                      acc=1e-7, MAX_ITER=1000,
                                       debug_level=0)
-        F_ext_list = [(n, 2, -1) for n in [1, 3]]
-
+        F_ext_list = [(n, 2, -100) for n in [1, 3]]
         print 'F_ext_list', F_ext_list
-        kappa = np.array([0, 0, 0, 0, 10, 10])
-        fu_tot_poteng = FuPotEngTotal(kappa=kappa, fu_factor=0.1,
+        fu_tot_poteng = FuPotEngTotal(kappa=1, fu_factor=1,
                                       F_ext_list=F_ext_list)
         sim_config._fu = fu_tot_poteng
         st = SimulationTask(previous_task=self.fold_task,
                             config=sim_config, n_steps=1)
         cp = st.formed_object
         cp.x_0 = self.fold_task.x_1
-        cp.u[(4, 5), 2] = 0.001
+        cp.u[:, :] = 0.0
+        #cp.u[(4, 5), 2] = -0.001
         cp.u[(1, 3), 2] = -0.001
         fu_tot_poteng.forming_task = st
         return st
