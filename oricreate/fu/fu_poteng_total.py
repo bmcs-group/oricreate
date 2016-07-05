@@ -20,6 +20,8 @@ from fu import \
     Fu
 from fu_poteng_bending_viz3d import \
     FuPotEngBendingViz3D
+from fu_poteng_node_load_viz3d import \
+    FuPotEngNodeLoadViz3D
 import numpy as np
 from oricreate.opt import \
     IFu
@@ -269,4 +271,5 @@ class FuPotEngTotal(Fu, Visual3D):
 
     @cached_property
     def _get_viz3d_dict(self):
-        return dict(default=FuPotEngBendingViz3D(vis3d=self))
+        return dict(default=FuPotEngBendingViz3D(vis3d=self),
+                    node_load=FuPotEngNodeLoadViz3D(vis3d=self))

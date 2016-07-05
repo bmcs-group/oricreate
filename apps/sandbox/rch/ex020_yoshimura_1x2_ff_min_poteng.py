@@ -139,6 +139,7 @@ if __name__ == '__main__':
     ftv.add(lt.config.gu['dofs'].viz3d)
 
     ftv.add(lt.config.fu.viz3d)
+    ftv.add(lt.config.fu.viz3d_dict['node_load'])
 
     it.u_1
     ft.u_1

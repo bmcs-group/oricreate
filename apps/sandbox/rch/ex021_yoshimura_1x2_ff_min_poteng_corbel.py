@@ -17,8 +17,8 @@ class BarrellVaultGravityFormingProcess(HasTraits):
     target surfaces and configuration of the algorithm itself.
     '''
 
-    L_x = Float(2.0, auto_set=False, enter_set=True, input=True)
-    L_y = Float(1.0, auto_set=False, enter_set=True, input=True)
+    L_x = Float(0.5, auto_set=False, enter_set=True, input=True)
+    L_y = Float(0.25, auto_set=False, enter_set=True, input=True)
     n_x = Int(1, auto_set=False, enter_set=True, input=True)
     n_y = Int(2, auto_set=False, enter_set=True, input=True)
     u_x = Float(0.1, auto_set=False, enter_set=True, input=True)
@@ -93,11 +93,11 @@ class BarrellVaultGravityFormingProcess(HasTraits):
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
                                       use_f_du=True,
-                                      acc=1e-7, MAX_ITER=1000,
+                                      acc=1e-8, MAX_ITER=1000,
                                       debug_level=0)
-        F_ext_list = [(n, 2, -100) for n in [1, 3]]
+        F_ext_list = [(n, 2, -1) for n in [1, 3]]
         print 'F_ext_list', F_ext_list
-        fu_tot_poteng = FuPotEngTotal(kappa=1, fu_factor=1,
+        fu_tot_poteng = FuPotEngTotal(kappa=10, fu_factor=1,
                                       F_ext_list=F_ext_list)
         sim_config._fu = fu_tot_poteng
         st = SimulationTask(previous_task=self.fold_task,
@@ -106,7 +106,7 @@ class BarrellVaultGravityFormingProcess(HasTraits):
         cp.x_0 = self.fold_task.x_1
         cp.u[:, :] = 0.0
         #cp.u[(4, 5), 2] = -0.001
-        cp.u[(1, 3), 2] = -0.001
+        #cp.u[(1, 3), 2] = -0.001
         fu_tot_poteng.forming_task = st
         return st
 
@@ -135,6 +135,7 @@ if __name__ == '__main__':
     ftv.add(lt.config.gu['dofs'].viz3d)
 
     ftv.add(lt.config.fu.viz3d)
+    ftv.add(lt.config.fu.viz3d_dict['node_load'])
 
     # it.u_1
     # ft.u_1

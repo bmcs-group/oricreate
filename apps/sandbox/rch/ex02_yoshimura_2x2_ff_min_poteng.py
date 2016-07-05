@@ -137,6 +137,7 @@ if __name__ == '__main__':
     ftv.add(lt.config.gu['dofs'].viz3d)
 
     ftv.add(lt.config.fu.viz3d)
+    ftv.add(lt.config.fu.viz3d_dict['node_load'])
 
     print 'ft_x1', ft.x_1
     cp = lt.formed_object

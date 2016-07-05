@@ -97,8 +97,7 @@ class BarrellVaultGravityFormingProcess(HasTraits):
                                           'dofs': gu_dof_constraints},
                                       acc=1e-4, MAX_ITER=1000,
                                       debug_level=0)
-        F_ext_list = [(n, 2, 1.0) for n in cp.N_h[2, :]]
-        print 'F_ext_list', F_ext_list
+        F_ext_list = [(n, 1, 1.0) for n in cp.N_h[2, :]]
         fu_tot_poteng = FuPotEngTotal(kappa=np.array([10]),
                                       F_ext_list=F_ext_list)
         sim_config._fu = fu_tot_poteng
@@ -139,6 +138,7 @@ if __name__ == '__main__':
 #     lt.config.gu['dofs'].viz3d.scale_factor = 0.5
 #     ftv.add(lt.config.gu['dofs'].viz3d)
     ftv.add(lt.config.fu.viz3d)
+    ftv.add(lt.config.fu.viz3d_dict['node_load'])
 
 #    ftv.add(ft.sim_history.viz3d_dict['node_numbers'], order=5)
 #    ft.sim_history.viz3d.set(tube_radius=0.002)

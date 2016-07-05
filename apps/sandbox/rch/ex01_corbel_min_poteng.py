@@ -133,7 +133,7 @@ def create_cp_factory(n=4, b=1):
 
 if __name__ == '__main__':
 
-    n = 20
+    n = 10
     cp_factory_task = create_cp_factory(n=n, b=10.5)
     cp = cp_factory_task.formed_object
 
@@ -184,6 +184,7 @@ if __name__ == '__main__':
     ftv.add(sim_task.formed_object.viz3d)
     ftv.add(gu_dof_constraints.viz3d)
     ftv.add(fu_tot_poteng.viz3d)
+    ftv.add(fu_tot_poteng.viz3d_dict['node_load'])
     ftv.plot()
     ftv.update(vot=1, force=True)
     ftv.show()

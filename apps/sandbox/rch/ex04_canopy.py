@@ -363,10 +363,10 @@ if __name__ == '__main__':
     mt = bsf_process.mask_task
     ab = bsf_process.add_boundary_task
 
-    import pylab as p
-    ax = p.axes()
-    ab.formed_object.plot_mpl(ax)
-    p.show()
+#     import pylab as p
+#     ax = p.axes()
+#     ab.formed_object.plot_mpl(ax)
+#     p.show()
 
     it = bsf_process.init_displ_task
     ft = bsf_process.fold_task
@@ -383,6 +383,7 @@ if __name__ == '__main__':
     lt.config.gu['dofs'].viz3d.scale_factor = 0.5
     ftv.add(lt.config.gu['dofs'].viz3d)
     ftv.add(lt.config.fu.viz3d)
+    ftv.add(lt.config.fu.viz3d_dict['node_load'])
 
 #    ftv.add(ft.sim_history.viz3d_dict['node_numbers'], order=5)
 #    ft.sim_history.viz3d.set(tube_radius=0.002)
