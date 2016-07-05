@@ -159,7 +159,7 @@ class BikeShellterFormingProcess(HasTraits):
     @cached_property
     def _get_init_displ_task(self):
         cp = self.mask_task.formed_object
-        return MapToSurface(previous_task=self.mask_task,
+        return MapToSurface(previous_task=self.add_boundary_task,
                             target_faces=[(self.ctf, cp.N)])
 
     fold_task = Property(Instance(FormingTask))
