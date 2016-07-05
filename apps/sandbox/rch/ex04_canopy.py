@@ -34,7 +34,7 @@ def get_fr(var_, L, H):
 
 
 class AddBoundaryTask(MappingTask):
-    '''Boundary facet to stiffen the shell
+    '''
     '''
 
     def _add_boundary_facet(self, N1, N2, dir_=-1, delta=0.1, N_start_idx=0):
@@ -43,40 +43,38 @@ class AddBoundaryTask(MappingTask):
         dx = x1[:, 0] - x2[:, 0]
         dy = x1[:, 1] - x2[:, 1]
         dz = np.zeros_like(dy)
-        # direction vector
         dirvec = np.c_[dx, dy, dz]
 
         x4 = x2[:, :]
         x4[:, 1] += dir_ * delta
         x3 = np.copy(x4)
-        x3[:, :] += dirvec * 0.8
+        x3[:, :] += dirvec * 0.82
 
-        x_add = np.array([x3[0],
-                          x4[0],
-                          x3[1]])
-        N = N_start_idx + np.arange(len(x_add))
+        x_add = np.vstack([x3, x4])
+        N3 = N_start_idx + np.arange(len(x3))
+        N4 = N_start_idx + len(x3) + np.arange(len(x4))
 
-        L_add = np.array([[N1[0], N[0]],
-                          [N2[0], N[0]],
-                          [N[0], N[1]],
-                          [N2[0], N[1]],
-                          [N1[1], N[2]],
-                          [N2[1], N[2]]
-                          ])
+        L_add = np.vstack([
+            np.array([N1, N3]).T,
+            np.array([N2, N3]).T,
+            np.array([N3, N4]).T,
+            np.array([N2, N4]).T
+        ])
 
-        F_add = np.array([[N1[0], N[0], N2[0]],
-                          [N[0], N[1], N2[0]],
-                          [N1[1], N[2], N2[1]]])
+        F_add = np.vstack([
+            np.array([N1, N3, N2]).T,
+            np.array([N3, N4, N2]).T
+        ])
 
         return x_add, L_add, F_add
 
     def _get_formed_object(self):
-        '''attach additional facets at the boundary
+        '''attach additional facets at the obundary
         '''
         cp = self.previous_task.formed_object
         x_0, L, F = cp.x_0, cp.L, cp.F
         n_N = len(x_0)
-        n_N_add = 3
+        n_N_add = 8
         x_br, L_br, F_br = self._add_boundary_facet(
             [8, 37, 15, 43], [37, 15, 43, 20], -1, 0.1, n_N)
         x_bl, L_bl, F_bl = self._add_boundary_facet(
@@ -183,9 +181,13 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
         control_right = fix(
             [20, 21, 22], (0),
             lambda t: -t * u_max)
+        front_node = fix(
+            [8], (1), lambda t: t * 0.03)
+        back_node = fix(
+            [14], (1), lambda t: -t * 0.03)
 
         dof_constraints = fixed_nodes_z + fixed_nodes_y + \
-            control_left + control_right
+            control_left + control_right + front_node + back_node
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
         sim_config = SimulationConfig(goal_function_type='gravity potential energy',
@@ -360,14 +362,15 @@ if __name__ == '__main__':
     fa = bsf_process.factory_task
     mt = bsf_process.mask_task
     ab = bsf_process.add_boundary_task
+
+    import pylab as p
+    ax = p.axes()
+    ab.formed_object.plot_mpl(ax)
+    p.show()
+
     it = bsf_process.init_displ_task
     ft = bsf_process.fold_task
     lt = bsf_process.load_task
-
-#     import pylab as p
-#     ax = p.axes()
-#     ab.formed_object.plot_mpl(ax)
-#     p.show()
 
     ftv = DoublyCurvedYoshiFormingProcessFTV(model=bsf_process)
 #     ftv.add(it.target_faces[0].viz3d)
@@ -375,7 +378,7 @@ if __name__ == '__main__':
 #     ftv.add(it.formed_object.viz3d)
 #     ftv.add(it.formed_object.viz3d_dict['node_numbers'], order=5)
     lt.formed_object.viz3d.set(tube_radius=0.002)
-    ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
+#    ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
     ftv.add(lt.formed_object.viz3d_dict['displ'])
     lt.config.gu['dofs'].viz3d.scale_factor = 0.5
     ftv.add(lt.config.gu['dofs'].viz3d)
