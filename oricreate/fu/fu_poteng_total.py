@@ -15,7 +15,7 @@
 from traits.api import \
     implements,  List, Tuple, Float, \
     cached_property, Property, Array, Int
-
+import types
 from fu import \
     Fu
 from fu_poteng_bending_viz3d import \
@@ -65,6 +65,16 @@ class FuPotEngTotal(Fu, Visual3D):
             cp = self.forming_task.formed_object
             return np.ones((cp.n_iL,), dtype='float_') * self._kappa
 
+    def _get_F_ext(self, t=0):
+        cp = self.forming_task.formed_object
+        F_ext = np.zeros_like(cp.u, dtype='float_')
+        for node, dim, value in self.F_ext_list:
+            if isinstance(value, types.FunctionType):
+                F_ext[node, dim] = value(t)
+            else:
+                F_ext[node, dim] = value
+        return F_ext
+
     fu_factor = Float(1.0)
 
     def get_f(self, t=0):
@@ -77,14 +87,10 @@ class FuPotEngTotal(Fu, Visual3D):
         stored_energy = np.einsum(
             '...i,...i,...i->...', self.kappa, iL_phi**2, iL_length) / 2.0
 
-        F_ext = np.zeros_like(cp.u, dtype='float_')
-        for node, dim, value in self.F_ext_list:
-            F_ext[node, dim] = value
-
+        F_ext = self._get_F_ext(t)
         ext_energy = np.einsum(
             '...i,...i->...', F_ext.flatten(), cp.u.flatten())
         tot_energy = self.fu_factor * (stored_energy - ext_energy)
-        print 'tot_energy', tot_energy
         return tot_energy
 
     def get_f_du(self, t=0):
@@ -251,9 +257,7 @@ class FuPotEngTotal(Fu, Visual3D):
             print 'psi_du', psi_du.shape
             print psi_du
 
-        F_ext = np.zeros_like(cp.u, dtype='float_')
-        for node, dim, value in self.F_ext_list:
-            F_ext[node, dim] = value
+        F_ext = self._get_F_ext(t)
 
         iL_phi = cp.iL_psi2 - cp.iL_psi_0
         iL_length = np.linalg.norm(cp.iL_vectors, axis=1)

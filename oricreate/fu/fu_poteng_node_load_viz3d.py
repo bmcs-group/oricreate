@@ -19,7 +19,7 @@ class FuPotEngNodeLoadViz3D(Viz3D):
     '''Visualize the crease Pattern
     '''
 
-    def get_node_load_values(self):
+    def get_node_load_values(self, t):
         fu_tot_poteng = self.vis3d
         ft = fu_tot_poteng.forming_task
         cp = ft.formed_object
@@ -28,9 +28,8 @@ class FuPotEngNodeLoadViz3D(Viz3D):
                       in fu_tot_poteng.F_ext_list], dtype='int_')
         dims = np.array([dim for node, dim, value
                          in fu_tot_poteng.F_ext_list], dtype='int_')
-        values = np.array([value for node, dim, value
+        values = np.array([value(t) for node, dim, value
                            in fu_tot_poteng.F_ext_list], dtype='float_')
-
         x_n = cp.x[n, :]
         x0_n = np.copy(x_n)
         x0_n[np.arange(len(values)), dims] -= values
@@ -43,7 +42,7 @@ class FuPotEngNodeLoadViz3D(Viz3D):
     def plot(self):
 
         m = self.ftv.mlab
-        x, y, z, u, v, w = self.get_node_load_values()
+        x, y, z, u, v, w = self.get_node_load_values(1.0)
 
         self.cl_arrow = m.quiver3d(x, y, z, u, v, w, mode='arrow',
                                    color=(1.0, 0.0, 0.0),
@@ -52,5 +51,5 @@ class FuPotEngNodeLoadViz3D(Viz3D):
         m.pipeline.surface(self.cl_arrow)
 
     def update(self):
-        x, y, z, u, v, w = self.get_node_load_values()
+        x, y, z, u, v, w = self.get_node_load_values(1.0)
         self.cl_arrow.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)

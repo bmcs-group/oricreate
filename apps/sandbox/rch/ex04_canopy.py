@@ -198,35 +198,75 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
         return SimulationTask(previous_task=self.init_displ_task,
                               config=sim_config, n_steps=self.n_steps)
 
+    turn_task = Property(Instance(FormingTask))
+    '''Configure the simulation task.
+    '''
+    @cached_property
+    def _get_turn_task(self):
+        self.fold_task.x_1
+        fixed_nodes_z = fix(
+            [0, 1, 2, 20, 21, 22], (0, 2))
+        fixed_nodes_y = fix(
+            [1, 21], (1))
+        front_nodes = fix(
+            [8, 14], (0, 1, 2))
+
+        dof_constraints = fixed_nodes_z + fixed_nodes_y + \
+            front_nodes
+        gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
+        gu_constant_length = GuConstantLength()
+        sim_config = SimulationConfig(goal_function_type='gravity potential energy',
+                                      gu={'cl': gu_constant_length,
+                                          'dofs': gu_dof_constraints},
+                                      acc=1e-5, MAX_ITER=500,
+                                      debug_level=0)
+        st = SimulationTask(previous_task=self.fold_task,
+                            config=sim_config, n_steps=1)
+        cp = st.formed_object
+        cp.x_0 = self.fold_task.x_1
+        cp.x_0[:, 2] *= -1
+        cp.u[:, :] = 0.0
+
+        cp.u[tuple(np.arange(47, 47 + 32)), 2] = -0.2
+
+        return st
+
     load_task = Property(Instance(FormingTask))
     '''Configure the simulation task.
     '''
     @cached_property
     def _get_load_task(self):
-        self.fold_task.x_1
+        self.turn_task.x_1
 
-        fixed_nodes = fix([0, 2, 20,  22], (0, 1, 2))  # + \
+        fixed_nodes_yz = fix([0, 2, 20,  22], (1, 2))  # + \
+        fixed_nodes_x = fix([0, 2, 20, 22], (0))  # + \
         #    fix([1, 21], [0, 2])
-        dof_constraints = fixed_nodes
+
+        link_bnd = link([48, 49, 50, 56, 57, 58, 64, 65, 66, 72, 73, 74],
+                        [0, 1, 2], 1.0,
+                        [51, 52, 53, 59, 60, 61, 67, 68, 69, 75, 76, 77],
+                        [0, 1, 2], -1.0)
+
+        dof_constraints = fixed_nodes_x + fixed_nodes_yz + link_bnd
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
         sim_config = SimulationConfig(goal_function_type='total potential energy',
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
-                                      acc=1e-4, MAX_ITER=1000,
+                                      acc=1e-5, MAX_ITER=1000,
                                       debug_level=0)
-        nodes = [9, 10, 11, 12, 13]
-        F_ext_list = [(n, 2, 10) for n in nodes]
+        load_nodes = [8, 9, 10, 11, 12, 13, 14]
+        FN = lambda F: lambda t: t * F
+        F_ext_list = [(n, 2, FN(-10)) for n in load_nodes]
         fu_tot_poteng = FuPotEngTotal(kappa=np.array([10]),
                                       F_ext_list=F_ext_list)  # (2 * n, 2, -1)])
         sim_config._fu = fu_tot_poteng
-        st = SimulationTask(previous_task=self.fold_task,
+        st = SimulationTask(previous_task=self.turn_task,
                             config=sim_config, n_steps=1)
         fu_tot_poteng.forming_task = st
         cp = st.formed_object
-        cp.x_0 = self.fold_task.x_1
+        cp.x_0 = self.turn_task.x_1
         cp.u[:, :] = 0.0
-        #cp.u[tuple(nodes), 2] = 0.00001
         return st
 
     def generate_scaffolding(self, x_scaff_position):
@@ -359,6 +399,8 @@ if __name__ == '__main__':
     bsf_process = DoublyCurvedYoshiFormingProcess(L_x=3.0, L_y=2.41, n_x=4,
                                                   n_y=12, u_x=0.1, n_steps=4)
 
+    ftv = DoublyCurvedYoshiFormingProcessFTV(model=bsf_process)
+
     fa = bsf_process.factory_task
     mt = bsf_process.mask_task
     ab = bsf_process.add_boundary_task
@@ -370,9 +412,20 @@ if __name__ == '__main__':
 
     it = bsf_process.init_displ_task
     ft = bsf_process.fold_task
+    tt = bsf_process.turn_task
+
+#     tt.formed_object.viz3d.set(tube_radius=0.002)
+#     ftv.add(tt.formed_object.viz3d)
+#     tt.config.gu['dofs'].viz3d.scale_factor = 0.5
+#     ftv.add(tt.config.gu['dofs'].viz3d)
+#     tt.u_1
+#     ftv.plot()
+#     ftv.update(vot=1, force=True)
+#     ftv.show()
+
     lt = bsf_process.load_task
 
-    ftv = DoublyCurvedYoshiFormingProcessFTV(model=bsf_process)
+
 #     ftv.add(it.target_faces[0].viz3d)
 #     it.formed_object.viz3d.set(tube_radius=0.002)
 #     ftv.add(it.formed_object.viz3d)
@@ -393,12 +446,18 @@ if __name__ == '__main__':
 #     ftv.add(ft.config.gu['dofs'].viz3d)
 #
     it.u_1
+    tt.u_1
     ft.u_1
 
 #     cp = lt.formed_object
 #     cp.u[:, :] = 0.00001
 #
     lt.u_1
+
+    cp = lt.formed_object
+    iL_phi = cp.iL_psi2 - cp.iL_psi_0
+    iL_m = lt.config._fu.kappa * iL_phi
+    print 'moments', np.max(np.fabs(iL_m))
 
     # bsf_process.generate_scaffoldings()
 

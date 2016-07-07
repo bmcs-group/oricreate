@@ -134,7 +134,7 @@ def create_cp_factory(n=4, b=1):
 if __name__ == '__main__':
 
     n = 10
-    cp_factory_task = create_cp_factory(n=n, b=10.5)
+    cp_factory_task = create_cp_factory(n=n, b=2.0)
     cp = cp_factory_task.formed_object
 
     #cp.x_0[4, 2] = 0.3
@@ -154,15 +154,18 @@ if __name__ == '__main__':
                                   acc=1e-7, MAX_ITER=1000)
 
     F_nodes = np.linspace(0, -10, n)
-    F_ext_list = [(i + 1, 2, F_n) for i, F_n in enumerate(F_nodes)]
-    #F_ext_list = [(2 * n, 2, -10)]
+    F_ext_list = [(i + 1, 2, lambda t: t * F_n)
+                  for i, F_n in enumerate(F_nodes)]
+    FN = lambda F: lambda t: t * F
+    F_ext_list = [(i + 1, 2, FN(F_n)) for i, F_n in enumerate(F_nodes)]
 
     fu_tot_poteng = FuPotEngTotal(kappa=np.array([5000.0]), fu_factor=1,
                                   F_ext_list=F_ext_list)  # (2 * n, 2, -1)])
+
     sim_config._fu = fu_tot_poteng
     sim_task = SimulationTask(previous_task=cp_factory_task,
                               config=sim_config,
-                              n_steps=1)
+                              n_steps=10)
     cp = sim_task.formed_object
     cp.x_0 = np.copy(sim_task.previous_task.formed_object.X)
     cp.u[:, :] = 0.0
