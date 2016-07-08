@@ -56,24 +56,16 @@ class BarrellVaultGravityFormingProcess(HasTraits):
         x_1 = self.init_displ_task.x_1
         cp = self.factory_task
 
-#         n_l_h = cp.N_h[0, :].flatten()
-#         n_r_h = cp.N_h[-1, :].flatten()
-#         n_lr_h = cp.N_h[(0, -1), :].flatten()
-#         n_fixed_y = cp.N_h[(0, -1), 1].flatten()
-
-        n_l_h = [0, 1, 2]
-        n_r_h = [15, 16, 17]
-        n_lr_h = [0, 1, 2, 15, 16, 17]
-        n_fixed_y = [1, 16]
-
-        n_vl = [18, 19]
-        n_vr = [20, 21]
+        n_l_h = cp.N_h[0, :].flatten()
+        n_r_h = cp.N_h[-1, :].flatten()
+        n_lr_h = cp.N_h[(0, -1), :].flatten()
+        n_fixed_y = cp.N_h[(0, -1), 1].flatten()
 
         u_max = self.u_x
         dof_constraints = fix(n_l_h, [0], lambda t: t * u_max) + fix(n_lr_h, [2]) + \
             fix(n_fixed_y, [1]) + fix(n_r_h, [0], lambda t: t * -u_max) + \
-            link(n_vl, 0, 1.0,
-                 n_vr, 0, 1.0)
+            link(cp.N_v[0, :].flatten(), 0, 1.0,
+                 cp.N_v[1, :].flatten(), 0, 1.0)
 
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
@@ -93,36 +85,30 @@ class BarrellVaultGravityFormingProcess(HasTraits):
         self.fold_task.x_1
         cp = self.factory_task
 
-#         n_l_h = cp.N_h[0, (0, -1)].flatten()
-#         print'n_l_h', n_l_h
-#         n_r_h = cp.N_h[-1, (0, -1)].flatten()
-#         print'n_r_h', n_r_h
+        n_l_h = cp.N_h[0, (0, -1)].flatten()
+        n_r_h = cp.N_h[-1, (0, -1)].flatten()
 
-        n_l_h = [0, 1, 2]
-        n_r_h = [15, 16, 17]
-        n_lr_h = [0, 1, 2, 15, 16, 17]
-        n_fixed_y = [1, 16]
-
-        dof_constraints = fix(
-            n_l_h, [0, 1, 2]) + fix(n_r_h, [0, 1, 2])
+        dof_constraints = fix(n_l_h, [0, 1, 2]) + fix(n_r_h, [0, 1, 2])
 
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
         sim_config = SimulationConfig(goal_function_type='total potential energy',
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
-                                      acc=1e-4, MAX_ITER=1000,
+                                      acc=1e-6, MAX_ITER=1000,
                                       debug_level=0)
         FN = lambda F: lambda t: t * F
-        F_ext_list = [(26, 2, FN(1.0)), (27, 2, FN(1.0))]
+        F_max = 20
+        F_ext_list = [(26, 2, FN(F_max)), (27, 2, FN(F_max))]
         fu_tot_poteng = FuPotEngTotal(kappa=np.array([10]),
                                       F_ext_list=F_ext_list)
         sim_config._fu = fu_tot_poteng
         st = SimulationTask(previous_task=self.fold_task,
-                            config=sim_config, n_steps=1)
+                            config=sim_config, n_steps=10)
         cp = st.formed_object
         cp.x_0 = self.fold_task.x_1
         cp.u[:, :] = 0.0
+        cp.u[(26, 27), 2] = 0.001
         fu_tot_poteng.forming_task = st
         return st
 
@@ -134,14 +120,15 @@ class BikeShellterFormingProcessFTV(FTV):
 
 if __name__ == '__main__':
     bsf_process = BarrellVaultGravityFormingProcess(
-        L_x=12.8, n_x=5, L_y=10.25, n_y=4, n_steps=1, u_x=0.2)
+        L_x=0.63, n_x=5, L_y=0.42, n_y=4, n_steps=5, u_x=0.135 / 2.0)
     it = bsf_process.init_displ_task
+
     ft = bsf_process.fold_task
     lt = bsf_process.load_task
 
 #     import pylab as p
 #     ax = p.axes()
-#     ab.formed_object.plot_mpl(ax)
+#     it.formed_object.plot_mpl(ax)
 #     p.show()
 
     ftv = BikeShellterFormingProcessFTV(model=bsf_process)
@@ -155,10 +142,10 @@ if __name__ == '__main__':
     lt.config.gu['dofs'].viz3d.scale_factor = 0.5
     ftv.add(lt.config.gu['dofs'].viz3d)
     ftv.add(lt.config.fu.viz3d)
-#     ftv.add(lt.config.fu.viz3d_dict['node_load'])
+    ftv.add(lt.config.fu.viz3d_dict['node_load'])
 
 #    ftv.add(lt.sim_history.viz3d)
-    ftv.add(lt.config.fu.viz3d_dict['node_load'])
+#    ftv.add(lt.config.fu.viz3d_dict['node_load'])
 #    ftv.add(ft.config.gu['dofs'].viz3d)
 #
     it.u_1
