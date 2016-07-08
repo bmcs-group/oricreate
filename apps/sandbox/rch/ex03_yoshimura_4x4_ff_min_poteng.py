@@ -1,7 +1,7 @@
 from traits.api import \
     HasTraits, Float, Property, cached_property, Instance, \
     Int
-
+import numpy as np
 from oricreate.api import \
     YoshimuraCPFactory,     fix, link, r_, s_, t_, MapToSurface,\
     GuConstantLength, GuDofConstraints, SimulationConfig, SimulationTask, \
@@ -9,7 +9,7 @@ from oricreate.api import \
 from oricreate.crease_pattern.crease_pattern_state import CreasePatternState
 from oricreate.forming_tasks.forming_task import FormingTask
 from oricreate.fu import \
-    FuTotalPotentialEnergy
+    FuPotEngTotal
 from oricreate.mapping_tasks.mask_task import MaskTask
 
 
@@ -69,7 +69,7 @@ class BarrellVaultGravityFormingProcess(HasTraits):
 
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
-        sim_config = SimulationConfig(goal_function_type='potential_energy',
+        sim_config = SimulationConfig(goal_function_type='gravity potential energy',
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
                                       acc=1e-5, MAX_ITER=500,
@@ -92,15 +92,15 @@ class BarrellVaultGravityFormingProcess(HasTraits):
 
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
-        sim_config = SimulationConfig(goal_function_type='potential_energy',
+        sim_config = SimulationConfig(goal_function_type='total potential energy',
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
                                       acc=1e-4, MAX_ITER=1000,
                                       debug_level=0)
-        F_ext_list = [(n, 2, 100.0) for n in cp.N_h[2, :]]
-        print 'F_ext_list', F_ext_list
-        fu_tot_poteng = FuTotalPotentialEnergy(kappa=10,
-                                               F_ext_list=F_ext_list)
+        FN = lambda F: lambda t: t * F
+        F_ext_list = [(n, 2, FN(1.0)) for n in cp.N_h[2, :]]
+        fu_tot_poteng = FuPotEngTotal(kappa=np.array([10]),
+                                      F_ext_list=F_ext_list)
         sim_config._fu = fu_tot_poteng
         st = SimulationTask(previous_task=self.fold_task,
                             config=sim_config, n_steps=1)
@@ -133,56 +133,43 @@ if __name__ == '__main__':
 #     it.formed_object.viz3d.set(tube_radius=0.002)
 #     ftv.add(it.formed_object.viz3d)
 #     ftv.add(it.formed_object.viz3d_dict['node_numbers'], order=5)
-    lt.formed_object.viz3d.set(tube_radius=0.002)
+    lt.formed_object.viz3d.set(tube_radius=0.001)
     #ftv.add(ft.formed_object.viz3d_dict['node_numbers'], order=5)
-    ftv.add(lt.formed_object.viz3d)
+    ftv.add(lt.formed_object.viz3d_dict['displ'])
     lt.config.gu['dofs'].viz3d.scale_factor = 0.5
     ftv.add(lt.config.gu['dofs'].viz3d)
-
     ftv.add(lt.config.fu.viz3d)
+#     ftv.add(lt.config.fu.viz3d_dict['node_load'])
 
-#    ftv.add(ft.sim_history.viz3d_dict['node_numbers'], order=5)
-#    ft.sim_history.viz3d.set(tube_radius=0.002)
-
-#    ftv.add(ft.sim_history.viz3d)
+#    ftv.add(lt.sim_history.viz3d)
+    ftv.add(lt.config.fu.viz3d_dict['node_load'])
 #    ftv.add(ft.config.gu['dofs'].viz3d)
 #
     it.u_1
     ft.u_1
-    print 'ft_x1', ft.x_1
-    cp = lt.formed_object
-    print 'lt_x0', cp.x_0
-    print 'lt_u', cp.u
-    cp.u[7, 2] = 0.001
-    print 'lt.u_1', lt.u_1
-
-    print 'fu', lt.sim_step.get_f()
-    print 'Gu', lt.sim_step.get_G()
-
-    cp = lt.formed_object
-    iL_phi = cp.iL_psi2 - cp.iL_psi_0
-    print 'phi',  iL_phi
+    lt.u_1
+#
+#     print 'fu', lt.sim_step.get_f()
+#     print 'Gu', lt.sim_step.get_G()
+#
+#     cp = lt.formed_object
+#     iL_phi = cp.iL_psi2 - cp.iL_psi_0
+#     print 'phi',  iL_phi
 
     ftv.plot()
     ftv.update(vot=1, force=True)
     ftv.show()
 
-#     n_cam_move = 40
-#     fta = FTA(ftv=ftv)
-#     fta.init_view(a=45, e=60, d=7, f=(0, 0, 0), r=-120)
-#     fta.add_cam_move(a=60, e=70, n=n_cam_move, d=6, r=-120,
-#                      duration=10,
-#                      vot_fn=lambda cmt: np.linspace(0.01, 0.5, n_cam_move),
-#                      azimuth_move='damped',
-#                      elevation_move='damped',
-#                      distance_move='damped')
-#     fta.add_cam_move(a=80, e=80, d=4, n=n_cam_move, r=-132,
-#                      duration=10,
-#                      vot_fn=lambda cmt: np.linspace(0.5, 1.0, n_cam_move),
-#                      azimuth_move='damped',
-#                      elevation_move='damped',
-#                      distance_move='damped')
-#
-#     fta.plot()
-#     fta.render()
-#     fta.configure_traits()
+    n_cam_move = 100
+    fta = FTA(ftv=ftv)
+    fta.init_view(a=45, e=60, d=10, f=(0, 0, 0), r=-120)
+    fta.add_cam_move(n=n_cam_move,  # a=60, e=70, d=6, r=-120,
+                     duration=100,
+                     vot_fn=lambda cmt: np.linspace(0.01, 1.0, n_cam_move),
+                     azimuth_move='damped',
+                     elevation_move='damped',
+                     distance_move='damped')
+
+    fta.plot()
+    fta.render()
+    fta.configure_traits()

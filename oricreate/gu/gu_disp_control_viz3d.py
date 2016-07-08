@@ -196,7 +196,7 @@ class GuDofConstraintsViz3D(Viz3D):
         m.pipeline.surface(self.cf_cross)
         m.pipeline.surface(self.cf_arrow)
 
-        # load constrain
+        # load constraint
 
         cp_l = x_t[cn_l]
 
@@ -216,7 +216,7 @@ class GuDofConstraintsViz3D(Viz3D):
                                    scale_factor=self.scale_factor)
         m.pipeline.surface(self.cl_arrow)
 
-        # connected contrains
+        # connected constraints
 
         cp_c = x_t[cn_c]
 

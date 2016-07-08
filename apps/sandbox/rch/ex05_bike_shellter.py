@@ -23,6 +23,12 @@ import sympy as sp
 a_, b_ = sp.symbols('a,b')
 
 
+def oricreate_mlab_label(m):
+    atext_width = 0.18
+    m.text(1 - atext_width, 0.003, 'oricreate',
+           color=(.7, .7, .7), width=atext_width)
+
+
 def get_fr(var_, L, H):
     fx = a_ * (var_ / L)**2 + b_ * (var_ / L)
     eqns = [fx.subs(var_, L), fx.subs(var_, L / 2) - H]
@@ -190,7 +196,7 @@ class BikeShellterFormingProcess(HasTraits):
             fixed_nodes_y + fixed_nodes_x
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
-        sim_config = SimulationConfig(goal_function_type='potential_energy',
+        sim_config = SimulationConfig(goal_function_type='gravity potential energy',
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
                                       acc=1e-5, MAX_ITER=500,
@@ -206,7 +212,7 @@ class BikeShellterFormingProcessFTV(FTV):
 
 if __name__ == '__main__':
     bsf_process = BikeShellterFormingProcess(L_x=3.0, L_y=2.41, n_x=4,
-                                             n_y=12, n_steps=40)
+                                             n_y=12, n_steps=80)
 
     mt = bsf_process.mask_task
     ab = bsf_process.add_boundary_task
@@ -219,6 +225,7 @@ if __name__ == '__main__':
 #     p.show()
 
     ftv = BikeShellterFormingProcessFTV(model=bsf_process)
+
 #    ftv.add(it.target_faces[0].viz3d)
 #    ftv.add(ft.formed_object.viz3d_dict['node_numbers'], order=5)
 #    ftv.add(ft.formed_object.viz3d)
@@ -230,6 +237,7 @@ if __name__ == '__main__':
     ftv.add(ft.sim_history.viz3d)
 #    ftv.add(ft.config.gu['dofs'].viz3d)
 #
+
     it.u_1
     ft.u_1
 
@@ -237,7 +245,7 @@ if __name__ == '__main__':
 #     ftv.update(vot=1, force=True)
 #     ftv.show()
 
-    n_cam_move = 40
+    n_cam_move = 80
     fta = FTA(ftv=ftv)
     fta.init_view(a=45, e=60, d=7, f=(0, 0, 0), r=-120)
     fta.add_cam_move(a=60, e=70, n=n_cam_move, d=6, r=-120,

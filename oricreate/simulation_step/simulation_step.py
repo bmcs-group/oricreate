@@ -263,7 +263,7 @@ class SimulationStep(HasStrictTraits):
         '''
         self.cp_state.U = U
         f_du = self.get_f_du()
-        if self.debug_level > 1:
+        if self.debug_level > 2:
             print 'f_du.shape:\n', f_du.shape
             print 'f_du:\n', f_du
         return f_du
@@ -277,7 +277,7 @@ class SimulationStep(HasStrictTraits):
     def get_G_t(self, U):
         self.cp_state.U = U
         g = self.get_G(self.t)
-        if self.debug_level > 0:
+        if self.debug_level > 1:
             print 'G:\n', [g]
         return g
 
@@ -296,7 +296,7 @@ class SimulationStep(HasStrictTraits):
         if(g_du_lst == []):
             return []
         g_du = np.vstack(g_du_lst)
-        if self.debug_level > 1:
+        if self.debug_level > 3:
             print 'G_du.shape:\n', g_du.shape
             print 'G_du:\n', [g_du]
         return g_du

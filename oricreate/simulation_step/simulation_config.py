@@ -10,7 +10,7 @@ from traits.api import \
 
 import numpy as np
 from oricreate.fu import \
-    FuTargetFaces, FuPotentialEnergy
+    FuTargetFaces, FuPotEngGravity, FuPotEngBending, FuPotEngTotal
 from oricreate.opt import \
     IOpt, IFu, IGu, IHu
 
@@ -30,7 +30,9 @@ class SimulationConfig(HasStrictTraits):
     goal_function_type = Trait('target_faces',
                                {'none': None,
                                 'target_faces': FuTargetFaces,
-                                'potential_energy': FuPotentialEnergy
+                                'bending potential energy': FuPotEngBending,
+                                'gravity potential energy': FuPotEngGravity,
+                                'total potential energy': FuPotEngTotal
                                 },
                                input_change=True)
     r'''Type of the goal function.

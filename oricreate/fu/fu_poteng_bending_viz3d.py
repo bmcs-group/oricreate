@@ -15,7 +15,7 @@ import numpy as np
 from oricreate.viz3d import Viz3D
 
 
-class FuBendingEnergyViz3D(Viz3D):
+class FuPotEngBendingViz3D(Viz3D):
     '''Visualize the crease Pattern
     '''
 
@@ -27,7 +27,6 @@ class FuBendingEnergyViz3D(Viz3D):
         iL_phi = cp.iL_psi2 - cp.iL_psi_0
         iL_length = np.linalg.norm(cp.iL_vectors, axis=1)
         iL_m = fu_tot_poteng.kappa * iL_phi * iL_length
-        print 'iL_m', iL_m
         max_m = np.max(iL_m)
         iL_m /= max_m
 
@@ -57,8 +56,16 @@ class FuBendingEnergyViz3D(Viz3D):
 
         m = self.ftv.mlab
         x, y, z, u, v, w = self.get_values()
-        self.quifer3d_pipe = m.quiver3d(x, y, z, u, v, w)
+        self.quiver3d_pipe = m.quiver3d(x, y, z, u, v, w)
+        vectors = self.quiver3d_pipe
+        vectors.glyph.glyph_source.glyph_source = vectors.glyph.glyph_source.glyph_dict[
+            'cone_source']
+        vectors.glyph.glyph.scale_factor *= -1.0
+        vectors.glyph.glyph_source.glyph_source.direction = np.array(
+            [1.,  0.,  0.])
+        vectors.glyph.glyph_source.glyph_source.center = np.array(
+            [0.,  0.,  0.])
 
     def update(self):
         x, y, z, u, v, w = self.get_values()
-        self.quifer3d_pipe.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)
+        self.quiver3d_pipe.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)

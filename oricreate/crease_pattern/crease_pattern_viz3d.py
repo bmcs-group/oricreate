@@ -4,6 +4,11 @@ Created on Dec 3, 2015
 @author: rch
 '''
 
+from mayavi.filters.api import ExtractTensorComponents, \
+    ExtractVectorComponents
+from mayavi.filters.api import WarpVector
+from mayavi.modules.api import Surface
+from mayavi.sources.api import VTKDataSource, VTKFileReader
 from traits.api import \
     Array, Tuple, Property, Bool, Float, Color
 
@@ -88,6 +93,59 @@ class CreasePatternViz3D(Viz3D):
 
     def _get_line_width(self):
         return self._get_max_length() * self.line_width_factor
+
+
+class CreasePatternDisplViz3D(CreasePatternViz3D):
+    '''Visualize the crease pattern with displacement vectors at the nodes
+    '''
+
+    N_L_F = Property(Tuple)
+    '''Geometry with applied selection arrays.
+    '''
+
+    def _get_N_L_F(self):
+        cp = self.vis3d
+        print 'viz-cp', cp
+        x, u, L, F = cp.x_0, cp.u, cp.L, cp.F
+        if len(self.N_selection):
+            x = x[self.N_selection]
+            u = u[self.N_selection]
+        if len(self.L_selection):
+            L = L[self.L_selection]
+        if len(self.F_selection):
+            F = F[self.F_selection]
+        return x, u, L, F
+
+    def plot(self):
+
+        m = self.ftv.mlab
+        x_0, u_, L, F = self.N_L_F
+        x, y, z = x_0.T
+        u, v, w = u_.T
+        if len(F) > 0:
+            cp_pipe = m.triangular_mesh(x, y, z, F,
+                                        line_width=3,
+                                        color=self.facet_color)
+            if self.lines is True:
+                cp_pipe.mlab_source.dataset.lines = L
+                tube = m.pipeline.tube(cp_pipe,
+                                       tube_radius=0.003)
+                m.pipeline.surface(tube, color=(1.0, 1.0, 1.0))
+
+        else:
+            cp_pipe = m.points3d(x, y, z, scale_factor=0.2)
+            cp_pipe.mlab_source.dataset.lines = L
+        ds = cp_pipe.mlab_source.dataset
+        ds.point_data.vectors = u_
+        ds.point_data.vectors.name = 'u'
+        warp = m.pipeline.warp_vector(cp_pipe)
+        surf = m.pipeline.surface(warp)
+        self.cp_pipe = cp_pipe
+
+    def update(self):
+        x_0, u, L, F = self.N_L_F
+        # self.u_pipe.mlab_source.set(vector_data=u)
+        self.cp_pipe.mlab_source.set(points=x_0, vectors=u)
 
 
 class CreasePatternThickViz3D(CreasePatternViz3D):

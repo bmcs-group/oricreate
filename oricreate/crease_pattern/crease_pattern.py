@@ -327,6 +327,20 @@ class CreasePattern(CreaseNodeOperators,
     def _get_iL(self):
         return np.where(np.bincount(self.L_F_map[0]) == 2)[0]
 
+    n_iL = Property
+    '''Number of interior lines
+    '''
+
+    iL_N = Property(depends_on=INPUT)
+    '''End nodes of a line.
+    '''
+    @cached_property
+    def _get_iL_N(self):
+        return self.L_N[self.iL]
+
+    def _get_n_iL(self):
+        return len(self.iL)
+
     eL = Property(depends_on=INPUT)
     '''Array of edge lines ``(n_eL,)``.
     Edge lines are associated to one facet only.
@@ -388,12 +402,21 @@ class CreasePattern(CreaseNodeOperators,
     '''
     @cached_property
     def _get_F_L(self):
+        # get cycled  node numbers around a facet
+        F_L_N = self.F_L_N
+        # use the NN_L map to get line numbers
+        return self.NN_L[F_L_N[..., 0], F_L_N[..., 1]]
+
+    F_L_N = Property(depends_on=INPUT)
+    '''Facets with lines enumerated counterclockwise.
+    Array with the shape ``(n_F, 3, 2)``
+    '''
+    @cached_property
+    def _get_F_L_N(self):
         # cycle indexes around the nodes of a facet
         ix_arr = np.array([[0, 1], [1, 2], [2, 0]])
         # get cycled  node numbers around a facet
-        F_N = self.F_N[:, ix_arr]
-        # use the NN_L map to get line numbers
-        return self.NN_L[F_N[..., 0], F_N[..., 1]]
+        return self.F_N[:, ix_arr]
 
     def _get_nbr_cycle(self, neighbors):
         '''Auxiliary private methods identifying cycles around a node.

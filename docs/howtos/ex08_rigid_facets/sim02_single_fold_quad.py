@@ -73,15 +73,16 @@ if __name__ == '__main__':
     # Link the crease factory it with the constraint client
     gu_constant_length = GuConstantLength()
     dof_constraints = fix([0], [0, 1, 2]) + fix([1], [1, 2]) + fix([3], [2]) + \
-        fix([5], 2, 0.5)
+        fix([5], 2, lambda t: 0.5)
     gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
 
     sim_config = SimulationConfig(gu={'cl': gu_constant_length,
-                                      'dofs': gu_dof_constraints})
+                                      'dofs': gu_dof_constraints},
+                                  acc=1e-5, MAX_ITER=10)
     sim_step = SimulationStep(forming_task=cp_factory,
-                              config=sim_config, acc=1e-5, MAX_ITER=10)
+                              config=sim_config)
 
-    sim_step._solve_nr(1.0)
+    sim_step._solve_nr()
 
     m.figure(bgcolor=(1.0, 1.0, 1.0), fgcolor=(0.6, 0.6, 0.6))
     cp.plot_mlab(m, nodes=True, lines=True)

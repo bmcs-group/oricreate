@@ -16,7 +16,8 @@ from traits.api import \
     Float, Property, cached_property
 
 from crease_pattern_viz3d import \
-    CreasePatternViz3D, CreasePatternNodeNumbersViz3D
+    CreasePatternViz3D, CreasePatternNodeNumbersViz3D, \
+    CreasePatternDisplViz3D
 import numpy as np
 from oricreate.viz3d import \
     Visual3D
@@ -124,7 +125,8 @@ class CreasePatternPlotHelper(Visual3D):
     @cached_property
     def _get_viz3d_dict(self):
         return dict(default=CreasePatternViz3D(vis3d=self),
-                    node_numbers=CreasePatternNodeNumbersViz3D(vis3d=self))
+                    node_numbers=CreasePatternNodeNumbersViz3D(vis3d=self),
+                    displ=CreasePatternDisplViz3D(vis3d=self))
 
     def get_cnstr_pos(self, iteration_step):
         r'''
