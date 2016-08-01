@@ -62,8 +62,8 @@ class BarrellVaultGravityFormingProcess(HasTraits):
         n_fixed_y = cp.N_h[(0, -1), 1].flatten()
 
         u_max = self.u_x
-        dof_constraints = fix(n_l_h, [0], lambda t: t * u_max) + fix(n_lr_h, [2]) + \
-            fix(n_fixed_y, [1]) + fix(n_r_h, [0], lambda t: t * -u_max) + \
+        dof_constraints = fix([0, 2, 4], [0], lambda t: t * u_max) + fix([0, 2, 4, 20, 22, 24], [2]) + \
+            fix([2, 22], [1]) + fix([20, 22, 24], [0], lambda t: t * -u_max) + \
             link(cp.N_v[0, :].flatten(), 0, 1.0,
                  cp.N_v[1, :].flatten(), 0, 1.0)
 
@@ -88,7 +88,8 @@ class BarrellVaultGravityFormingProcess(HasTraits):
         n_l_h = cp.N_h[0, (0, -1)].flatten()
         n_r_h = cp.N_h[-1, (0, -1)].flatten()
 
-        dof_constraints = fix(n_l_h, [0, 1, 2]) + fix(n_r_h, [0, 1, 2])
+        dof_constraints = fix(
+            [0, 2, 4], [0, 1, 2]) + fix([20, 22, 24], [0, 1, 2])
 
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
@@ -99,7 +100,8 @@ class BarrellVaultGravityFormingProcess(HasTraits):
                                       debug_level=0)
         FN = lambda F: lambda t: t * F
         F_max = 20
-        F_ext_list = [(26, 2, FN(F_max)), (27, 2, FN(F_max))]
+
+        F_ext_list = [(cp.N_h[2, :], 2, FN(F_max))]
         fu_tot_poteng = FuPotEngTotal(kappa=np.array([10]),
                                       F_ext_list=F_ext_list)
         sim_config._fu = fu_tot_poteng
@@ -108,7 +110,7 @@ class BarrellVaultGravityFormingProcess(HasTraits):
         cp = st.formed_object
         cp.x_0 = self.fold_task.x_1
         cp.u[:, :] = 0.0
-        cp.u[(26, 27), 2] = 0.001
+        cp.u[[10, 11, 12, 13, 14], 2] = 0.001
         fu_tot_poteng.forming_task = st
         return st
 
@@ -120,7 +122,7 @@ class BikeShellterFormingProcessFTV(FTV):
 
 if __name__ == '__main__':
     bsf_process = BarrellVaultGravityFormingProcess(
-        L_x=0.63, n_x=5, L_y=0.42, n_y=4, n_steps=5, u_x=0.135 / 2.0)
+        L_x=0.63, n_x=4, L_y=0.415, n_y=8, n_steps=5, u_x=0.125 / 2.0)
     it = bsf_process.init_displ_task
 
     ft = bsf_process.fold_task
@@ -139,7 +141,7 @@ if __name__ == '__main__':
     lt.formed_object.viz3d.set(tube_radius=0.001)
     #ftv.add(ft.formed_object.viz3d_dict['node_numbers'], order=5)
     ftv.add(lt.formed_object.viz3d_dict['displ'])
-    lt.config.gu['dofs'].viz3d.scale_factor = 0.5
+    lt.config.gu['dofs'].viz3d.scale_factor = 0.3
     ftv.add(lt.config.gu['dofs'].viz3d)
     ftv.add(lt.config.fu.viz3d)
     ftv.add(lt.config.fu.viz3d_dict['node_load'])
