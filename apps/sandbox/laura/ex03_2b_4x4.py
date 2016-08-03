@@ -84,11 +84,17 @@ class BarrellVaultGravityFormingProcess(HasTraits):
     def _get_load_task(self):
         self.fold_task.x_1
         cp = self.factory_task
+        cp_obj = cp.formed_object
+        cp_obj.L = np.vstack(
+            [cp_obj.L, np.array([[6, 7], [7, 8]], dtype='int_')])
 
         n_l_h = cp.N_h[0, (0, -1)].flatten()
         n_r_h = cp.N_h[-1, (0, -1)].flatten()
         n_fixed_y = cp.N_h[(0, -1), 1].flatten()
+        n_scheitel = cp.N_h[2, :]
+        n_aussen = cp.N_v
 
+# link([7, 8, 23, 24], 2, 1.0,     [6], 2, - 1.0) +
         dof_constraints = fix(
             n_l_h, [0, 1]) + fix(n_r_h, [0, 1]) + fix(n_fixed_y, [0, 1, 2])
 
@@ -100,10 +106,11 @@ class BarrellVaultGravityFormingProcess(HasTraits):
                                       acc=1e-6, MAX_ITER=1000,
                                       debug_level=0)
         FN = lambda F: lambda t: t * F
-        F_max = 1
+        F_max = 2
+        F_min = 1
 
-        F_ext_list = [(cp.N_h[2, :], 2, FN(F_max))]
-        fu_tot_poteng = FuPotEngTotal(kappa=np.array([4.94]),
+        F_ext_list = [(7, 2, FN(F_max)), (6, 2, FN(F_min)), (8, 2, FN(F_min))]
+        fu_tot_poteng = FuPotEngTotal(kappa=np.array([4.97]),
                                       F_ext_list=F_ext_list)
         sim_config._fu = fu_tot_poteng
         st = SimulationTask(previous_task=self.fold_task,
@@ -129,56 +136,74 @@ if __name__ == '__main__':
     ft = bsf_process.fold_task
     lt = bsf_process.load_task
 
-#     import pylab as p
-#     ax = p.axes()
-#     it.formed_object.plot_mpl(ax)
-#     p.show()
-
+    print 'ndofs', lt.formed_object.n_dofs - lt.formed_object.n_L
     ftv = BikeShellterFormingProcessFTV(model=bsf_process)
-#     ftv.add(it.target_faces[0].viz3d)
-#     it.formed_object.viz3d.set(tube_radius=0.002)
-#     ftv.add(it.formed_object.viz3d)
-#     ftv.add(it.formed_object.viz3d_dict['node_numbers'], order=5)
-    lt.formed_object.viz3d.set(tube_radius=0.001)
-    #ftv.add(ft.formed_object.viz3d_dict['node_numbers'], order=5)
-    ftv.add(lt.formed_object.viz3d_dict['displ'])
-    lt.config.gu['dofs'].viz3d.scale_factor = 0.3
-    ftv.add(lt.config.gu['dofs'].viz3d)
-    ftv.add(lt.config.fu.viz3d)
-    ftv.add(lt.config.fu.viz3d_dict['node_load'])
 
-#    ftv.add(lt.sim_history.viz3d)
-#    ftv.add(lt.config.fu.viz3d_dict['node_load'])
-#    ftv.add(ft.config.gu['dofs'].viz3d)
-#
-    it.u_1
-    ft.u_1
-    lt.u_1
+    animate = False
+    show_init_task = False
+    show_fold_task = False
+    show_load_task = True
 
-    cp = lt.formed_object
-    print'iL_psi_o', cp.iL_psi_0
-    iL_phi = cp.iL_psi2 - cp.iL_psi_0
-    iL_m = lt.config._fu.kappa * iL_phi
-    print'iL_m', iL_m
-    print 'moments', np.max(np.fabs(iL_m))
-#
-#     print 'fu', lt.sim_step.get_f()
-#     print 'Gu', lt.sim_step.get_G()
-#
-#     cp = lt.formed_object
-#     iL_phi = cp.iL_psi2 - cp.iL_psi_0
-#     print 'phi',  iL_phi
+    if show_init_task:
+        ftv.add(it.target_faces[0].viz3d)
+        it.formed_object.viz3d.set(tube_radius=0.002)
+        ftv.add(it.formed_object.viz3d)
+        ftv.add(it.formed_object.viz3d_dict['node_numbers'], order=5)
+        it.u_1
 
-    ftv.plot()
-    ftv.update(vot=1, force=True)
-    ftv.show()
+    if show_fold_task:
+        ft.sim_history.viz3d.set(tube_radius=0.002)
+        ftv.add(ft.sim_history.viz3d)
+        ft.config.gu['dofs'].viz3d.scale_factor = 0.5
+        ftv.add(ft.config.gu['dofs'].viz3d)
+        ft.u_1
 
-    n_cam_move = 100
+    if show_load_task == True:
+        lt = bsf_process.load_task
+        lt.formed_object.viz3d.set(tube_radius=0.002)
+
+        ftv.add(lt.formed_object.viz3d_dict['displ'])
+        lt.config.gu['dofs'].viz3d.scale_factor = 0.2
+        ftv.add(lt.config.gu['dofs'].viz3d)
+        ftv.add(lt.config.fu.viz3d)
+
+        ftv.add(lt.config.fu.viz3d_dict['node_load'])
+#         print 'u_', lt.u_1[6, 2]
+#         print 'u_', lt.u_1[7, 2]
+#         print 'u_', lt.u_1[8, 2]
+        n_max_uz = np.argmax(lt.u_1[:, 2])
+        n_max_uy = np.argmax(lt.u_1[:, 1])
+        n_max_ux = np.argmax(lt.u_1[:, 0])
+
+        print 'node max_uz', n_max_uz
+        print 'uz_max', lt.u_1[n_max_uz, 2]
+        print 'node max_uy', n_max_uy
+        print 'uy_max', lt.u_1[n_max_uy, 2]
+        print 'node max_ux', n_max_ux
+        print 'ux_max', lt.u_1[n_max_ux, 2]
+
+        cp = lt.formed_object
+        iL_phi = cp.iL_psi2 - cp.iL_psi_0
+        iL_m = lt.config._fu.kappa * iL_phi
+        print 'moment', iL_m
+        print 'max moment', np.max(np.fabs(iL_m))
+
+        ftv.plot()
+        ftv.update(vot=1, force=True)
+        ftv.show()
+
+    n_cam_move = 20
     fta = FTA(ftv=ftv)
-    fta.init_view(a=45, e=60, d=10, f=(0, 0, 0), r=-120)
-    fta.add_cam_move(n=n_cam_move,  # a=60, e=70, d=6, r=-120,
-                     duration=100,
-                     vot_fn=lambda cmt: np.linspace(0.01, 1.0, n_cam_move),
+    fta.init_view(a=45, e=60, d=7, f=(0, 0, 0), r=-120)
+    fta.add_cam_move(a=60, e=70, n=n_cam_move, d=8, r=-120,
+                     duration=10,
+                     vot_fn=lambda cmt: np.linspace(0.01, 0.5, n_cam_move),
+                     azimuth_move='damped',
+                     elevation_move='damped',
+                     distance_move='damped')
+    fta.add_cam_move(a=80, e=80, d=7, n=n_cam_move, r=-132,
+                     duration=10,
+                     vot_fn=lambda cmt: np.linspace(0.5, 1.0, n_cam_move),
                      azimuth_move='damped',
                      elevation_move='damped',
                      distance_move='damped')
