@@ -247,7 +247,7 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
                         [51, 52, 53, 59, 60, 61, 67, 68, 69, 75, 76, 77],
                         [0, 1, 2], -1.0)
 
-        dof_constraints = fixed_nodes_x + fixed_nodes_yz + link_bnd
+        dof_constraints = fixed_nodes_x + fixed_nodes_yz  # + link_bnd
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
         sim_config = SimulationConfig(goal_function_type='total potential energy',
@@ -414,58 +414,54 @@ if __name__ == '__main__':
     ft = bsf_process.fold_task
     tt = bsf_process.turn_task
 
-#     tt.formed_object.viz3d.set(tube_radius=0.002)
-#     ftv.add(tt.formed_object.viz3d)
-#     tt.config.gu['dofs'].viz3d.scale_factor = 0.5
-#     ftv.add(tt.config.gu['dofs'].viz3d)
-#     tt.u_1
-#     ftv.plot()
-#     ftv.update(vot=1, force=True)
-#     ftv.show()
+    animate = False
+    show_init_task = False
+    show_fold_task = False
+    show_load_task = True
 
-    lt = bsf_process.load_task
+    if show_init_task:
+        ftv.add(it.target_faces[0].viz3d)
+        it.formed_object.viz3d.set(tube_radius=0.002)
+        ftv.add(it.formed_object.viz3d)
+        ftv.add(it.formed_object.viz3d_dict['node_numbers'], order=5)
+        it.u_1
 
+    if show_fold_task:
+        ft.sim_history.viz3d.set(tube_radius=0.002)
+        ftv.add(ft.sim_history.viz3d)
+        ft.config.gu['dofs'].viz3d.scale_factor = 0.5
+        ftv.add(ft.config.gu['dofs'].viz3d)
+        ft.u_1
 
-#     ftv.add(it.target_faces[0].viz3d)
-#     it.formed_object.viz3d.set(tube_radius=0.002)
-#     ftv.add(it.formed_object.viz3d)
-#     ftv.add(it.formed_object.viz3d_dict['node_numbers'], order=5)
-    lt.formed_object.viz3d.set(tube_radius=0.002)
-#    ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
-    ftv.add(lt.formed_object.viz3d_dict['displ'])
-    lt.config.gu['dofs'].viz3d.scale_factor = 0.5
-    ftv.add(lt.config.gu['dofs'].viz3d)
-    ftv.add(lt.config.fu.viz3d)
-    ftv.add(lt.config.fu.viz3d_dict['node_load'])
+    if show_load_task == True:
+        lt = bsf_process.load_task
+        lt.formed_object.viz3d.set(tube_radius=0.002)
+        #    ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
+        ftv.add(lt.formed_object.viz3d_dict['displ'])
+        lt.config.gu['dofs'].viz3d.scale_factor = 0.5
+        ftv.add(lt.config.gu['dofs'].viz3d)
+        ftv.add(lt.config.fu.viz3d)
 
-#    ftv.add(ft.sim_history.viz3d_dict['node_numbers'], order=5)
-#    ft.sim_history.viz3d.set(tube_radius=0.002)
+        ftv.add(lt.config.fu.viz3d_dict['node_load'])
+        print 'u_13', lt.u_1[13, 2]
+        n_max_u = np.argmax(lt.u_1[:, 2])
+        print 'node max_u', n_max_u
+        print 'u_max', lt.u_1[n_max_u, 2]
 
-#     ftv.add(ft.sim_history.viz3d)
-#     ft.config.gu['dofs'].viz3d.scale_factor = 0.5
-#     ftv.add(ft.config.gu['dofs'].viz3d)
+        cp = lt.formed_object
+        iL_phi = cp.iL_psi2 - cp.iL_psi_0
+        iL_m = lt.config._fu.kappa * iL_phi
+        print 'moments', np.max(np.fabs(iL_m))
+
+        ftv.plot()
+        ftv.update(vot=1, force=True)
+        ftv.show()
+
 #
-    it.u_1
-    tt.u_1
-    ft.u_1
-
-#     cp = lt.formed_object
-#     cp.u[:, :] = 0.00001
-#
-    lt.u_1
-
-    cp = lt.formed_object
-    iL_phi = cp.iL_psi2 - cp.iL_psi_0
-    iL_m = lt.config._fu.kappa * iL_phi
-    print 'moments', np.max(np.fabs(iL_m))
 
     # bsf_process.generate_scaffoldings()
 
-    ftv.plot()
-    ftv.update(vot=1, force=True)
-    ftv.show()
-
-    n_cam_move = 40
+    n_cam_move = 20
     fta = FTA(ftv=ftv)
     fta.init_view(a=45, e=60, d=7, f=(0, 0, 0), r=-120)
     fta.add_cam_move(a=60, e=70, n=n_cam_move, d=8, r=-120,
