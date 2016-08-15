@@ -168,6 +168,7 @@ class SimulationStep(HasStrictTraits):
     def _solve(self):
         '''Decide which solver to take and start it.
         '''
+        self.config.validate_input()
         if self.config.goal_function_type_ is not None:
             U_t = self._solve_fmin()
         else:

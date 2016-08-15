@@ -40,7 +40,8 @@ class MiuraOriCPFactory(FactoryTask):
 
     n_x = Int(2, geometry=True)
     n_y = Int(2, geometry=True)
-    d_x = Float(4)
+    d_0 = Float(-0.1, geometry=True)
+    d_1 = Float(0.1, geometry=True)
 
     def deliver(self):
         return CreasePatternState(X=self.X,
@@ -118,33 +119,19 @@ class MiuraOriCPFactory(FactoryTask):
 
         n_x = self.n_x
         n_y = self.n_y
-        d_x = self.d_x
 
         L_x = self.L_x
         L_y = self.L_y
 
-        x_e, y_e = np.mgrid[0:L_x:complex(n_x + 1), 0:L_y:complex(n_y + 1)]
-        # print x_e
-        # print y_e
-        x_e[1:-1:1, 0::2] = x_e[1:-1:1, 0::2] + d_x
-        x_e[1:-1:1, 1::2] = x_e[1:-1:1, 1::2] - d_x
+        x_e, y_e = np.mgrid[0:L_x:complex(n_x + 2), 0:L_y:complex(n_y + 2)]
+        z_e = np.zeros_like(x_e)
 
-        # nodes on horizontal crease lines
+        x_e[1:-1, ::2] += self.d_0
+        x_e[1:-1, 1::2] += self.d_1
 
-        x_h = x_e[:, ::1]
-
-        y_h = y_e[:, ::1]
-        X_h = np.c_[x_h.flatten(), y_h.flatten()]
-
-        # interior nodes on odd horizontal crease lines
-
-        n_all = np.arange((n_x + 1) * (n_y + 1)).reshape((n_x + 1), (n_y + 1))
+        X_h = np.c_[x_e.flatten(), y_e.flatten(), z_e.flatten()]
 
         nodes = X_h
-
-        zero_z = np.zeros((nodes.shape[0], 1), dtype=float)
-
-        nodes = np.hstack([nodes, zero_z])
 
         # connectivity of nodes defining the crease pattern
 
@@ -152,47 +139,39 @@ class MiuraOriCPFactory(FactoryTask):
         # Construct the creaseline mappings
         # ======================================================================
 
-        c_h = np.column_stack((np.arange(
-            (n_x + 1) * (n_y + 1) - n_y - 1),
-            np.arange(n_y + 1, (n_x + 1) * (n_y + 1))))
-        c_v = np.column_stack(
-            (n_all[:, 0:-1].flatten('F'), n_all[:, 1:].flatten('F')))
-        c_d = np.column_stack(
-            (n_all[0:-1:1, 0:-1:1].flatten(), n_all[1::1, 1::1].flatten()))
+        nidx = np.arange(len(nodes)).reshape(n_x + 2, n_y + 2)
 
-        crease_lines = np.vstack((c_h, c_v, c_d))
+        l_vertical = np.c_[nidx[:, :-1].flatten(), nidx[:, 1:].flatten()]
+        l_horizontal = np.c_[nidx[:-1, :].flatten(), nidx[1:, :].flatten()]
+        l_diag = np.c_[nidx[1:, :-1].flatten(), nidx[:-1, 1:].flatten()]
+
+        lines = np.vstack([l_vertical, l_horizontal, l_diag])
 
         # ======================================================================
         # Construct the facet mappings
         # ======================================================================
-        f_1 = n_all[0:-1:1, 0:-1:1].flatten()
-        f_2 = n_all[0:-1:1, 1::1].flatten()
-        f_3 = n_all[1::1, 1::1].flatten()
-        f_4 = n_all[1::1, 0:-1:1].flatten()
+        f_1 = np.c_[
+            nidx[:-1, :-1].flatten(), nidx[1:, :-1].flatten(), nidx[:-1, 1:].flatten()]
+        f_2 = np.c_[
+            nidx[1:, :-1].flatten(), nidx[1:, 1:].flatten(), nidx[:-1, 1:].flatten()]
 
-        facets_1 = np.column_stack((f_1, f_2, f_3))
-        facets_2 = np.column_stack((f_3, f_4, f_1))
-        facets = np.vstack((facets_1, facets_2))
+        facets = np.vstack((f_1, f_2))
 
-        return (nodes, crease_lines, facets,
+        return (nodes, lines, facets,
                 )
 
 if __name__ == '__main__':
 
-    yf = MiuraOriCPFactory(L_x=3,
-                           L_y=3,
-                           n_x=4,
-                           n_y=4,
-                           d_x=0.5)
+    yf = MiuraOriCPFactory(L_x=30,
+                           L_y=15,
+                           n_x=10,
+                           n_y=10,
+                           d_0=1.0,
+                           d_1=-1.0)
 
     cp = yf.formed_object
-    cp.gL = [12, 13, 14, 15]
 
-    print cp.gL
-
-    print cp.cL
-
-    print cp.L
+    print cp.F
 
     import pylab as p
     cp.plot_mpl(p.axes())

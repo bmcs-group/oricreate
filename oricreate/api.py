@@ -7,7 +7,9 @@ from factories import \
 from forming_tasks import \
     FormingTask, IFormingTask
 from fu import FuTargetFace, FuTF, FuTargetFaces
-from gu import fix, link, GuDofConstraints, GuConstantLength
+from gu import \
+    fix, link, GuDofConstraints, GuConstantLength, \
+    GuPsiConstraints
 from mapping_tasks import \
     MappingTask, MapToSurface, RotateCopy
 from simulation_step import \

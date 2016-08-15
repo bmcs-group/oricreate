@@ -105,6 +105,13 @@ class SimulationConfig(HasStrictTraits):
     r'''Switch the use of constraint derivatives on.
     '''
 
+    def validate_input(self):
+        # self.fu.validate_input()
+        for gu in self.gu_lst:
+            gu.validate_input()
+        for hu in self.hu_lst:
+            hu.validate_input()
+
     # ===========================================================================
     # Kinematic constraints
     # ===========================================================================

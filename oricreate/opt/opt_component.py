@@ -19,6 +19,11 @@ class OptComponent(HasStrictTraits):
 
     formed_object = Property
 
+    def validate_input(self):
+        '''Method to validate the consistency of the input parameters 
+        '''
+        return
+
     def _get_formed_object(self):
         return self.forming_task.formed_object
 

@@ -11,5 +11,5 @@ from gu_disp_control import \
     GuGrabPoints, GuPointsOnLine, GuDofConstraints
 from gu_dofs import \
     fix, link
-
-
+from gu_psi_constraints import \
+    GuPsiConstraints

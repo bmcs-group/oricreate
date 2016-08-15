@@ -1,18 +1,16 @@
 r'''
 
-Fold the logo of Engineered Folding Research Center
----------------------------------------------------
+Fold control by dihedral multiple angles
+----------------------------------------
 
-This example shows one possible  
-
-The target face is defined as horizontal plane at the height 8
-and nodes [0,1,2] are involved in the minimum distance criterion.
+Sequence of triangles connected by hinge lines is folded
+by controlling the dihedral angle between the triangles.
 '''
 
 import numpy as np
 from oricreate.api import \
     SimulationTask, SimulationConfig, \
-    GuConstantLength, GuDofConstraints, fix, \
+    GuConstantLength, GuDofConstraints, GuPsiConstraints, fix, \
     FTV, FTA
 
 
@@ -23,15 +21,19 @@ def create_cp_factory():
     x = np.array([[0, 0, 0],
                   [1, 0, 0],
                   [1, 1, 0],
-                  [2, 1, 0]
+                  [2, 1, 0],
+                  [2, 0, 0],
+                  [1.5, -0.707, 0]
                   ], dtype='float_')
 
     L = np.array([[0, 1], [1, 2], [2, 0],
-                  [1, 3], [2, 3]],
+                  [1, 3], [2, 3], [1, 4], [3, 4], [1, 5], [4, 5]],
                  dtype='int_')
 
     F = np.array([[0, 1, 2],
                   [1, 3, 2],
+                  [1, 4, 3],
+                  [1, 4, 5]
                   ], dtype='int_')
 
     cp = CreasePatternState(X=x,
@@ -45,24 +47,29 @@ def create_cp_factory():
 
 if __name__ == '__main__':
 
-    import mayavi.mlab as m
-
     cp_factory_task = create_cp_factory()
     cp = cp_factory_task.formed_object
 
     # Link the crease factory it with the constraint client
     gu_constant_length = GuConstantLength()
 
-    u_max = 0.8
-    displ_cntl = fix([3], 2, lambda t: u_max * t)
+    psi_max = np.pi * 0.3
+    gu_psi_constraints = \
+        GuPsiConstraints(forming_task=cp_factory_task,
+                         psi_constraints=[([(1, 1.0)], lambda t: psi_max * t),
+                                          ([(3, 1.0)], psi_max),
+                                          ([(5, 1.0)], lambda t: psi_max * t),
+                                          ])
+
     dof_constraints = fix([0], [0, 1, 2]) + fix([1], [1, 2]) \
-        + fix([2], [2]) + displ_cntl
+        + fix([2], [2])
     gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
 
     sim_config = SimulationConfig(goal_function_type='none',
                                   gu={'cl': gu_constant_length,
-                                      'dofs': gu_dof_constraints},
-                                  acc=1e-5, MAX_ITER=10)
+                                      'u': gu_dof_constraints,
+                                      'psi': gu_psi_constraints},
+                                  acc=1e-5, MAX_ITER=100)
     sim_task = SimulationTask(previous_task=cp_factory_task,
                               config=sim_config,
                               n_steps=5)
@@ -87,13 +94,3 @@ if __name__ == '__main__':
     fta.plot()
     fta.render()
     fta.configure_traits()
-#
-#     m.figure(bgcolor=(1.0, 1.0, 1.0), fgcolor=(0.6, 0.6, 0.6))
-#     cp.plot_mlab(m, nodes=True, lines=True)
-#     m.show()
-#
-#     import matplotlib.pyplot as plt
-#     fig, ax = plt.subplots()
-#     cp.plot_mpl(ax, facets=True)
-#     plt.tight_layout()
-#     plt.show()

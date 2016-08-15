@@ -14,7 +14,7 @@
 
 from traits.api import \
     Property, cached_property, \
-    Array, Constant, implements
+    Array, Constant, implements, Int
 from traitsui.api import \
     View, Item, TabularEditor
 from traitsui.tabular_adapter import TabularAdapter
@@ -138,6 +138,8 @@ class CreasePattern(CreaseNodeOperators,
     n_D = Constant(3)
     '''Dinensionality of the Euklidian space (constant = 3).
     '''
+
+    debug_level = Int(0, auto_set=False, enter_set=True)
 
     # ==========================================================================
     # Node mappings
@@ -326,6 +328,17 @@ class CreasePattern(CreaseNodeOperators,
     @cached_property
     def _get_iL(self):
         return np.where(np.bincount(self.L_F_map[0]) == 2)[0]
+
+    L_iL = Property(depends_on=INPUT)
+    '''Array mapping the line indexed within the ``L`` array to the 
+    index of within the interior line array. Lines that are not interior
+    contain the index None
+    '''
+    @cached_property
+    def _get_L_iL(self):
+        L_iL = np.zeros(self.n_L, dtype=np.int) - 1
+        L_iL[self.iL] = np.arange(self.n_iL)
+        return L_iL
 
     n_iL = Property
     '''Number of interior lines
