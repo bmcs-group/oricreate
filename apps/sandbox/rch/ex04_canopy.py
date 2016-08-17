@@ -255,7 +255,7 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
                                           'dofs': gu_dof_constraints},
                                       acc=1e-5, MAX_ITER=1000,
                                       debug_level=0)
-        load_nodes = [8, 9, 10, 11, 12, 13, 14]
+        load_nodes = [10, 11, 12]
         FN = lambda F: lambda t: t * F
         F_ext_list = [(n, 2, FN(-10)) for n in load_nodes]
         fu_tot_poteng = FuPotEngTotal(kappa=np.array([10]),

@@ -10,3 +10,5 @@ from fu_poteng_total import \
     FuPotEngTotal
 from fu_target_face import \
     FuTargetFaces, FuTargetFace, FuTF, FuFaceNodeDistance
+from fu_target_psi_value import \
+    FuTargetPsiValue

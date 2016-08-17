@@ -12,10 +12,10 @@ class IHu(Interface):
     '''Interface of an inequality constraint.
     '''
 
-    def get_H(self, U, t=0):
+    def get_H(self, t=0):
         '''Return the vector of equality constraint values.
         '''
 
-    def get_H_du(self, U, t=0):
+    def get_H_du(self, t=0):
         '''Return the jacobian of equality constraint values.
         '''
