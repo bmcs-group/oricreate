@@ -18,17 +18,17 @@ def create_cp_factory():
     from oricreate.api import MiuraOriCPFactory
     cp_factory = MiuraOriCPFactory(L_x=30,
                                    L_y=21,
-                                   n_x=2,
-                                   n_y=1,
-                                   d_0=3.0,
-                                   d_1=-3.0)
+                                   n_x=10,
+                                   n_y=2,
+                                   d_0=1.0,
+                                   d_1=-1.0)
     # end
     return cp_factory
 
 if __name__ == '__main__':
 
-    cp_factory_task = create_cp_factory()
-    cp = cp_factory_task.formed_object
+    cpf = create_cp_factory()
+    cp = cpf.formed_object
 
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots()
@@ -38,15 +38,16 @@ if __name__ == '__main__':
 
     # Link the crease factory it with the constraint client
     gu_constant_length = GuConstantLength()
-    dof_constraints = fix(
-        [1], [1]) + fix([4], [0, 1, 2]) + fix([3, 5], [2])
+    dof_constraints = fix(cpf.N_grid[0, 1], [1]) \
+        + fix(cpf.N_grid[1, 1], [0, 1, 2]) \
+        + fix(cpf.N_grid[1, (0, -1)], [2])
     gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
     psi_max = np.pi / 4.0
-    quad_psi_constraints = [([(i, 1.0)], 0) for i in range(17, 23)]
+    diag_psi_constraints = [([(i, 1.0)], 0) for i in cpf.L_d_grid.flatten()]
     gu_psi_constraints = \
-        GuPsiConstraints(forming_task=cp_factory_task,
-                         psi_constraints=quad_psi_constraints +
-                         [([(12, 1.0)],
+        GuPsiConstraints(forming_task=cpf,
+                         psi_constraints=diag_psi_constraints +
+                         [([(cpf.L_h_grid[1, 1], 1.0)],
                            lambda t: -psi_max * t),
                           ])
 
@@ -55,17 +56,17 @@ if __name__ == '__main__':
                                       'dofs': gu_dof_constraints,
                                       'psi': gu_psi_constraints},
                                   acc=1e-5, MAX_ITER=100)
-    sim_task = SimulationTask(previous_task=cp_factory_task,
+    sim_task = SimulationTask(previous_task=cpf,
                               config=sim_config,
                               n_steps=20)
 
     cp = sim_task.formed_object
-    cp.u[(1, 7, 8, 9), 2] = -4.0
-    cp.u[(0, 2), 2] = -8.0
+    cp.u[cpf.N_grid[::2, :].flatten(), 2] = -0.1
+    cp.u[cpf.N_grid[0, ::2].flatten(), 2] = -0.2
     sim_task.u_1
 
     ftv = FTV()
-    ftv.add(sim_task.sim_history.viz3d_dict['node_numbers'], order=5)
+#    ftv.add(sim_task.sim_history.viz3d_dict['node_numbers'], order=5)
     ftv.add(sim_task.sim_history.viz3d)
     ftv.add(gu_dof_constraints.viz3d)
 

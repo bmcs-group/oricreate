@@ -112,6 +112,63 @@ class MiuraOriCPFactory(FactoryTask):
     def _geo_transform_default(self):
         return lambda X_arr: X_arr
 
+    N_grid = Property(depends_on='+geometry')
+    '''Node numbers ordered in a two-dimensional grid.
+    '''
+    @cached_property
+    def _get_N_grid(self):
+        n_N = (self.n_x + 1) * (self.n_y + 1)
+        return np.arange(n_N).reshape(self.n_x + 1, self.n_y + 1)
+
+    L_N_v = Property(depends_on='+geometry')
+    '''Vertical lines-node connectivity.
+    '''
+    @cached_property
+    def _get_L_N_v(self):
+        N_grid = self.N_grid
+        return np.c_[N_grid[:, :-1].flatten(), N_grid[:, 1:].flatten()]
+
+    L_v_grid = Property(depends_on='+geometry')
+    '''Vertical line indices ordered in a two-dimensional grid..
+    '''
+    @cached_property
+    def _get_L_v_grid(self):
+        return np.arange(len(self.L_N_v)).reshape(self.n_x + 1, self.n_y)
+
+    L_N_h = Property(depends_on='+geometry')
+    '''Horizontal lines - node connectivity..
+    '''
+    @cached_property
+    def _get_L_N_h(self):
+        N_grid = self.N_grid
+        return np.c_[N_grid[:-1, :].flatten(), N_grid[1:, :].flatten()]
+
+    L_h_grid = Property(depends_on='+geometry')
+    '''Horizontal line indices ordered in a two-dimensional grid..
+    '''
+    @cached_property
+    def _get_L_h_grid(self):
+        offset = len(self.L_N_v)
+        L_h = np.arange(len(self.L_N_h)) + offset
+        return L_h.reshape(self.n_x, self.n_y + 1)
+
+    L_N_d = Property(depends_on='+geometry')
+    '''Diagonal lines-node connectivity..
+    '''
+    @cached_property
+    def _get_L_N_d(self):
+        N_grid = self.N_grid
+        return np.c_[N_grid[1:, :-1].flatten(), N_grid[:-1, 1:].flatten()]
+
+    L_d_grid = Property(depends_on='+geometry')
+    '''Diagonal line indices ordered in a two-dimensional grid..
+    '''
+    @cached_property
+    def _get_L_d_grid(self):
+        offset = len(self.L_N_v) + len(self.L_N_h)
+        L_d = np.arange(len(self.L_N_d)) + offset
+        return L_d.reshape(self.n_x, self.n_y)
+
     _geometry = Property(depends_on='+geometry')
 
     @cached_property
@@ -123,7 +180,7 @@ class MiuraOriCPFactory(FactoryTask):
         L_x = self.L_x
         L_y = self.L_y
 
-        x_e, y_e = np.mgrid[0:L_x:complex(n_x + 2), 0:L_y:complex(n_y + 2)]
+        x_e, y_e = np.mgrid[0:L_x:complex(n_x + 1), 0:L_y:complex(n_y + 1)]
         z_e = np.zeros_like(x_e)
 
         x_e[1:-1, ::2] += self.d_0
@@ -139,7 +196,7 @@ class MiuraOriCPFactory(FactoryTask):
         # Construct the creaseline mappings
         # ======================================================================
 
-        nidx = np.arange(len(nodes)).reshape(n_x + 2, n_y + 2)
+        nidx = np.arange(len(nodes)).reshape(n_x + 1, n_y + 1)
 
         l_vertical = np.c_[nidx[:, :-1].flatten(), nidx[:, 1:].flatten()]
         l_horizontal = np.c_[nidx[:-1, :].flatten(), nidx[1:, :].flatten()]
@@ -164,11 +221,13 @@ if __name__ == '__main__':
 
     yf = MiuraOriCPFactory(L_x=30,
                            L_y=15,
-                           n_x=10,
-                           n_y=10,
+                           n_x=3,
+                           n_y=3,
                            d_0=1.0,
                            d_1=-1.0)
 
+    print yf.N_grid[:, 0]
+    print yf.L_d_grid[:, 0]
     cp = yf.formed_object
 
     print cp.F

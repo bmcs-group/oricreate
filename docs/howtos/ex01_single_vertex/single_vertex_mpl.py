@@ -13,3 +13,4 @@ if __name__ == '__main__':
     cp.plot_mpl(ax, facets=True)
     plt.tight_layout()
     # end
+    plt.show()
