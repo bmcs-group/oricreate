@@ -247,7 +247,7 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
                         [51, 52, 53, 59, 60, 61, 67, 68, 69, 75, 76, 77],
                         [0, 1, 2], -1.0)
 
-        dof_constraints = fixed_nodes_x + fixed_nodes_yz  # + link_bnd
+        dof_constraints = fixed_nodes_x + fixed_nodes_yz + link_bnd
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
         sim_config = SimulationConfig(goal_function_type='total potential energy',

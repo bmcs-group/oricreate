@@ -24,7 +24,7 @@ def create_hu():
     # Link the crease factory it with the constraint client
     fu_target_psi_value = \
         FuTargetPsiValue(forming_task=cp_factory,
-                         psi_value=(1, -0.5)
+                         psi_value=(1, lambda t: -0.5 * t)
                          )
     cp = cp_factory.formed_object
     print cp.iL

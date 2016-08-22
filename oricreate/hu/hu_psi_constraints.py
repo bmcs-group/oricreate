@@ -6,7 +6,7 @@ Created on Feb 19, 2015
 
 from traits.api import \
     implements, \
-    Array, cached_property, Property, Dict
+    Array, cached_property, Property, Dict, Float
 
 
 from hu import Hu
@@ -42,7 +42,9 @@ class HuPsiConstraints(Hu, Visual3D):
     :func:`oricrete.fix_psis` and :func:`oricrete.link_psis`.
     '''
 
-    sign = Dict({True: -1, False: 1})
+    sign = Dict({True: 1, False: -1})
+
+    threshold = Float(np.pi * 0.0)
 
     def validate_input(self):
         cp = self.formed_object
@@ -64,7 +66,7 @@ class HuPsiConstraints(Hu, Visual3D):
             l, is_mountain = psi_cnstr
             sign = self.sign[is_mountain]
             il = cp.L_iL[l]
-            H[i] = sign * iL_psi[il]
+            H[i] = sign * iL_psi[il] + self.threshold
         return H
 
     def get_H_du(self, t=0.0):

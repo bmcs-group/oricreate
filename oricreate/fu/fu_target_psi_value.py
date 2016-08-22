@@ -7,6 +7,8 @@ Created on Feb 19, 2015
 from traits.api import \
     implements, Tuple, \
     cached_property, Property
+import types
+
 from fu import Fu
 from fu_target_psi_value_viz3d2 import \
     FuTargetPsiValueViz3D
@@ -51,7 +53,8 @@ class FuTargetPsiValue(Fu, Visual3D):
         '''
         cp = self.formed_object
         iL_psi = cp.iL_psi
-        l, value = self.psi_value
+        l, v = self.psi_value
+        value = v(t) if isinstance(v, types.FunctionType) else v
         il = cp.L_iL[l]
         return 0.5 * (iL_psi[il] - value) ** 2
 
@@ -61,7 +64,8 @@ class FuTargetPsiValue(Fu, Visual3D):
         cp = self.formed_object
         iL_psi = cp.iL_psi
         iL_psi_du = cp.iL_psi_du
-        l, value = self.psi_value  # @UnusedVariable
+        l, v = self.psi_value  # @UnusedVariable
+        value = v(t) if isinstance(v, types.FunctionType) else v
         il = cp.L_iL[l]
         return (iL_psi[il] - value) * iL_psi_du[il]
 

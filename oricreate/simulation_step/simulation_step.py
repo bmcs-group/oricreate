@@ -217,6 +217,8 @@ class SimulationStep(HasStrictTraits):
         eps = d0 * 1e-4
         get_f_du_t = None
         get_G_du_t = None
+        get_H_t = None
+        get_H_du_t = None
         acc = self.config.acc
         max_iter = self.config.MAX_ITER
 
@@ -224,12 +226,18 @@ class SimulationStep(HasStrictTraits):
             get_f_du_t = self.get_f_du_t
         if self.config.use_G_du:
             get_G_du_t = self.get_G_du_t
+        if self.config.has_H:
+            get_H_t = self.get_H_t
+            if self.config.use_H_du:
+                get_H_du_t = self.get_H_du_t
 
         info = fmin_slsqp(self.get_f_t,
                           self.U,
                           fprime=get_f_du_t,
                           f_eqcons=self.get_G_t,
                           fprime_eqcons=get_G_du_t,
+                          f_ieqcons=get_H_t,
+                          fprime_ieqcons=get_H_du_t,
                           acc=acc, iter=max_iter,
                           iprint=0,
                           full_output=True,
@@ -301,3 +309,33 @@ class SimulationStep(HasStrictTraits):
             print 'G_du.shape:\n', g_du.shape
             print 'G_du:\n', [g_du]
         return g_du
+
+    # ==========================================================================
+    # Inequality constraints
+    # ==========================================================================
+    def get_H_t(self, U):
+        self.cp_state.U = U
+        h = self.get_H(self.t)
+        if self.debug_level > 1:
+            print 'H:\n', [h]
+        return h
+
+    def get_H(self, t=0):
+        h_lst = [hu.get_H(t) for hu in self.hu_lst]
+        if(h_lst == []):
+            return []
+        return np.hstack(h_lst)
+
+    def get_H_du_t(self, U):
+        self.cp_state.U = U
+        return self.get_H_du(self.t)
+
+    def get_H_du(self, t=0):
+        h_du_lst = [hu.get_H_du(t) for hu in self.hu_lst]
+        if(h_du_lst == []):
+            return []
+        h_du = np.vstack(h_du_lst)
+        if self.debug_level > 3:
+            print 'G_du.shape:\n', h_du.shape
+            print 'G_du:\n', [h_du]
+        return h_du

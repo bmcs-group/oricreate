@@ -83,7 +83,12 @@ class SimulationConfig(HasStrictTraits):
     '''
     @cached_property
     def _get_hu_lst(self):
-        return self.gu.values()
+        return self.hu.values()
+
+    has_H = Property(Bool)
+
+    def _get_has_H(self):
+        return len(self.hu) > 0
 
     show_iter = Bool(False, auto_set=False, enter_set=True)
     r'''Saves the first 10 iteration steps, so they can be analyzed
@@ -102,6 +107,10 @@ class SimulationConfig(HasStrictTraits):
     '''
 
     use_G_du = Bool(True, auto_set=False, enter_set=True)
+    r'''Switch the use of constraint derivatives on.
+    '''
+
+    use_H_du = Bool(True, auto_set=False, enter_set=True)
     r'''Switch the use of constraint derivatives on.
     '''
 
