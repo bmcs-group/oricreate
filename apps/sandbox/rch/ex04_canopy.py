@@ -15,6 +15,8 @@ from oricreate.api import YoshimuraCPFactory, \
     GuConstantLength, GuDofConstraints, SimulationConfig, SimulationTask, \
     FTV, FTA
 from oricreate.crease_pattern.crease_pattern_state import CreasePatternState
+from oricreate.export import \
+    InfoCadMeshExporter
 from oricreate.forming_tasks.forming_task import FormingTask
 from oricreate.fu import \
     FuPotEngTotal
@@ -417,7 +419,8 @@ if __name__ == '__main__':
     animate = False
     show_init_task = False
     show_fold_task = False
-    show_load_task = True
+    show_load_task = False
+    export_and_show_mesh = True
 
     if show_init_task:
         ftv.add(it.target_faces[0].viz3d)
@@ -457,6 +460,15 @@ if __name__ == '__main__':
         ftv.update(vot=1, force=True)
         ftv.show()
 
+    if export_and_show_mesh:
+        lt = bsf_process.load_task
+        me = InfoCadMeshExporter(forming_task=lt, n_l_e=4)
+        me.write()
+        X, F = me._get_geometry()
+        x, y, z = X.T
+        import mayavi.mlab as m
+        me.plot_mlab(m)
+        m.show()
 #
 
     # bsf_process.generate_scaffoldings()

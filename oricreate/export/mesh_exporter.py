@@ -13,6 +13,8 @@
 
 from copy import copy
 import math
+import os
+import tempfile
 from traits.api import Property, cached_property, \
     Array, Int, \
     Str, Float, Dict, WeakRef
@@ -112,10 +114,63 @@ class MeshExporter(Exporter, Visual3D):
 
         return N_X, F_t_N
 
+    def plot_mlab(self, m, nodes=False):
+        m.figure(fgcolor=(0, 0, 0), bgcolor=(1, 1, 1))
+
+        X, F = self._get_geometry()
+        x, y, z = X.T
+
+        m.triangular_mesh(x, y, z, F,
+                          line_width=3,
+                          representation='wireframe',
+                          color=(0.6, 0.6, 0.6))
+
+        if nodes:
+            text = np.array([])
+            pts = X
+            for i in range(len(pts)):
+                temp_text = m.text3d(
+                    x[i], y[i], z[i] + 0.2, str(i), scale=0.05)
+
+
+class InfoCadMeshExporter(MeshExporter):
+
+    def write(self):
+
+        X, F = self._get_geometry()
+        x, y, z = X.T
+        nodes = "*Node"
+        for i in range(len(x)):
+            temp_node = ' %i \t %.4f \t %.4f \t %.4f\n' % (
+                i + 1, x[i], y[i], z[i])
+            temp_node = temp_node.replace('.', ',')
+            nodes += temp_node
+
+        F0, F1, F2 = F.T + 1
+        elements = "*Elements"
+        for i in range(len(F0)):
+            temp_facet = ' %i\tSH36\t%i\t%i\t%i\t\t\t\t\t\t1\n' % \
+                (i + 1, F0[i], F1[i], F2[i])
+            elements += temp_facet
+
+        part = '*Part, NAME=Part-1\n'
+        part += nodes
+        part += elements
+
+        fname_base = 'infocad_mesh'
+        tdir = tempfile.mkdtemp()
+        fname_path = os.path.join(tdir, fname_base)
+
+        fname = fname_path + '.inp'
+        inp_file = open(fname, 'w')
+        inp_file.write(part)
+        inp_file.close()
+        print'inp file %s written' % fname
+
 if __name__ == '__main__':
     from oricreate.api import YoshimuraCPFactory, \
         CreasePattern, CustomCPFactory
-    cpf = YoshimuraCPFactory(L_x=4, L_y=2, n_x=10, n_y=20)
+    cpf = YoshimuraCPFactory(L_x=4, L_y=2, n_x=3, n_y=4)
 #     cp = CreasePattern(X=[[0, 0, 0],
 #                           [2, 0, 0],
 #                           [0, 2, 0],
@@ -123,25 +178,15 @@ if __name__ == '__main__':
 #                        L=[[0, 1], [2, 0], [2, 1]],
 #                        F=[[0, 1, 2]])
 #     cpf = CustomCPFactory(formed_object=cp)
-    me = MeshExporter(forming_task=cpf, n_l_e=8)
+    cpf.formed_object.x[20, 2] = 0.5
+    me = InfoCadMeshExporter(forming_task=cpf, n_l_e=8)
+
+    me.write()
 
     X, F = me._get_geometry()
 
     x, y, z = X.T
 
     import mayavi.mlab as m
-
-    m.figure(fgcolor=(0, 0, 0), bgcolor=(1, 1, 1))
-    m.triangular_mesh(x, y, z, F,
-                      line_width=3,
-                      representation='wireframe',
-                      color=(0.6, 0.6, 0.6))
-
-    if False:
-        text = np.array([])
-        pts = X
-        for i in range(len(pts)):
-            temp_text = m.text3d(
-                x[i], y[i], z[i] + 0.2, str(i), scale=0.05)
-
+    me.plot_mlab(m)
     m.show()
