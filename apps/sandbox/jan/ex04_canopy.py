@@ -77,7 +77,7 @@ class AddBoundaryTask(MappingTask):
         n_N = len(x_0)
         n_N_add = 8
         x_br, L_br, F_br = self._add_boundary_facet(
-            #            [8, 37, 15, 43], [37, 15, 43, 20], -1, 0.0732, n_N)
+#            [8, 37, 15, 43], [37, 15, 43, 20], -1, 0.0732, n_N)
             [8, 37, 15, 43], [37, 15, 43, 20], -1, 0.0732, n_N)
         x_bl, L_bl, F_bl = self._add_boundary_facet(
             [8, 31, 3, 27], [31, 3, 27, 0], -1, 0.0732, n_N + n_N_add)
@@ -264,51 +264,29 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
 
         fixed_nodes_yz = fix([0, 2, 20,  22], (1, 2))  # + \
         fixed_nodes_x = fix([0, 2, 20, 22], (0))  # + \
-        fixed_nodes_middle = fix([1, 21], [0, 1, 2])
+        #    fix([1, 21], [0, 2])
 
-        'Gesamter Randbereich'
-        link_bnd = link([48, 49, 50, 56, 57, 58, 64, 65, 66, 72, 73, 74, 71, 55],
+        link_bnd = link([48, 49, 50, 56, 57, 58, 64, 65, 66, 72, 73, 74],
                         [0, 1, 2], 1.0,
-                        [51, 52, 53, 59, 60, 61, 67,
-                            68, 69, 75, 76, 77, 63, 47],
+                        [51, 52, 53, 59, 60, 61, 67, 68, 69, 75, 76, 77],
                         [0, 1, 2], -1.0)
 
-        'Ohne mittlere Randknoten'
-#         link_bnd = link([48, 49, 50, 56, 57, 58, 64, 65, 66, 72, 73, 74],
-#                         [0, 1, 2], 1.0,
-#                         [51, 52, 53, 59, 60, 61, 67,
-#                             68, 69, 75, 76, 77],
-#                         [0, 1, 2], -1.0)
-
-#         'Ohne aeussere Randknoten'
-#         link_bnd = link([48, 49, 56, 57, 64, 65, 72, 73, 71, 55],
-#                         [0, 1, 2], 1.0,
-#                         [51, 52, 59, 60, 67,
-#                             68, 75, 76, 63, 47],
-#                         [0, 1, 2], -1.0)
-
-        # + link_bnd + # fixed_nodes_middle
-        dof_constraints = fixed_nodes_x + fixed_nodes_yz
+        dof_constraints = fixed_nodes_x + fixed_nodes_yz + link_bnd
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
         sim_config = SimulationConfig(goal_function_type='total potential energy',
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints},
-                                      acc=1e-8, MAX_ITER=1000,
+                                      acc=1e-5, MAX_ITER=1000,
                                       debug_level=0)
+        load_nodes = [10, 11, 12]
         FN = lambda F: lambda t: t * F
-
-        H = 0
-        P = 3
-        F_ext_list = [(33, 2, FN(-P)), (34, 2, FN(-P)), (11, 2, FN(-P)), (39, 2, FN(-P)), (40, 2, FN(-P)), (4, 0, FN(0.1609 * H)), (4, 2, FN(-0.2385 * H)), (10, 2, FN(-0.3975 * H)), (16, 0, FN(-0.1609 * H)), (16, 2, FN(-0.2385 * H)),
-                      (6, 0, FN(0.1609 * H)), (6, 2, FN(-0.2385 * H)), (12, 2, FN(-0.3975 * H)), (18, 0, FN(-0.1609 * H)), (18, 2, FN(-0.2385 * H))]
-
-        fu_tot_poteng = FuPotEngTotal(kappa=np.array([5.28]),
-                                      F_ext_list=F_ext_list)
+        F_ext_list = [(n, 2, FN(-10)) for n in load_nodes]
+        fu_tot_poteng = FuPotEngTotal(kappa=np.array([10]),
+                                      F_ext_list=F_ext_list)  # (2 * n, 2, -1)])
         sim_config._fu = fu_tot_poteng
         st = SimulationTask(previous_task=self.turn_task,
                             config=sim_config, n_steps=1)
-
         fu_tot_poteng.forming_task = st
         cp = st.formed_object
         cp.x_0 = self.turn_task.x_1
@@ -442,11 +420,6 @@ class DoublyCurvedYoshiFormingProcessFTV(FTV):
 
 
 if __name__ == '__main__':
-
-    measured = np.loadtxt('C:\Users\laura\Desktop\Masterarbeit\Schale\AuswertungKO\KO6.txt')
-    node_idx_measured = np.array(measured[:, 0], dtype='int_')
-    x_measured = measured[:, 1:]
-
     bsf_process = DoublyCurvedYoshiFormingProcess(L_x=3.0, L_y=2.41, n_x=4,
                                                   n_y=12, u_x=0.1, n_steps=4)
 
@@ -468,9 +441,8 @@ if __name__ == '__main__':
     animate = False
     show_init_task = False
     show_fold_task = False
-    show_turn_task = True
     show_load_task = False
-    export_and_show_mesh = False
+    export_and_show_mesh = True
 
     if show_init_task:
         ftv.add(it.target_faces[0].viz3d)
@@ -486,29 +458,9 @@ if __name__ == '__main__':
         ftv.add(ft.config.gu['dofs'].viz3d)
         ft.u_1
 
-        ftv.plot()
-        ftv.update(vot=1, force=True)
-        ftv.show()
-
-    if show_turn_task:
-        tt.formed_object.viz3d.set(tube_radius=0.002)
-        # ftv.add(tt.formed_object.viz3d)
-        ftv.add(tt.formed_object.viz3d_dict['displ'])
-        tt.u_1
-        cp = tt.formed_object
-        x_mes = np.copy(cp.X)
-        x_mes[node_idx_measured, :] = x_measured
-        u = x_mes - cp.X
-        cp.u[:, :] = u
-
-        ftv.plot()
-        ftv.update(vot=1, force=True)
-        ftv.show()
-
     if show_load_task == True:
         lt = bsf_process.load_task
         lt.formed_object.viz3d.set(tube_radius=0.002)
-        ftv.add(lt.formed_object.viz3d)
         #    ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
         ftv.add(lt.formed_object.viz3d_dict['displ'])
         lt.config.gu['dofs'].viz3d.scale_factor = 0.5
@@ -516,29 +468,15 @@ if __name__ == '__main__':
         ftv.add(lt.config.fu.viz3d)
 
         ftv.add(lt.config.fu.viz3d_dict['node_load'])
-        n_max_uz = np.argmax(lt.u_1[:, 2])
-        n_max_uy = np.argmax(lt.u_1[:, 1])
-        n_max_ux = np.argmax(lt.u_1[:, 0])
-
-        print 'node max_uz', n_max_uz
-        print 'uz_max', lt.u_1[n_max_uz, 2]
-        print 'node max_uy', n_max_uy
-        print 'uy_max', lt.u_1[n_max_uy, 2]
-        print 'node max_ux', n_max_ux
-        print 'ux_max', lt.u_1[n_max_ux, 2]
-
-        print 'node 11_uz', lt.u_1[11, 2]
-        print 'node 5_uz', lt.u_1[5, 2]
-
-        f_du = lt.config.fu.get_f_du(t=1)
-
-        print 'force vector', f_du.reshape(-1, 3)
+        print 'u_13', lt.u_1[13, 2]
+        n_max_u = np.argmax(lt.u_1[:, 2])
+        print 'node max_u', n_max_u
+        print 'u_max', lt.u_1[n_max_u, 2]
 
         cp = lt.formed_object
         iL_phi = cp.iL_psi2 - cp.iL_psi_0
         iL_m = lt.config._fu.kappa * iL_phi
-#        print 'moment', iL_m
-        print 'max moment', np.max(np.fabs(iL_m))
+        print 'moments', np.max(np.fabs(iL_m))
 
         ftv.plot()
         ftv.update(vot=1, force=True)

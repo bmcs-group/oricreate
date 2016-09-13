@@ -12,10 +12,13 @@
 #
 
 
+import types
+
+from pandas.io.sql import _get_valid_mysql_name
 from traits.api import \
     implements,  List, Tuple, Float, \
     cached_property, Property, Array, Int
-import types
+
 from fu import \
     Fu
 from fu_poteng_bending_viz3d import \
@@ -23,6 +26,7 @@ from fu_poteng_bending_viz3d import \
 from fu_poteng_node_load_viz3d import \
     FuPotEngNodeLoadViz3D
 import numpy as np
+from oricreate.crease_pattern.crease_pattern_operators import CreaseCummulativeOperators
 from oricreate.opt import \
     IFu
 from oricreate.util.einsum_utils import \
@@ -93,6 +97,12 @@ class FuPotEngTotal(Fu, Visual3D):
         tot_energy = self.fu_factor * (stored_energy - ext_energy)
         return tot_energy
 
+#         F_ext = self._get_F_ext(t)
+#         ext_energy = (np.einsum(
+#             '...i,...i->...', F_ext.flatten(), cp.u.flatten()) - cp.V)
+#         tot_energy = self.fu_factor * (stored_energy - ext_energy)
+#         return tot_energy
+
     def get_f_du(self, t=0):
         '''Get the derivatives with respect to individual displacements.
         '''
@@ -107,7 +117,10 @@ class FuPotEngTotal(Fu, Visual3D):
         Pi_int_du = np.einsum('...l,...l,...l,...lId->...Id',
                               iL_length, self.kappa, iL_phi, iL_phi_du)
 
+        V_du = cp.V_du.reshape((-1, 3))
+
         Pi_ext_du = F_ext
+#         Pi_ext_du = F_ext - V_du
 
         Pi_du = Pi_int_du - Pi_ext_du
 
