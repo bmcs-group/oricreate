@@ -12,12 +12,10 @@
 #
 
 
-import types
-
-from pandas.io.sql import _get_valid_mysql_name
 from traits.api import \
     implements,  List, Tuple, Float, \
     cached_property, Property, Array, Int
+import types
 
 from fu import \
     Fu

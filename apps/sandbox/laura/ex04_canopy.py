@@ -255,6 +255,15 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
 
         return st
 
+    measure_task = Property(Instance(FormingTask))
+    '''Configure the simulation task.
+    '''
+    @cached_property
+    def _get_measure_task(self):
+        mt = MappingTask(previous_task=self.turn_task)
+        mt.formed_object.reset_state()
+        return mt
+
     load_task = Property(Instance(FormingTask))
     '''Configure the simulation task.
     '''
@@ -443,7 +452,14 @@ class DoublyCurvedYoshiFormingProcessFTV(FTV):
 
 if __name__ == '__main__':
 
-    measured = np.loadtxt('C:\Users\laura\Desktop\Masterarbeit\Schale\AuswertungKO\KO6.txt')
+    import os.path as path
+    from os.path import expanduser
+    home = expanduser("~")
+    fname = 'KO8.txt'
+    test_dir = path.join(home, 'simdb', 'exdata',
+                         'shell_tests', '2016-09-09-FSH04-Canopy')
+    fname = path.join(test_dir, fname)
+    measured = np.loadtxt(fname)
     node_idx_measured = np.array(measured[:, 0], dtype='int_')
     x_measured = measured[:, 1:]
 
@@ -456,10 +472,11 @@ if __name__ == '__main__':
     mt = bsf_process.mask_task
     ab = bsf_process.add_boundary_task
 
-    import pylab as p
-    ax = p.axes()
-    ab.formed_object.plot_mpl(ax)
-    p.show()
+    if False:
+        import pylab as p
+        ax = p.axes()
+        ab.formed_object.plot_mpl(ax)
+        p.show()
 
     it = bsf_process.init_displ_task
     ft = bsf_process.fold_task
@@ -468,7 +485,8 @@ if __name__ == '__main__':
     animate = False
     show_init_task = False
     show_fold_task = False
-    show_turn_task = True
+    show_turn_task = False
+    show_measure_task = True
     show_load_task = False
     export_and_show_mesh = False
 
@@ -492,15 +510,44 @@ if __name__ == '__main__':
 
     if show_turn_task:
         tt.formed_object.viz3d.set(tube_radius=0.002)
-        # ftv.add(tt.formed_object.viz3d)
         ftv.add(tt.formed_object.viz3d_dict['displ'])
-        tt.u_1
-        cp = tt.formed_object
-        x_mes = np.copy(cp.X)
-        x_mes[node_idx_measured, :] = x_measured
-        u = x_mes - cp.X
+
+        ftv.plot()
+        ftv.update(vot=1, force=True)
+        ftv.show()
+
+    if show_measure_task:
+        mt = bsf_process.measure_task
+
+        home = expanduser("~")
+        fname00 = 'KO0.txt'
+        fname08 = 'KO8.txt'
+        # Adapt back to your path
+        laura = True
+        if laura:
+            test_dir = 'WRITE YOUR PATH HERE OR MOVE THE DATA TO' \
+                '$HOME\simdb\exdata\shell_tests\2016-09-09-FSH04-Canopy'
+        else:
+            test_dir = path.join(home, 'simdb', 'exdata',
+                                 'shell_tests', '2016-09-09-FSH04-Canopy')
+
+        fpath00 = path.join(test_dir, fname00)
+        fpath08 = path.join(test_dir, fname08)
+        measured_00 = np.loadtxt(fpath00)
+        measured_08 = np.loadtxt(fpath08)
+        node_idx_measured = np.array(measured[:, 0], dtype='int_')
+        x_00 = measured_00[:, 1:]
+        x_08 = measured_08[:, 1:]
+
+        cp = mt.formed_object
+        cp.X[node_idx_measured, :] = x_00
+        x_mes = np.copy(cp.x)
+        x_mes[node_idx_measured, :] = x_08
+        u = x_mes - cp.x
         cp.u[:, :] = u
 
+        mt.formed_object.viz3d.set(tube_radius=0.002)
+        ftv.add(mt.formed_object.viz3d_dict['displ'])
         ftv.plot()
         ftv.update(vot=1, force=True)
         ftv.show()
@@ -554,25 +601,25 @@ if __name__ == '__main__':
         me.plot_mlab(m)
         m.show()
 #
+    if animate:
+        # bsf_process.generate_scaffoldings()
 
-    # bsf_process.generate_scaffoldings()
+        n_cam_move = 20
+        fta = FTA(ftv=ftv)
+        fta.init_view(a=45, e=60, d=7, f=(0, 0, 0), r=-120)
+        fta.add_cam_move(a=60, e=70, n=n_cam_move, d=8, r=-120,
+                         duration=10,
+                         vot_fn=lambda cmt: np.linspace(0.01, 0.5, n_cam_move),
+                         azimuth_move='damped',
+                         elevation_move='damped',
+                         distance_move='damped')
+        fta.add_cam_move(a=80, e=80, d=7, n=n_cam_move, r=-132,
+                         duration=10,
+                         vot_fn=lambda cmt: np.linspace(0.5, 1.0, n_cam_move),
+                         azimuth_move='damped',
+                         elevation_move='damped',
+                         distance_move='damped')
 
-    n_cam_move = 20
-    fta = FTA(ftv=ftv)
-    fta.init_view(a=45, e=60, d=7, f=(0, 0, 0), r=-120)
-    fta.add_cam_move(a=60, e=70, n=n_cam_move, d=8, r=-120,
-                     duration=10,
-                     vot_fn=lambda cmt: np.linspace(0.01, 0.5, n_cam_move),
-                     azimuth_move='damped',
-                     elevation_move='damped',
-                     distance_move='damped')
-    fta.add_cam_move(a=80, e=80, d=7, n=n_cam_move, r=-132,
-                     duration=10,
-                     vot_fn=lambda cmt: np.linspace(0.5, 1.0, n_cam_move),
-                     azimuth_move='damped',
-                     elevation_move='damped',
-                     distance_move='damped')
-
-    fta.plot()
-    fta.render()
-    fta.configure_traits()
+        fta.plot()
+        fta.render()
+        fta.configure_traits()

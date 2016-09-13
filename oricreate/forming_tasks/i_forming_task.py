@@ -13,7 +13,7 @@
 # Created on Jan 29, 2013 by: rch
 
 from traits.api import \
-    Interface, Property, Self, Instance
+    Interface, Property, Self, Instance, Array
 
 from i_formed_object import IFormedObject
 
@@ -29,3 +29,16 @@ class IFormingTask(Interface):
     source_task = Instance(Self)
 
     formed_object = Instance(IFormedObject)
+
+    # =========================================================================
+    # Geometric data
+    # =========================================================================
+
+    x_0 = Property(Array(float))
+    '''Positions at the beginning of the forming task
+    '''
+
+    x_1 = Property(Array(float))
+    '''Final state of the FormingTask process that can be used
+    by further FormingTask controller.
+    '''

@@ -81,6 +81,13 @@ class CreasePatternState(CreasePattern):
     def _get_n_dofs(self):
         return self.n_N * self.n_D
 
+    def reset_state(self):
+        '''Move the base position to the displaced configuration and
+        zero the displacements.
+        '''
+        self.x_0 = self.x
+        self.u[:, :] = 0.0
+
 if __name__ == '__main__':
 
     # trivial example with a single triangle positioned

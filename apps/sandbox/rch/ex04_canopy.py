@@ -233,6 +233,15 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
 
         return st
 
+    measure_task = Property(Instance(FormingTask))
+    '''Configure the simulation task.
+    '''
+    @cached_property
+    def _get_measure_task(self):
+        mt = MappingTask(previous_task=self.turn_task)
+        mt.formed_object.reset_state()
+        return mt
+
     load_task = Property(Instance(FormingTask))
     '''Configure the simulation task.
     '''
@@ -418,7 +427,9 @@ if __name__ == '__main__':
 
     animate = False
     show_init_task = False
-    show_fold_task = True
+    show_fold_task = False
+    show_turn_task = False
+    show_measure_task = True
     show_load_task = False
     export_and_show_mesh = False
 
@@ -436,6 +447,40 @@ if __name__ == '__main__':
         ftv.add(ft.config.gu['dofs'].viz3d)
         ft.u_1
 
+        ftv.plot()
+        ftv.update(vot=1, force=True)
+        ftv.show()
+
+    if show_turn_task:
+        tt.formed_object.viz3d.set(tube_radius=0.002)
+        ftv.add(tt.formed_object.viz3d_dict['displ'])
+
+        ftv.plot()
+        ftv.update(vot=1, force=True)
+        ftv.show()
+
+    if show_measure_task:
+        mt = bsf_process.measure_task
+
+        import os.path as path
+        from os.path import expanduser
+        home = expanduser("~")
+        fname = 'KO8.txt'
+        test_dir = path.join(home, 'simdb', 'exdata',
+                             'shell_tests', '2016-09-09-FSH04-Canopy')
+        fname = path.join(test_dir, fname)
+        measured = np.loadtxt(fname)
+        node_idx_measured = np.array(measured[:, 0], dtype='int_')
+        x_measured = measured[:, 1:]
+
+        cp = mt.formed_object
+        x_mes = np.copy(cp.x)
+        x_mes[node_idx_measured, :] = x_measured
+        u = x_mes - cp.x
+        cp.u[:, :] = u
+
+        mt.formed_object.viz3d.set(tube_radius=0.002)
+        ftv.add(mt.formed_object.viz3d_dict['displ'])
         ftv.plot()
         ftv.update(vot=1, force=True)
         ftv.show()
@@ -476,23 +521,23 @@ if __name__ == '__main__':
 #
 
     # bsf_process.generate_scaffoldings()
+    if animate:
+        n_cam_move = 20
+        fta = FTA(ftv=ftv)
+        fta.init_view(a=45, e=60, d=7, f=(0, 0, 0), r=-120)
+        fta.add_cam_move(a=60, e=70, n=n_cam_move, d=8, r=-120,
+                         duration=10,
+                         vot_fn=lambda cmt: np.linspace(0.01, 0.5, n_cam_move),
+                         azimuth_move='damped',
+                         elevation_move='damped',
+                         distance_move='damped')
+        fta.add_cam_move(a=80, e=80, d=7, n=n_cam_move, r=-132,
+                         duration=10,
+                         vot_fn=lambda cmt: np.linspace(0.5, 1.0, n_cam_move),
+                         azimuth_move='damped',
+                         elevation_move='damped',
+                         distance_move='damped')
 
-    n_cam_move = 20
-    fta = FTA(ftv=ftv)
-    fta.init_view(a=45, e=60, d=7, f=(0, 0, 0), r=-120)
-    fta.add_cam_move(a=60, e=70, n=n_cam_move, d=8, r=-120,
-                     duration=10,
-                     vot_fn=lambda cmt: np.linspace(0.01, 0.5, n_cam_move),
-                     azimuth_move='damped',
-                     elevation_move='damped',
-                     distance_move='damped')
-    fta.add_cam_move(a=80, e=80, d=7, n=n_cam_move, r=-132,
-                     duration=10,
-                     vot_fn=lambda cmt: np.linspace(0.5, 1.0, n_cam_move),
-                     azimuth_move='damped',
-                     elevation_move='damped',
-                     distance_move='damped')
-
-    fta.plot()
-    fta.render()
-    fta.configure_traits()
+        fta.plot()
+        fta.render()
+        fta.configure_traits()

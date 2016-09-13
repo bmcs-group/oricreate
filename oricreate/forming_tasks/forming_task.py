@@ -16,7 +16,7 @@ import copy
 from traits.api import \
     HasStrictTraits, Event, Property, Str, \
     List, Instance, implements, \
-    cached_property, Enum
+    cached_property, Enum, Array
 from traitsui.api import \
     View
 
@@ -24,6 +24,7 @@ from i_formed_object import \
     IFormedObject
 from i_forming_task import \
     IFormingTask
+import numpy as np
 
 
 class FormingTask(HasStrictTraits):
@@ -68,6 +69,13 @@ class FormingTask(HasStrictTraits):
             raise NotImplementedError('No pre-fabrication method'
                                       'for the object to form')
 
+    cp = Property
+    '''Instance of a crease pattern.
+    '''
+
+    def _get_cp(self):
+        return self.formed_object
+
     source_task = Property
     r'''The task without ``previous_task`` is the initial task.
     Recursive search.
@@ -80,3 +88,18 @@ class FormingTask(HasStrictTraits):
             return self
 
     traits_view = View()
+
+    x_0 = Property(Array(float))
+    '''Initial position of the forming task.
+    '''
+
+    def _get_x_0(self):
+        return self.formed_object.x_0
+
+    x_1 = Property(Array(float))
+    '''Final state of the FormingTask process that can be used
+    by further FormingTask controller.
+    '''
+
+    def _get_x_1(self):
+        return self.x_0 + self.u_1

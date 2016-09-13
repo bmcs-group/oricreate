@@ -79,13 +79,6 @@ class SimulationTask(FormingTask):
         return SimulationStep(forming_task=self,
                               config=self.config, )
 
-    cp = Property
-    '''Instance of a crease pattern.
-    '''
-
-    def _get_cp(self):
-        return self.formed_object
-
     # =========================================================================
     # Geometric data
     # =========================================================================
@@ -106,15 +99,6 @@ class SimulationTask(FormingTask):
 
     def _get_u_1(self):
         return self.u_t[-1]
-
-    x_1 = Property(Array(float))
-    '''Final state of the FormingTask process that can be used
-    by further FormingTask controller.
-    '''
-
-    def _get_x_1(self):
-        x_0 = self.cp.x_0
-        return x_0 + self.u_1
 
     # ==========================================================================
     # Solver parameters
