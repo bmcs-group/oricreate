@@ -418,9 +418,9 @@ if __name__ == '__main__':
 
     animate = False
     show_init_task = False
-    show_fold_task = False
+    show_fold_task = True
     show_load_task = False
-    export_and_show_mesh = True
+    export_and_show_mesh = False
 
     if show_init_task:
         ftv.add(it.target_faces[0].viz3d)
@@ -435,6 +435,10 @@ if __name__ == '__main__':
         ft.config.gu['dofs'].viz3d.scale_factor = 0.5
         ftv.add(ft.config.gu['dofs'].viz3d)
         ft.u_1
+
+        ftv.plot()
+        ftv.update(vot=1, force=True)
+        ftv.show()
 
     if show_load_task == True:
         lt = bsf_process.load_task

@@ -54,11 +54,13 @@ class FormingTaskView3D(HasStrictTraits):
         '''
         mm = []
         if len(self.viz3d_list) == 0:
-            raise IndexError, 'vizualization module inserted into fold television'
+            raise IndexError, 'No vizualization module inserted' \
+                'into fold television'
         for viz3d in self.viz3d_list:
             x_min, x_max = viz3d.min_max
             if x_min != None and x_max != None:
                 mm.append([x_min, x_max])
+
         bnodes = np.array(mm, dtype='float_')
         bb_min, bb_max = np.min(bnodes[:, 0, :], axis=0), np.max(
             bnodes[:, 1, :], axis=0)
