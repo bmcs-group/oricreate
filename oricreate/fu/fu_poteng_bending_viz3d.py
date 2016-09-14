@@ -26,7 +26,7 @@ class FuPotEngBendingViz3D(Viz3D):
 
         iL_phi = cp.iL_psi2 - cp.iL_psi_0
         iL_length = np.linalg.norm(cp.iL_vectors, axis=1)
-        iL_m = fu_tot_poteng.kappa * iL_phi * iL_length
+        iL_m = fu_tot_poteng.kappa * iL_phi
         max_m = np.max(iL_m)
         iL_m /= max_m
 

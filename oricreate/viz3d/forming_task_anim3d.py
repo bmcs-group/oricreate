@@ -220,7 +220,7 @@ class CamMove(HasStrictTraits):
             ff = ftv.get_center()
             self.reset_cam(ftv.mlab, a, e, d, ff, r)
             fname = '%s%03d.%s' % (fname_base, idx + idx_offset, format_)
-            ftv.mlab.savefig(fname, magnification=2.2)
+            ftv.mlab.savefig(fname, size=(3200, 2000))  # magnification=2.2)
             im_files.append(fname)
         return im_files
 

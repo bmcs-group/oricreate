@@ -159,7 +159,7 @@ class BikeShellterFormingProcess(HasTraits):
     @cached_property
     def _get_init_displ_task(self):
         cp = self.mask_task.formed_object
-        return MapToSurface(previous_task=self.add_boundary_task,
+        return MapToSurface(previous_task=self.mask_task,
                             target_faces=[(self.ctf, cp.N)])
 
     fold_task = Property(Instance(FormingTask))
@@ -212,7 +212,7 @@ class BikeShellterFormingProcessFTV(FTV):
 
 if __name__ == '__main__':
     bsf_process = BikeShellterFormingProcess(L_x=3.0, L_y=2.41, n_x=4,
-                                             n_y=12, n_steps=80)
+                                             n_y=12, n_steps=10)
 
     mt = bsf_process.mask_task
     ab = bsf_process.add_boundary_task
@@ -245,7 +245,7 @@ if __name__ == '__main__':
 #     ftv.update(vot=1, force=True)
 #     ftv.show()
 
-    n_cam_move = 80
+    n_cam_move = 5
     fta = FTA(ftv=ftv)
     fta.init_view(a=45, e=60, d=7, f=(0, 0, 0), r=-120)
     fta.add_cam_move(a=60, e=70, n=n_cam_move, d=6, r=-120,

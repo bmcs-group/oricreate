@@ -76,7 +76,7 @@ if __name__ == '__main__':
     print 'V_du', V_du
 
     iL_length = np.linalg.norm(cp.iL_vectors, axis=1)
-    iL_m = sim_config._fu.kappa * iL_phi * iL_length
+    iL_m = sim_config._fu.kappa * iL_phi
 
     print 'moments', iL_m
 

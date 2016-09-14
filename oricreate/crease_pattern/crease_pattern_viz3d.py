@@ -125,6 +125,7 @@ class CreasePatternDisplViz3D(CreasePatternViz3D):
         if len(F) > 0:
             cp_pipe = m.triangular_mesh(x, y, z, F,
                                         line_width=3,
+                                        scalars=w,
                                         color=self.facet_color)
             if self.lines is True:
                 cp_pipe.mlab_source.dataset.lines = L
