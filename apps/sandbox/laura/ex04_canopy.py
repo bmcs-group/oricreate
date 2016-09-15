@@ -275,14 +275,14 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
         fixed_nodes_x = fix([0, 2, 20, 22], (0))  # + \
         fixed_nodes_middle = fix([1, 21], [0, 1, 2])
 
-        'Gesamter Randbereich'
-        link_bnd = link([48, 49, 50, 56, 57, 58, 64, 65, 66, 72, 73, 74, 71, 55],
-                        [0, 1, 2], 1.0,
-                        [51, 52, 53, 59, 60, 61, 67,
-                            68, 69, 75, 76, 77, 63, 47],
-                        [0, 1, 2], -1.0)
+#         'Gesamter Randbereich'
+#         link_bnd = link([48, 49, 50, 56, 57, 58, 64, 65, 66, 72, 73, 74, 71, 55],
+#                         [0, 1, 2], 1.0,
+#                         [51, 52, 53, 59, 60, 61, 67,
+#                             68, 69, 75, 76, 77, 63, 47],
+#                         [0, 1, 2], -1.0)
 
-        'Ohne mittlere Randknoten'
+#         'Ohne mittlere Randknoten'
 #         link_bnd = link([48, 49, 50, 56, 57, 58, 64, 65, 66, 72, 73, 74],
 #                         [0, 1, 2], 1.0,
 #                         [51, 52, 53, 59, 60, 61, 67,
@@ -308,7 +308,7 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
         FN = lambda F: lambda t: t * F
 
         H = 0
-        P = 3
+        P = 3.5
         F_ext_list = [(33, 2, FN(-P)), (34, 2, FN(-P)), (11, 2, FN(-P)), (39, 2, FN(-P)), (40, 2, FN(-P)), (4, 0, FN(0.1609 * H)), (4, 2, FN(-0.2385 * H)), (10, 2, FN(-0.3975 * H)), (16, 0, FN(-0.1609 * H)), (16, 2, FN(-0.2385 * H)),
                       (6, 0, FN(0.1609 * H)), (6, 2, FN(-0.2385 * H)), (12, 2, FN(-0.3975 * H)), (18, 0, FN(-0.1609 * H)), (18, 2, FN(-0.2385 * H))]
 
@@ -455,9 +455,8 @@ if __name__ == '__main__':
     import os.path as path
     from os.path import expanduser
     home = expanduser("~")
-    fname = 'KO8.txt'
-    test_dir = path.join(home, 'simdb', 'exdata',
-                         'shell_tests', '2016-09-09-FSH04-Canopy')
+    fname = 'KOI.txt'
+    test_dir = 'C:\Users\laura\Desktop\Masterarbeit\Schale\AuswertungKO'
     fname = path.join(test_dir, fname)
     measured = np.loadtxt(fname)
     node_idx_measured = np.array(measured[:, 0], dtype='int_')
@@ -520,13 +519,12 @@ if __name__ == '__main__':
         mt = bsf_process.measure_task
 
         home = expanduser("~")
-        fname00 = 'KO0.txt'
-        fname08 = 'KO8.txt'
+        fname00 = 'KOA.txt'
+        fname08 = 'KOI.txt'
         # Adapt back to your path
         laura = True
         if laura:
-            test_dir = 'WRITE YOUR PATH HERE OR MOVE THE DATA TO' \
-                '$HOME\simdb\exdata\shell_tests\2016-09-09-FSH04-Canopy'
+            test_dir = 'C:\Users\laura\Desktop\Masterarbeit\Schale\AuswertungKO'
         else:
             test_dir = path.join(home, 'simdb', 'exdata',
                                  'shell_tests', '2016-09-09-FSH04-Canopy')
@@ -544,10 +542,17 @@ if __name__ == '__main__':
         x_mes = np.copy(cp.x)
         x_mes[node_idx_measured, :] = x_08
         u = x_mes - cp.x
-        cp.u[:, :] = u
+        cp.u = u
+
+        print'angle', cp.iL_psi2
+        print'angle size', cp.iL_psi2.size
+
+        dummy_fu = FuPotEngTotal(forming_task=mt,
+                                 kappa=np.array([5.28]))
 
         mt.formed_object.viz3d.set(tube_radius=0.002)
         ftv.add(mt.formed_object.viz3d_dict['displ'])
+        ftv.add(dummy_fu.viz3d)
         ftv.plot()
         ftv.update(vot=1, force=True)
         ftv.show()
@@ -556,13 +561,14 @@ if __name__ == '__main__':
         lt = bsf_process.load_task
         lt.formed_object.viz3d.set(tube_radius=0.002)
         ftv.add(lt.formed_object.viz3d)
-        #    ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
+        ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
         ftv.add(lt.formed_object.viz3d_dict['displ'])
         lt.config.gu['dofs'].viz3d.scale_factor = 0.5
         ftv.add(lt.config.gu['dofs'].viz3d)
         ftv.add(lt.config.fu.viz3d)
 
         ftv.add(lt.config.fu.viz3d_dict['node_load'])
+
         n_max_uz = np.argmax(lt.u_1[:, 2])
         n_max_uy = np.argmax(lt.u_1[:, 1])
         n_max_ux = np.argmax(lt.u_1[:, 0])
@@ -577,14 +583,10 @@ if __name__ == '__main__':
         print 'node 11_uz', lt.u_1[11, 2]
         print 'node 5_uz', lt.u_1[5, 2]
 
-        f_du = lt.config.fu.get_f_du(t=1)
-
-        print 'force vector', f_du.reshape(-1, 3)
-
         cp = lt.formed_object
         iL_phi = cp.iL_psi2 - cp.iL_psi_0
         iL_m = lt.config._fu.kappa * iL_phi
-#        print 'moment', iL_m
+        print 'moment', iL_m
         print 'max moment', np.max(np.fabs(iL_m))
 
         ftv.plot()

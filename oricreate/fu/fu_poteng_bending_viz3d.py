@@ -23,10 +23,11 @@ class FuPotEngBendingViz3D(Viz3D):
         fu_tot_poteng = self.vis3d
         ft = fu_tot_poteng.forming_task
         cp = ft.formed_object
+        print 'cp.u', cp.u
 
         iL_phi = cp.iL_psi2 - cp.iL_psi_0
-        iL_length = np.linalg.norm(cp.iL_vectors, axis=1)
         iL_m = fu_tot_poteng.kappa * iL_phi
+        print 'iL_m', iL_m
         max_m = np.max(iL_m)
         iL_m /= max_m
 
