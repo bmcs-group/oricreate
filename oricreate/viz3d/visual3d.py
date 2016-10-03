@@ -5,7 +5,7 @@ Created on Dec 3, 2015
 '''
 
 from traits.api import \
-    HasStrictTraits, Dict, Property, Range, Float
+    HasStrictTraits, Dict, Property, Float
 
 
 class Visual3D(HasStrictTraits):
@@ -16,23 +16,29 @@ class Visual3D(HasStrictTraits):
     from Visual3D which introduces a dictionary viz3d objects.
     '''
 
-    #vot = Range(low=0.0, high=1.0, time_change=True)
     vot = Float(0.0, time_change=True)
-    '''Object life time
+    '''Visual object time
     '''
-    viz3d_dict = Dict({})
+    viz3d = Dict({})
     '''Dictionary of visualization objects'''
 
-    viz3d = Property
-    '''Default visualization of an object'''
+    viz3d_classes = Dict
+    '''Visualization classes applicable to this object. 
+    '''
 
-    def _get_viz3d(self):
-        if len(self.viz3d_dict) == 1:
-            return self.viz3d_dict.values()[0]
-        elif self.viz3d_dict.has_key('default'):
-            return self.viz3d_dict['default']
-        else:
-            raise NotImplementedError, 'no default visualization object for %s' % self.__class__
+    def get_viz3d(self, key):
+        '''Get a vizualization object given the key
+        of the vizualization class. Construct it on demand
+        and register in the viz3d_dict.
+        '''
+        viz3d = self.viz3d.get(key, None)
+        if viz3d == None:
+            viz3d_class = self.viz3d_classes.get(key, None)
+            if viz3d_class == None:
+                raise KeyError, 'No vizualization class with key %s' % key
+            viz3d = viz3d_class(vis3d=self)
+            self.viz3d[key] = viz3d
+        return viz3d
 
     def viz3d_notify_change(self):
         for viz3d in self.viz3d_dict.values():

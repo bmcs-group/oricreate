@@ -183,19 +183,21 @@ class GuDofConstraintsViz3D(Viz3D):
         y = y - V - sV
         z = z - W - sW
 
-        self.cf_arrow = m.quiver3d(x, y, z, U, V, W,
-                                   mode='2darrow', color=(0.0, 0.0, 1.0),
-                                   scale_mode='vector', scale_factor=self.scale_factor,
-                                   line_width=line_width)
-        self.cf_cross = m.quiver3d(x, y, z, U, V, W, mode='2dcross',
-                                   color=(0.0, 0.0, 1.0),
-                                   scale_mode='vector',
-                                   scale_factor=self.scale_factor,
-                                   line_width=line_width)
+        cf_arrow = m.quiver3d(x, y, z, U, V, W,
+                              mode='2darrow', color=(0.0, 0.0, 1.0),
+                              scale_mode='vector', scale_factor=self.scale_factor,
+                              line_width=line_width)
+        cf_cross = m.quiver3d(x, y, z, U, V, W, mode='2dcross',
+                              color=(0.0, 0.0, 1.0),
+                              scale_mode='vector',
+                              scale_factor=self.scale_factor,
+                              line_width=line_width)
 
-        m.pipeline.surface(self.cf_cross)
-        m.pipeline.surface(self.cf_arrow)
+        m.pipeline.surface(cf_cross)
+        m.pipeline.surface(cf_arrow)
 
+        self.pipes['cf_cross'] = cf_cross
+        self.pipes['cf_arrow'] = cf_arrow
         # load constraint
 
         cp_l = x_t[cn_l]
@@ -209,12 +211,13 @@ class GuDofConstraintsViz3D(Viz3D):
         y = y - V - sV
         z = z - W - sW
 
-        self.cl_arrow = m.quiver3d(x, y, z, U, V, W, mode='arrow',
-                                   color=(1.0, 0.0, 0.0),
-                                   scale_mode='vector',
-                                   line_width=line_width,
-                                   scale_factor=self.scale_factor)
-        m.pipeline.surface(self.cl_arrow)
+        cl_arrow = m.quiver3d(x, y, z, U, V, W, mode='arrow',
+                              color=(1.0, 0.0, 0.0),
+                              scale_mode='vector',
+                              line_width=line_width,
+                              scale_factor=self.scale_factor)
+        m.pipeline.surface(cl_arrow)
+        self.pipes['cl_arrow'] = cl_arrow
 
         # connected constraints
 
@@ -229,17 +232,18 @@ class GuDofConstraintsViz3D(Viz3D):
         y = y - V - sV
         z = z - W - sW
 
-        self.cc_arrow = m.quiver3d(x, y, z, U, V, W,
-                                   mode='2darrow',
-                                   line_width=line_width,
-                                   color=(0.0, 1.0, 0.0),
-                                   scale_mode='vector',
-                                   scale_factor=self.scale_factor)
+        cc_arrow = m.quiver3d(x, y, z, U, V, W,
+                              mode='2darrow',
+                              line_width=line_width,
+                              color=(0.0, 1.0, 0.0),
+                              scale_mode='vector',
+                              scale_factor=self.scale_factor)
 
-        self.cc_arrow.mlab_source.dataset.lines = cc_c
+        cc_arrow.mlab_source.dataset.lines = cc_c
 
-        m.pipeline.surface(self.cc_arrow, color=(0.0, 0.7, 0.0),
+        m.pipeline.surface(cc_arrow, color=(0.0, 0.7, 0.0),
                            line_width=line_width)
+        self.pipes['cc_arrow'] = cc_arrow
 
     def update(self):
 
@@ -264,8 +268,10 @@ class GuDofConstraintsViz3D(Viz3D):
         y = y - V - sV
         z = z - W - sW
 
-        self.cf_arrow.mlab_source.reset(x=x, y=y, z=z)
-        self.cf_cross.mlab_source.reset(x=x, y=y, z=z)
+        cf_arrow = self.pipes['cf_arrow']
+        cf_arrow.mlab_source.reset(x=x, y=y, z=z)
+        cf_cross = self.pipes['cf_cross']
+        cf_cross.mlab_source.reset(x=x, y=y, z=z)
 
         # load constrains
         cp_l = x_t[cn_l]
@@ -279,7 +285,8 @@ class GuDofConstraintsViz3D(Viz3D):
         y = y - V - sV
         z = z - W - sW
 
-        self.cl_arrow.mlab_source.reset(x=x, y=y, z=z)
+        cl_arrow = self.pipes['cl_arrow']
+        cl_arrow.mlab_source.reset(x=x, y=y, z=z)
 
         # connected constrains
         cp_c = x_t[cn_c]
@@ -293,8 +300,9 @@ class GuDofConstraintsViz3D(Viz3D):
         y = y - V - sV
         z = z - W - sW
 
-        self.cc_arrow.mlab_source.reset(x=x, y=y, z=z)
-        self.cc_arrow.mlab_source.dataset.lines = cc_c
+        cc_arrow = self.pipes['cc_arrow']
+        cc_arrow.mlab_source.reset(x=x, y=y, z=z)
+        cc_arrow.mlab_source.dataset.lines = cc_c
 
     def _get_bounding_box(self):
         cp = self.vis3d.formed_object

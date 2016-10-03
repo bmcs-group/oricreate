@@ -523,7 +523,7 @@ if __name__ == '__main__':
         fname00 = 'KO0.txt'
         fname08 = 'KO8.txt'
         # Adapt back to your path
-        laura = True
+        laura = False
         if laura:
             test_dir = 'WRITE YOUR PATH HERE OR MOVE THE DATA TO' \
                 '$HOME\simdb\exdata\shell_tests\2016-09-09-FSH04-Canopy'

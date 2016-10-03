@@ -273,7 +273,7 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
                                       F_ext_list=F_ext_list)  # (2 * n, 2, -1)])
         sim_config._fu = fu_tot_poteng
         st = SimulationTask(previous_task=self.turn_task,
-                            config=sim_config, n_steps=1)
+                            config=sim_config, n_steps=10)
         fu_tot_poteng.forming_task = st
         cp = st.formed_object
         cp.x_0 = self.turn_task.x_1
@@ -427,11 +427,15 @@ if __name__ == '__main__':
 
     animate = False
     show_init_task = False
-    show_fold_task = False
-    show_turn_task = False
-    show_measure_task = True
-    show_load_task = False
+    show_fold_task = True
+    show_turn_task = True
+    show_measure_task = False
+    show_load_task = True
     export_and_show_mesh = False
+
+    fta = FTA(ftv=ftv)
+    fta.init_view(
+        a=45, e=54, d=6, f=(1.50000005,  1.20499998, -0.07490424), r=-120)
 
     if show_init_task:
         ftv.add(it.target_faces[0].viz3d)
@@ -441,23 +445,57 @@ if __name__ == '__main__':
         it.u_1
 
     if show_fold_task:
-        ft.sim_history.viz3d.set(tube_radius=0.002)
+        ft.sim_history.viz3d.set(tube_radius=0.002,
+                                 anim_t_start=0,
+                                 anim_t_end=20)
         ftv.add(ft.sim_history.viz3d)
-        ft.config.gu['dofs'].viz3d.scale_factor = 0.5
-        ftv.add(ft.config.gu['dofs'].viz3d)
+#         ft.config.gu['dofs'].viz3d.scale_factor = 0.5
+#         ftv.add(ft.config.gu['dofs'].viz3d)
         ft.u_1
 
-        ftv.plot()
-        ftv.update(vot=1, force=True)
-        ftv.show()
+#         ftv.plot()
+#         print ftv.mlab.view()
+#         print ftv.mlab.roll()
+#         ftv.update(vot=1, force=True)
+#         ftv.show()
+
+        fta.add_cam_move(a=45, e=73, d=5,
+                         duration=20, n=20,
+                         azimuth_move='damped',
+                         elevation_move='damped',
+                         distance_move='damped')
 
     if show_turn_task:
         tt.formed_object.viz3d.set(tube_radius=0.002)
         ftv.add(tt.formed_object.viz3d_dict['displ'])
 
-        ftv.plot()
-        ftv.update(vot=1, force=True)
-        ftv.show()
+    if show_load_task == True:
+        lt = bsf_process.load_task
+        lt.sim_history.viz3d_dict['displ'].set(tube_radius=0.002,
+                                               anim_t_start=20,
+                                               anim_t_end=30)
+        #    ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
+        ftv.add(lt.sim_history.viz3d_dict['displ'])
+        lt.config.gu['dofs'].viz3d.scale_factor = 0.5
+        ftv.add(lt.config.gu['dofs'].viz3d)
+        ftv.add(lt.config.fu.viz3d)
+
+        ftv.add(lt.config.fu.viz3d_dict['node_load'])
+        print 'u_13', lt.u_1[13, 2]
+        n_max_u = np.argmax(lt.u_1[:, 2])
+        print 'node max_u', n_max_u
+        print 'u_max', lt.u_1[n_max_u, 2]
+
+        cp = lt.formed_object
+        iL_phi = cp.iL_psi2 - cp.iL_psi_0
+        iL_m = lt.config._fu.kappa * iL_phi
+        print 'moments', np.max(np.fabs(iL_m))
+
+        fta.add_cam_move(a=45, e=73, d=5,
+                         duration=10, n=20,
+                         azimuth_move='damped',
+                         elevation_move='damped',
+                         distance_move='damped')
 
     if show_measure_task:
         mt = bsf_process.measure_task
@@ -485,30 +523,6 @@ if __name__ == '__main__':
         ftv.update(vot=1, force=True)
         ftv.show()
 
-    if show_load_task == True:
-        lt = bsf_process.load_task
-        lt.formed_object.viz3d.set(tube_radius=0.002)
-        #    ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
-        ftv.add(lt.formed_object.viz3d_dict['displ'])
-        lt.config.gu['dofs'].viz3d.scale_factor = 0.5
-        ftv.add(lt.config.gu['dofs'].viz3d)
-        ftv.add(lt.config.fu.viz3d)
-
-        ftv.add(lt.config.fu.viz3d_dict['node_load'])
-        print 'u_13', lt.u_1[13, 2]
-        n_max_u = np.argmax(lt.u_1[:, 2])
-        print 'node max_u', n_max_u
-        print 'u_max', lt.u_1[n_max_u, 2]
-
-        cp = lt.formed_object
-        iL_phi = cp.iL_psi2 - cp.iL_psi_0
-        iL_m = lt.config._fu.kappa * iL_phi
-        print 'moments', np.max(np.fabs(iL_m))
-
-        ftv.plot()
-        ftv.update(vot=1, force=True)
-        ftv.show()
-
     if export_and_show_mesh:
         lt = bsf_process.load_task
         me = InfoCadMeshExporter(forming_task=lt, n_l_e=4)
@@ -519,6 +533,8 @@ if __name__ == '__main__':
         me.plot_mlab(m)
         m.show()
 #
+    fta.plot()
+    fta.configure_traits()
 
     # bsf_process.generate_scaffoldings()
     if animate:
@@ -539,5 +555,4 @@ if __name__ == '__main__':
                          distance_move='damped')
 
         fta.plot()
-        fta.render()
         fta.configure_traits()

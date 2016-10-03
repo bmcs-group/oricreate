@@ -120,13 +120,9 @@ class CreasePatternPlotHelper(Visual3D):
             cp_pipe.mlab_source.dataset.lines = self.L
         return cp_pipe.mlab_source
 
-    viz3d_dict = Property
-
-    @cached_property
-    def _get_viz3d_dict(self):
-        return dict(default=CreasePatternViz3D(vis3d=self),
-                    node_numbers=CreasePatternNodeNumbersViz3D(vis3d=self),
-                    displ=CreasePatternDisplViz3D(vis3d=self))
+    viz3d_classes = dict(cp=CreasePatternViz3D,
+                         node_numbers=CreasePatternNodeNumbersViz3D,
+                         displ=CreasePatternDisplViz3D)
 
     def get_cnstr_pos(self, iteration_step):
         r'''

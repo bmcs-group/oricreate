@@ -5,13 +5,14 @@ Created on Dec 3, 2015
 '''
 
 from traits.api import \
-    HasTraits, WeakRef, Str, Event, Property
+    HasStrictTraits, WeakRef, Str, Event, Property, Float, Bool, \
+    Dict
 
 from visual3d import \
     Visual3D
 
 
-class Viz3D(HasTraits):
+class Viz3D(HasStrictTraits):
     '''Base class for visualization objects.
     Each state and operator objects like crease pattern
     or constraint can define provide tailored visualizations
@@ -22,6 +23,9 @@ class Viz3D(HasTraits):
     label = Str('default')
     '''Label of the visualization object.
     '''
+
+    anim_t_start = Float(0.0, enter_set=True, auto_set=False, input=True)
+    anim_t_end = Float(-1.0, enter_set=True, auto_set=False, input=True)
 
     vis3d = WeakRef(Visual3D)
     '''Link to the visual object to transform into the 
@@ -36,6 +40,8 @@ class Viz3D(HasTraits):
     '''Folding task view3d object. 
     '''
 
+    pipes = Dict()
+
     def register(self, ftv):
         '''Construct the visualization within the forming task view3d object.
         '''
@@ -46,6 +52,36 @@ class Viz3D(HasTraits):
         '''Plot the object within ftv
         '''
         return
+
+    _hidden = Bool(False)
+
+    def _show(self):
+        if self._hidden == True:
+            self.show()
+            self._hidden = False
+
+    def _hide(self):
+        if self._hidden == False:
+            self.hide()
+            self._hidden = True
+
+    def hide(self):
+        for pipe in self.pipes.values():
+            pipe.visible = False
+
+    def show(self):
+        for pipe in self.pipes.values():
+            pipe.visible = True
+
+    def update_t(self, anim_t=0.0):
+        '''Update with regard to the global time line.
+        '''
+        if anim_t >= self.anim_t_start and anim_t <= self.anim_t_end \
+                or self.anim_t_end < 0.0:
+            self._show()
+            self.update()
+        else:
+            self._hide()
 
     def update(self):
         '''Update the visualization within the view3d object.

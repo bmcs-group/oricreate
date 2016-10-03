@@ -62,9 +62,12 @@ class FormingTaskView3D(HasStrictTraits):
                 mm.append([x_min, x_max])
 
         bnodes = np.array(mm, dtype='float_')
-        bb_min, bb_max = np.min(bnodes[:, 0, :], axis=0), np.max(
-            bnodes[:, 1, :], axis=0)
-        return bb_min, bb_max
+        if len(bnodes) > 0:
+            bb_min, bb_max = np.min(bnodes[:, 0, :], axis=0), np.max(
+                bnodes[:, 1, :], axis=0)
+            return bb_min, bb_max
+        else:
+            return np.array([[0, 0, 0], [1, 1, 1]], dtype=np.float)
 
     xyz_grid_resolution = Int(10)
     '''Resolution of the field grid within the extent for 
@@ -121,17 +124,16 @@ class FormingTaskView3D(HasStrictTraits):
         for viz3d in self.viz3d_list:
             viz3d.plot()
 
-    def update(self, vot=0.0, force=False):
+    def update(self, vis_t=0.0, viz_t=0.0, force=False):
         '''Update current visualization.
         '''
-        self.vot = vot
-        print 'FTV vot', vot
+        self.vot = vis_t
         fig = self.mlab.gcf()
         fig.scene.disable_render = True
         for viz3d in self.viz3d_list:
             if force:
                 viz3d.vis3d_changed = True
-            viz3d.update()
+            viz3d.update_t(viz_t)
         fig.scene.disable_render = False
 
     def show(self, *args, **kw):
@@ -172,6 +174,12 @@ if __name__ == '__main__':
         def plot(self):
             x, y, z, s = self.vis3d.p
             self._pipe = self.ftv.mlab.points3d(x, y, z, s)
+
+        def hide(self):
+            self._pipe.mlab_source.visible = False
+
+        def show(self):
+            self._pipe.mlab_source.visible = True
 
         def update(self):
             x, y, z, s = self.vis3d.p

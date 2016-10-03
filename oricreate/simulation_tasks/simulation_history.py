@@ -48,10 +48,8 @@ class SimulationHistory(CreasePattern):
 
     @on_trait_change('vot')
     def _set_time_step(self):
-        print 'VOT', self.vot
         n_t = len(self.x_t) - 1
         i_t = int(self.vot * n_t)
-        print 'SETTING TIME STEP TO', i_t
         self.time_step = i_t
 
     time_step = Int(0, cp_input=True)
@@ -62,9 +60,14 @@ class SimulationHistory(CreasePattern):
     '''
 
     def _get_x(self):
-        print 'getting x_t', self.time_step
-        print self.x_t[self.time_step]
         return self.x_t[self.time_step]
+
+    u = Property
+    '''Current displacement .
+    '''
+
+    def _get_u(self):
+        return self.u_t[self.time_step]
 
 if __name__ == '__main__':
 
