@@ -12,10 +12,11 @@
 #
 
 
+import types
+
 from traits.api import \
     implements,  List, Tuple, Float, \
     cached_property, Property, Array, Int
-import types
 
 from fu import \
     Fu
@@ -89,17 +90,18 @@ class FuPotEngTotal(Fu, Visual3D):
         stored_energy = np.einsum(
             '...i,...i,...i->...', self.kappa, iL_phi**2, iL_length) / 2.0
 
-        F_ext = self._get_F_ext(t)
-        ext_energy = np.einsum(
-            '...i,...i->...', F_ext.flatten(), cp.u.flatten())
-        tot_energy = self.fu_factor * (stored_energy - ext_energy)
-        return tot_energy
-
 #         F_ext = self._get_F_ext(t)
-#         ext_energy = (np.einsum(
-#             '...i,...i->...', F_ext.flatten(), cp.u.flatten()) - cp.V)
+#         ext_energy = np.einsum(
+#             '...i,...i->...', F_ext.flatten(), cp.u.flatten())
 #         tot_energy = self.fu_factor * (stored_energy - ext_energy)
 #         return tot_energy
+
+        F_ext = self._get_F_ext(t)
+        V_ext = cp.V * 0.236
+        ext_energy = (np.einsum(
+            '...i,...i->...', F_ext.flatten(), cp.u.flatten()) - V_ext)
+        tot_energy = self.fu_factor * (stored_energy - ext_energy)
+        return tot_energy
 
     def get_f_du(self, t=0):
         '''Get the derivatives with respect to individual displacements.
@@ -117,8 +119,8 @@ class FuPotEngTotal(Fu, Visual3D):
 
         V_du = cp.V_du.reshape((-1, 3))
 
-        Pi_ext_du = F_ext
-#         Pi_ext_du = F_ext - V_du
+#         Pi_ext_du = F_ext
+        Pi_ext_du = F_ext - V_du * 0.236
 
         Pi_du = Pi_int_du - Pi_ext_du
 
