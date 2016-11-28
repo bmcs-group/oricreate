@@ -12,11 +12,10 @@
 #
 
 
-import types
-
 from traits.api import \
     implements,  List, Tuple, Float, \
     cached_property, Property, Array, Int
+import types
 
 from fu import \
     Fu
@@ -126,9 +125,5 @@ class FuPotEngTotal(Fu, Visual3D):
 
         return Pi_du.flatten()
 
-    viz3d_dict = Property
-
-    @cached_property
-    def _get_viz3d_dict(self):
-        return dict(default=FuPotEngBendingViz3D(vis3d=self),
-                    node_load=FuPotEngNodeLoadViz3D(vis3d=self))
+    viz3d_classes = dict(default=FuPotEngBendingViz3D,
+                         node_load=FuPotEngNodeLoadViz3D)

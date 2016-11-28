@@ -82,8 +82,4 @@ class GuPsiConstraints(Gu, Visual3D):
 
         return G_du
 
-    viz3d_dict = Property
-
-    @cached_property
-    def _get_viz3d_dict(self):
-        return dict(default=GuPsiConstraintsViz3D(vis3d=self))
+    viz3d_classes = dict(psi_constraints=GuPsiConstraintsViz3D)

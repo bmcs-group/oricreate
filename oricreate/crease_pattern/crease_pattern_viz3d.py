@@ -10,7 +10,7 @@ from mayavi.filters.api import WarpVector
 from mayavi.modules.api import Surface
 from mayavi.sources.api import VTKDataSource, VTKFileReader
 from traits.api import \
-    Array, Tuple, Property, Bool, Float, Color
+    Array, Tuple, Property, Bool, Float, Color, List
 
 import numpy as np
 from oricreate.viz3d import Viz3D
@@ -63,13 +63,13 @@ class CreasePatternViz3D(Viz3D):
         if len(F) > 0:
             cp_pipe = m.triangular_mesh(x, y, z, F,
                                         line_width=3,
-                                        color=self.facet_color)
+                                        color=self.facet_color.toTuple()[:-1])
             if self.lines is True:
                 cp_pipe.mlab_source.dataset.lines = L
                 tube = m.pipeline.tube(cp_pipe,
                                        tube_radius=self.tube_radius)
-                m.pipeline.surface(tube, color=(1.0, 1.0, 1.0))
-
+                lines = m.pipeline.surface(tube, color=(1.0, 1.0, 1.0))
+                self.pipes['lines'] = lines
         else:
             cp_pipe = m.points3d(x, y, z, scale_factor=0.2)
             cp_pipe.mlab_source.dataset.lines = L
@@ -99,6 +99,10 @@ class CreasePatternDisplViz3D(CreasePatternViz3D):
     '''Visualize the crease pattern with displacement vectors at the nodes
     '''
 
+    warp_scale_factor = Float(1.0, enter_set=True, auto_set=False)
+    '''Displacement warp scale
+    '''
+
     N_L_F = Property(Tuple)
     '''Geometry with applied selection arrays.
     '''
@@ -125,13 +129,13 @@ class CreasePatternDisplViz3D(CreasePatternViz3D):
             cp_pipe = m.triangular_mesh(x, y, z, F,
                                         line_width=3,
                                         scalars=w,
-                                        color=self.facet_color)
+                                        color=self.facet_color.toTuple()[:-1])
             if self.lines is True:
                 cp_pipe.mlab_source.dataset.lines = L
                 tube = m.pipeline.tube(cp_pipe,
                                        tube_radius=0.003)
-                m.pipeline.surface(tube, color=(1.0, 1.0, 1.0))
-
+                lines = m.pipeline.surface(tube, color=(1.0, 1.0, 1.0))
+                self.pipes['lines'] = lines
         else:
             cp_pipe = m.points3d(x, y, z, scale_factor=0.2)
             cp_pipe.mlab_source.dataset.lines = L
@@ -139,7 +143,6 @@ class CreasePatternDisplViz3D(CreasePatternViz3D):
         ds.point_data.vectors = u_
         ds.point_data.vectors.name = 'u'
         warp = m.pipeline.warp_vector(cp_pipe)
-        warp.filter.scale_factor = 10000.0
         surf = m.pipeline.surface(warp)
         self.pipes['warp'] = warp
         self.pipes['cp_pipe'] = cp_pipe
@@ -148,6 +151,8 @@ class CreasePatternDisplViz3D(CreasePatternViz3D):
         x_0, u_, L, F = self.N_L_F
         u, v, w = u_.T
         cp_pipe = self.pipes['cp_pipe']
+#         warp = self.pipes['warp']
+#        warp.filter.scale_factor = self.warp_scale_factor
         cp_pipe.mlab_source.set(points=x_0, vectors=u_, scalars=w)
         ds = cp_pipe.mlab_source.dataset
         ds.point_data.vectors = u_
@@ -254,6 +259,8 @@ class CreasePatternNodeNumbersViz3D(Viz3D):
     scale_factor = Float(1.0, auto_set=False, enter_set=True)
     show_node_index = Bool(True)
 
+    text_entries = Array
+
     def plot(self):
         '''
         This pipeline comprised the labels for all node Indexes
@@ -270,7 +277,7 @@ class CreasePatternNodeNumbersViz3D(Viz3D):
                 x[i], y[i], z[i] + 0.2 * self.scale_factor, str(i), scale=0.05)
             temp_text.actor.actor.visibility = int(self.show_node_index)
             text = np.hstack([text, temp_text])
-        self.pipes['text_entries'] = text
+        self.text_entries = text
 
     def update(self):
         '''
@@ -278,7 +285,7 @@ class CreasePatternNodeNumbersViz3D(Viz3D):
         '''
         cp = self.vis3d
         x, y, z = cp.x.T
-        text_entries = self.pipes['text_entries']
+        text_entries = self.text_entries
         for i in range(len(self.text_entries)):
             text_entries[i].actor.actor.visibility = int(
                 self.show_node_index)

@@ -212,7 +212,7 @@ class BikeShellterFormingProcessFTV(FTV):
 
 if __name__ == '__main__':
     bsf_process = BikeShellterFormingProcess(L_x=3.0, L_y=2.41, n_x=4,
-                                             n_y=12, n_steps=10)
+                                             n_y=12, n_steps=60)
 
     mt = bsf_process.mask_task
     ab = bsf_process.add_boundary_task
@@ -232,9 +232,9 @@ if __name__ == '__main__':
 #    ftv.add(ft.config.gu['dofs'].viz3d)
 
 #    ftv.add(ft.sim_history.viz3d_dict['node_numbers'], order=5)
-    ft.sim_history.viz3d.set(tube_radius=0.002)
+    ft.sim_history.viz3d['cp'].set(tube_radius=0.002)
 
-    ftv.add(ft.sim_history.viz3d)
+    ftv.add(ft.sim_history.viz3d['cp'])
 #    ftv.add(ft.config.gu['dofs'].viz3d)
 #
 
@@ -245,22 +245,21 @@ if __name__ == '__main__':
 #     ftv.update(vot=1, force=True)
 #     ftv.show()
 
-    n_cam_move = 5
+    n_cam_move = 30
     fta = FTA(ftv=ftv)
-    fta.init_view(a=45, e=60, d=7, f=(0, 0, 0), r=-120)
-    fta.add_cam_move(a=60, e=70, n=n_cam_move, d=6, r=-120,
+    fta.init_view(a=60, e=55, d=6, f=(0.85, 0.03, -1.0), r=-132)
+    fta.add_cam_move(a=71, e=78, n=n_cam_move, d=5, r=-120,
                      duration=10,
-                     vot_fn=lambda cmt: np.linspace(0.01, 0.5, n_cam_move),
-                     azimuth_move='damped',
-                     elevation_move='damped',
-                     distance_move='damped')
-    fta.add_cam_move(a=80, e=80, d=4, n=n_cam_move, r=-132,
+                     azimuth_move='linear',
+                     elevation_move='linear',
+                     distance_move='linear',
+                     vot_end=0.8)
+    fta.add_cam_move(a=80, e=80, d=5, n=n_cam_move, r=-132,
                      duration=10,
-                     vot_fn=lambda cmt: np.linspace(0.5, 1.0, n_cam_move),
-                     azimuth_move='damped',
-                     elevation_move='damped',
-                     distance_move='damped')
+                     azimuth_move='linear',
+                     elevation_move='linear',
+                     distance_move='linear',
+                     vot_start=0.8)
 
     fta.plot()
-    fta.render()
     fta.configure_traits()

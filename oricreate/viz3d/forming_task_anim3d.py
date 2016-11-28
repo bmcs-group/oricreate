@@ -53,11 +53,11 @@ import os
 import tempfile
 from time import sleep
 from traits.api import \
-    HasStrictTraits, Callable, \
+    HasStrictTraits,  \
     Property, Instance, List, \
     Array, Float, Int, Tuple, \
     Str, WeakRef, Trait, Event, \
-    cached_property, Range, Dict
+    cached_property, Range
 from traitsui.api import \
     View, Item, UItem, HSplit, VGroup, HGroup, \
     TableEditor, ObjectColumn, InstanceEditor, \
@@ -81,6 +81,9 @@ class FTAHandler(Handler):
     def capture_cam_pos(self, info):
         info.object.capture_cam_pos()
 
+    def capture_init_cam_pos(self, info):
+        info.object.capture_init_cam_pos()
+
     def anim(self, info):
         info.object.anim()
 
@@ -96,7 +99,8 @@ class FTAHandler(Handler):
 action_strings = \
     [('Add', 'add_cam_move', 'Add a camera move'),
      ('Del', 'del_cam_move', 'Delete a camera move'),
-     ('Capture', 'capture_cam_pos', 'Capture camera_position'),
+     ('Capture initial', 'capture_init_cam_pos', 'Capture initial_position'),
+     ('Capture current', 'capture_cam_pos', 'Capture camera_position'),
      ('Animate', 'anim', 'Animate on screen'),
      ('Render', 'render', 'Render to file'),
      ('Save', 'save', 'Save timeline'),
@@ -360,6 +364,8 @@ class FormingTaskAnim3D(HasStrictTraits):
         d = kw.pop('d', prev_cam_station.distance)
         f = kw.pop('f', prev_cam_station.focal_point)
         r = kw.pop('r', prev_cam_station.roll)
+        vot_start = kw.pop('vot_start', 0)
+        vot_end = kw.pop('vot_end', 1)
 
         if prev_cam_station.prev_move:
             prev_move = prev_cam_station.prev_move
@@ -367,13 +373,16 @@ class FormingTaskAnim3D(HasStrictTraits):
         else:
             n = kw.pop('n', 20)
         next_cam_station = CamStation(azimuth=a, elevation=e, distance=d,
-                                      focal_point=f, roll=r)
+                                      focal_point=f, roll=r,
+                                      )
         self.cam_stations.append(next_cam_station)
         cm = CamMove(fta=self, ftv=self.ftv,
                      from_station=prev_cam_station,
-                     to_station=next_cam_station, n_t=n, **kw)
+                     to_station=next_cam_station, n_t=n,
+                     vot_start=vot_start, vot_end=vot_end, **kw)
         next_cam_station.prev_move = cm
         self.cam_moves.append(cm)
+        self.selected_cam_move = cm
 
     def del_cam_move(self):
         '''Delete currently selected cam move.
@@ -391,6 +400,16 @@ class FormingTaskAnim3D(HasStrictTraits):
             move_idx -= 1
 
         self.selected_cam_move = self.cam_moves[move_idx]
+
+    def capture_init_cam_pos(self):
+        '''Get the current position from the ftv and set it to the target
+        station of the cam move.
+        '''
+        a, e, d, f = self.ftv.mlab.view()
+        r = self.ftv.mlab.roll()
+        init_station = self.cam_moves[0].from_station
+        init_station.set(azimuth=a, elevation=e, distance=d,
+                         focal_point=tuple(f), roll=r)
 
     def capture_cam_pos(self):
         '''Get the current position from the ftv and set it to the target
@@ -520,12 +539,9 @@ if __name__ == '__main__':
         viz3d_classes = dict(default=PointCloudViz3D,
                              something_else=PointCloudViz3D)
 
+    pc = PointCloud(anim_t_start=10, anim_t_end=40)
     ftv = FTV()
-    pc = PointCloud()
-    print pc.viz3d_classes
-    ftv.add(pc.get_viz3d('default'))
-
-    pc.viz3d['default'].set(anim_t_start=10, anim_t_end=40)
+    ftv.add(pc.viz3d['default'])
 
     fta = FTA(ftv=ftv)
     fta.init_view(a=0, e=0, d=8, f=(0, 0, 0), r=0)

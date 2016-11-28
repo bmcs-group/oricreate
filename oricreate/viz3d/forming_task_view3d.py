@@ -91,8 +91,8 @@ class FormingTaskView3D(HasStrictTraits):
                            x0[2]:x1[2]:ff_r]
         return x, y, z * 2.0
 
-    bgcolor = Color((1.0, 1.0, 1.0))
-    fgcolor = Color((0.0, 0.0, 0.0))
+    bgcolor = Tuple(1.0, 1.0, 1.0)
+    fgcolor = Tuple(0.0, 0.0, 0.0)
 
     mlab = Property(depends_on='input_change')
     '''Get the mlab handle'''
@@ -103,9 +103,14 @@ class FormingTaskView3D(HasStrictTraits):
     def add(self, viz3d, order=1):
         '''Add a new visualization objectk.'''
         viz3d.ftv = self
-        label = '%s(%s)' % (viz3d.label, str(viz3d.__class__))
+        vis3d = viz3d.vis3d
+        label = '%s[%s:%s]-%s' % (str(vis3d.__class__),
+                                  viz3d.label,
+                                  str(viz3d.__class__),
+                                  vis3d
+                                  )
         if self.viz3d_dict.has_key(label):
-            raise KeyError, 'viz3d object named %s already registered' % viz3d.label
+            raise KeyError, 'viz3d object named %s already registered' % label
         self.viz3d_dict[label] = (viz3d, order)
 
     viz3d_list = Property
@@ -120,7 +125,9 @@ class FormingTaskView3D(HasStrictTraits):
         '''Plot the current visualization objects.
         '''
         fig = self.mlab.gcf()
-        self.mlab.figure(fig, bgcolor=self.bgcolor, fgcolor=self.fgcolor)
+        bgcolor = tuple(self.bgcolor)
+        fgcolor = tuple(self.fgcolor)
+        self.mlab.figure(fig, bgcolor=bgcolor, fgcolor=fgcolor)
         for viz3d in self.viz3d_list:
             viz3d.plot()
 
@@ -163,7 +170,7 @@ if __name__ == '__main__':
             x, y, z, s = self.p
             self.p = x * c, y * c, z * c, s * c
 
-        def _viz3d_dict_default(self):
+        def viz3d_dict_default(self):
             return dict(default=PointCloudViz3D(vis3d=self),
                         something_else=PointCloudViz3D(vis3d=self))
 
@@ -188,7 +195,7 @@ if __name__ == '__main__':
 
     ftv = FTV()
     pc = PointCloud()
-    ftv.add(pc.viz3d)
+    ftv.add(pc.viz3d['default'])
     ftv.plot()
     ftv.mlab.savefig('xxx01.jpg')
     pc.scale(1.3)

@@ -6,7 +6,7 @@ Created on Dec 3, 2015
 
 from traits.api import \
     HasStrictTraits, WeakRef, Str, Event, Property, Float, Bool, \
-    Dict
+    Dict, PrototypedFrom
 
 from visual3d import \
     Visual3D
@@ -24,8 +24,8 @@ class Viz3D(HasStrictTraits):
     '''Label of the visualization object.
     '''
 
-    anim_t_start = Float(0.0, enter_set=True, auto_set=False, input=True)
-    anim_t_end = Float(-1.0, enter_set=True, auto_set=False, input=True)
+    anim_t_start = PrototypedFrom('vis3d')
+    anim_t_end = PrototypedFrom('vis3d')
 
     vis3d = WeakRef(Visual3D)
     '''Link to the visual object to transform into the 
