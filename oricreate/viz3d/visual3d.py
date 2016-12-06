@@ -27,7 +27,7 @@ class Viz3DDict(HasStrictTraits):
             viz3d_class = self.viz3d_classes.get(key, None)
             if viz3d_class == None:
                 raise KeyError, 'No vizualization class with key %s' % key
-            viz3d = viz3d_class(vis3d=self.vis3d)
+            viz3d = viz3d_class(label=key, vis3d=self.vis3d)
             self._viz3d_objects[key] = viz3d
         return viz3d
 

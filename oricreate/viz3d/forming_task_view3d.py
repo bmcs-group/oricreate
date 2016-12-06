@@ -4,22 +4,36 @@ Created on Dec 3, 2015
 @author: rch
 '''
 
+from mayavi.core.ui.mayavi_scene import MayaviScene
+from mayavi.tools.mlab_scene_model import MlabSceneModel
 from traits.api import \
     HasStrictTraits, Dict, \
-    Property, Str, Float, \
+    Property, Str, Range, Float, \
     on_trait_change, Int, Tuple, Instance
+from traitsui.api import \
+    View, HSplit, VSplit, VGroup, Item, UItem, TableEditor, ObjectColumn, \
+    RangeEditor
+from tvtk.pyface.scene_editor import SceneEditor
 
-import mayavi.mlab as \
-    m2_lab
 import numpy as np
 from viz3d import \
     Viz3D
 
 
+viz3d_dict_editor = TableEditor(
+    columns=[ObjectColumn(label='Label', name='label', editable=False),
+             ObjectColumn(label='Start', name='anim_t_start', editable=False),
+             ObjectColumn(label='End', name='anim_t_end', editable=False),
+             ],
+    selection_mode='row',
+    selected='object.selected_viz3d',
+)
+
+
 class FormingTaskView3D(HasStrictTraits):
     '''Target object of a visualization of a forming task.
     '''
-    viz3d_dict = Dict(Str, Tuple(Viz3D, Int))
+    viz3d_dict = Dict(Str, Instance(Viz3D))
     '''Dictionary of visualization objects.
     '''
 
@@ -32,6 +46,9 @@ class FormingTaskView3D(HasStrictTraits):
     def _get_vis3d_list(self):
         return np.unique(np.array([viz3d.vis3d for viz3d in self.viz3d_list]))
 
+    vot_min = Float(0.0)
+    vot_max = Float(1.0)
+
     vot = Float(0.0)
     '''Visual object time - specifying the current appearance state of an object
     in the television.
@@ -40,6 +57,14 @@ class FormingTaskView3D(HasStrictTraits):
     def _broadcast_vot(self):
         for vis4d in self.vis3d_list:
             vis4d.vot = self.vot
+
+    vot_slider = Float(0.0)
+    '''Visual object time - specifying the current appearance state of an object
+    in the television.
+    '''
+    @on_trait_change('vot_slider')
+    def _update_vot_slider(self):
+        self.update(self.vot_slider)
 
     def get_center(self):
         '''Get the center of the displayed figure.
@@ -100,28 +125,34 @@ class FormingTaskView3D(HasStrictTraits):
     '''Get the mlab handle'''
 
     def _get_mlab(self):
-        return m2_lab
+        return self.scene.mlab
 
     def add(self, viz3d, order=1):
         '''Add a new visualization objectk.'''
         viz3d.ftv = self
         vis3d = viz3d.vis3d
-        label = '%s[%s:%s]-%s' % (str(vis3d.__class__),
-                                  viz3d.label,
+        label = '%s[%s:%s]-%s' % (viz3d.label,
+                                  str(vis3d.__class__),
                                   str(viz3d.__class__),
                                   vis3d
                                   )
         if self.viz3d_dict.has_key(label):
             raise KeyError, 'viz3d object named %s already registered' % label
-        self.viz3d_dict[label] = (viz3d, order)
+        viz3d.order = order
+        self.viz3d_dict[label] = viz3d
 
     viz3d_list = Property
 
     def _get_viz3d_list(self):
         map_order_viz3d = {}
-        for idx, (viz3d, order) in enumerate(self.viz3d_dict.values()):
+        for idx, (viz3d) in enumerate(self.viz3d_dict.values()):
+            order = viz3d.order
             map_order_viz3d['%5g%5g' % (order, idx)] = viz3d
         return [map_order_viz3d[key] for key in sorted(map_order_viz3d.keys())]
+
+    scene = Instance(MlabSceneModel, ())
+    '''Scene to plot the vizualization pipeline
+    '''
 
     def plot(self):
         '''Plot the current visualization objects.
@@ -149,6 +180,41 @@ class FormingTaskView3D(HasStrictTraits):
         '''Render the visualization.
         '''
         self.mlab.show(*args, **kw)
+
+    traits_view = View(
+        HSplit(
+            VSplit(
+                Item('viz3d_list',
+                     style='custom', editor=viz3d_dict_editor,
+                     show_label=False, springy=True, width=150),
+                Item('selected_viz3d@', show_label=False,
+                     springy=True,
+                     width=200, height=300),
+                show_border=True,
+            ),
+            VGroup(
+                UItem(name='scene',
+                      editor=SceneEditor(scene_class=MayaviScene),
+                      resizable=True,
+                      height=500,
+                      width=500),
+                UItem('vot_slider', editor=RangeEditor(low_name='vot_min',
+                                                       high_name='vot_max',
+                                                       format='(%s)',
+                                                       auto_set=False,
+                                                       enter_set=False,
+                                                       ),
+                      show_label=False
+                      ),
+
+            )
+        ),
+        resizable=True,
+        width=800,
+        height=600,
+        kind='subpanel',
+        title='Forming task viewer',
+    )
 
 FTV = FormingTaskView3D
 
@@ -185,7 +251,6 @@ if __name__ == '__main__':
         def _get_points(self):
             x, y, z, s = self.p
             c = self.vot
-            print 'c', c
             return x * c, y * c, z * c, s * c
 
         viz3d_classes = dict(default=PointCloudViz3D,
@@ -195,9 +260,4 @@ if __name__ == '__main__':
     pc = PointCloud()
     ftv.add(pc.viz3d['default'])
     ftv.plot()
-    ftv.mlab.savefig('xxx01.jpg')
-    ftv.update(vot=0.9)
-    ftv.mlab.savefig('xxx02.jpg')
-    ftv.update(vot=0.8)
-    ftv.mlab.savefig('xxx03.jpg')
-    ftv.show()
+    ftv.configure_traits()

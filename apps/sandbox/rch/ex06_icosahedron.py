@@ -142,7 +142,7 @@ class OctaHedronFormingProcess(HasTraits):
 
         np.random.shuffle(inner_lines)
 
-        psi_constr = [([(i, 1.0)], lambda t: psi_max * t)  # fold_step(t, i))
+        psi_constr = [([(i, 1.0)], lambda t: psi_max * fold_step(t, i))
                       for i in inner_lines]
 
         gu_psi_constraints = \
@@ -242,9 +242,6 @@ if __name__ == '__main__':
     fts.sim_history.set(anim_t_start=0, anim_t_end=20)
     fts.sim_history.viz3d['cp'].set(tube_radius=0.005)
     ftv.add(fts.sim_history.viz3d['cp'])
-
-    ftv.plot()
-    ftv.configure_traits()
 
     n_cam_move = 20
     fta = FTA(ftv=ftv)

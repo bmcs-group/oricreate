@@ -5,7 +5,7 @@ Created on Dec 3, 2015
 '''
 
 from traits.api import \
-    HasStrictTraits, WeakRef, Str, Event, Property, Float, Bool, \
+    HasStrictTraits, WeakRef, Str, Event, Property, Int, Bool, \
     Dict, PrototypedFrom
 
 from visual3d import \
@@ -26,6 +26,12 @@ class Viz3D(HasStrictTraits):
 
     anim_t_start = PrototypedFrom('vis3d')
     anim_t_end = PrototypedFrom('vis3d')
+
+    order = Int(1, auto_set=False, enter_set=True)
+    '''Deprecated -- is only here to have a control parameter
+    that avoids text visualization at the beginning of the time line
+    because then mlab fails. 
+    '''
 
     vis3d = WeakRef(Visual3D)
     '''Link to the visual object to transform into the 
