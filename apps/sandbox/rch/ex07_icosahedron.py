@@ -30,80 +30,44 @@ class OctahederFormingProcess(HasTraits):
     def _get_factory_task(self):
         dx = self.L_blue
         dy = self.L_blue * np.sin(np.pi / 3)
-        x1 = np.linspace(0, 4 * dx, 5)
-        x2 = np.linspace(0, 5 * dx, 6)
-        row0 = np.c_[dx + x1, np.zeros_like(x1), np.zeros_like(x1)]
-        row1 = np.c_[-dx / 2 + x2, dy + np.zeros_like(x2), np.zeros_like(x2)]
-        row2 = np.c_[x2, 2 * dy + np.zeros_like(x2), np.zeros_like(x2)]
-        row3 = np.c_[-dx / 2 + x1, 3 * dy +
-                     np.zeros_like(x1), np.zeros_like(x1)]
-        X = np.vstack([row0, row1, row2, row3])
-        L = [[0, 6],  # 0
-             [2, 8],  # 1 ***
-             [3, 9],
-             [4, 10],
-             [0, 7],
-             [1, 8],  # 5
-             [2, 9],
-             [3, 10],  # 7 ***
-             [1, 2],
-             [3, 4],
-             [6, 11],  # 10 ***
-             [7, 12],  # 11 ***
-             [8, 13],  # 12 ***
-             [9, 14],  # 13 ***
-             [10, 15],  # 14 ***
-             [5, 11],  # 15
-             [6, 12],  # 16 ***
-             [7, 13],  # 17 ***
-             [8, 14],  # 18 ***
-             [9, 15],  # 19 ***
-             [10, 16],  # 20
-             [5, 6],
-             [6, 7],  # 22 ***
-             [7, 8],
-             [8, 9],  # 24 ***
-             [9, 10],  # 25 ***
-             [11, 18],  # 26 ***
-             [12, 19],
-             [13, 20],
-             [14, 21],
-             [11, 17],  # 30
-             [12, 18],  # 31
-             [13, 19],  # 32 ***
-             [15, 21],
-             [11, 12],  # 34 ***
-             [12, 13],  # 35 ***
-             [13, 14],  # 36
-             [14, 15],  # 37 ***
-             [15, 16],  # 38
-             [17, 18],
-             [19, 20]  # 40
-             ]
-        F = [[0, 7, 6],
-             [1, 2, 8],
-             [2, 9, 8],
-             [3, 10, 9],
-             [3, 4, 10],
-             [5, 6, 11],
-             [6, 12, 11],
-             [6, 7, 12],
-             [7, 13, 12],
-             [7, 8, 13],
-             [8, 14, 13],
-             [8, 9, 14],
-             [9, 15, 14],
-             [9, 10, 15],
-             [10, 16, 15],
-             [11, 18, 17],
-             [11, 12, 18],
-             [12, 13, 19],
-             [13, 20, 19],
-             [14, 15, 21]
-             ]
-        cp = CreasePatternState(X=X,
-                                L=L,
-                                F=F)
+        cp = CreasePatternState(X=[[0, 0, 0],  # 0
+                                   [dx, 0, 0],  # 1
+                                   [-dx / 2.0, dy, 0],  # 2
+                                   [dx / 2.0, dy, 0],  # 3
+                                   [3 * dx / 2.0, dy, 0],  # 4
+                                   [0, 2 * dy, 0],  # 5
+                                   [-dx / 2.0, -dy, 0],  # 6
+                                   [dx / 2.0, -dy, 0],  # 7
+                                   [3 * dx / 2.0, -dy, 0],  # 8
+                                   [0, 2 * -dy, 0],  # 9
+                                   ],
+                                L=[[0, 1],  # 1
+                                   [2, 3],  # 2
+                                   [3, 4],  # 3
+                                   [6, 7],  # 4
+                                   [7, 8],  # 5
+                                   [0, 2],
+                                   [0, 3],
+                                   [1, 3],
+                                   [1, 4],
+                                   [2, 5],
+                                   [3, 5],
+                                   [0, 6],
+                                   [0, 7],
+                                   [1, 7],
+                                   [1, 8],
+                                   [6, 9],
+                                   [7, 9],
+                                   ],
+                                F=[[0, 3, 2],
+                                    [0, 1, 3],
+                                    [1, 4, 3],
+                                    [2, 3, 5],
+                                    [0, 6, 7],
+                                    [0, 7, 1],
+                                    [1, 7, 8],
+                                    [6, 9, 7]]
+                                )
         return CustomCPFactory(formed_object=cp)
     init_displ_task = Property(Instance(FormingTask))
     '''Initialization to render the desired folding branch. 
@@ -120,38 +84,27 @@ class OctahederFormingProcess(HasTraits):
     @cached_property
     def _get_fold_task(self):
 
-        psi_max = np.pi - 138.19 / 180.0 * np.pi
-        print psi_max
-        inner_lines = [1, 7, 10, 11, 12, 13, 14, 16, 17, 18, 19,
-                       22, 24, 25, 26, 32, 34, 35, 37]
-
-        def fold_step(t, fold_index):
-
-            n_steps = len(inner_lines)
-            dt = 1.0 / float(n_steps)
-            start_t = fold_index * dt
-            end_t = (fold_index + 1) * dt
-
-            print 't', t, start_t, end_t
-            if t < start_t:
-                return 0.0
-            elif t > end_t:
-                return 1.0
-            else:
-                return (t - start_t) / (end_t - start_t)
-
-        np.random.shuffle(inner_lines)
-
-        psi_constr = [([(i, 1.0)], lambda t: psi_max * fold_step(t, i))
-                      for i in inner_lines]
-
+        psi_max = self.phi_max
         gu_psi_constraints = \
             GuPsiConstraints(forming_task=self.factory_task,
-                             psi_constraints=psi_constr)
+                             psi_constraints=[([(0, 1.0)],
+                                               lambda t: psi_max * t),
+                                              ([(1, 1.0)],
+                                               lambda t: psi_max * t),
+                                              ([(6, 1.0)],
+                                               lambda t: psi_max * t),
+                                              ([(7, 1.0)],
+                                               lambda t: psi_max * t),
+                                              ([(3, 1.0)],
+                                               lambda t: psi_max * t),
+                                              ([(12, 1.0)],
+                                               lambda t: psi_max * t),
+                                              ([(13, 1.0)],
+                                               lambda t: psi_max * t),
+                                              ])
 
-        dof_constraints = fix([6], [0, 1, 2]) + \
-            fix([7], [1, 2]) + \
-            fix([13], [2])
+        dof_constraints = fix([0], [0, 1, 2]) + fix([1], [1, 2]) \
+            + fix([3], [2])
 
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
@@ -222,14 +175,12 @@ class OctahederFormingProcess(HasTraits):
 
 
 if __name__ == '__main__':
-    bsf_process = OctahederFormingProcess(n_steps=20,
+    bsf_process = OctahederFormingProcess(n_steps=70,
                                           phi_max=np.pi / 2.556)
-
-    cp = bsf_process.factory_task.formed_object
 
     fact = bsf_process.factory_task
 #     ft = bsf_process.fold_seq_task
-    fts = bsf_process.fold_task
+    fts = bsf_process.fold_seq_task
 
 #    ft.u_1
     fts.u_1
@@ -243,7 +194,7 @@ if __name__ == '__main__':
     fts.sim_history.viz3d['cp'].set(tube_radius=0.005)
     ftv.add(fts.sim_history.viz3d['cp'])
 
-    n_cam_move = 20
+    n_cam_move = 70
     fta = FTA(ftv=ftv)
     fta.init_view(a=45.0,
                   e=54.7356103172,

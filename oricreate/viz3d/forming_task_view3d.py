@@ -6,8 +6,8 @@ Created on Dec 3, 2015
 
 from traits.api import \
     HasStrictTraits, Dict, \
-    Property, Str, Color, Float, \
-    on_trait_change, Int, Tuple
+    Property, Str, Float, \
+    on_trait_change, Int, Tuple, Instance
 
 import mayavi.mlab as \
     m2_lab
@@ -26,6 +26,8 @@ class FormingTaskView3D(HasStrictTraits):
     vis3d_list = Property
     '''Gather all the visualization objects
     '''
+
+    selected_viz3d = Instance(Viz3D)
 
     def _get_vis3d_list(self):
         return np.unique(np.array([viz3d.vis3d for viz3d in self.viz3d_list]))
@@ -131,16 +133,16 @@ class FormingTaskView3D(HasStrictTraits):
         for viz3d in self.viz3d_list:
             viz3d.plot()
 
-    def update(self, vis_t=0.0, viz_t=0.0, force=False):
+    def update(self, vot=0.0, anim_t=0.0, force=False):
         '''Update current visualization.
         '''
-        self.vot = vis_t
+        self.vot = vot
         fig = self.mlab.gcf()
         fig.scene.disable_render = True
         for viz3d in self.viz3d_list:
             if force:
                 viz3d.vis3d_changed = True
-            viz3d.update_t(viz_t)
+            viz3d.update_t(anim_t)
         fig.scene.disable_render = False
 
     def show(self, *args, **kw):
@@ -148,12 +150,24 @@ class FormingTaskView3D(HasStrictTraits):
         '''
         self.mlab.show(*args, **kw)
 
-
 FTV = FormingTaskView3D
 
 if __name__ == '__main__':
 
     from visual3d import Visual3D
+
+    class PointCloudViz3D(Viz3D):
+        '''Visualization object
+        '''
+
+        def plot(self):
+            x, y, z, s = self.vis3d.p
+            self.pipes['points'] = self.ftv.mlab.points3d(x, y, z, s)
+
+        def update(self):
+            x, y, z, s = self.vis3d.points
+            points = np.c_[x, y, z]
+            self.pipes['points'].mlab_source.set(points=points)
 
     class PointCloud(Visual3D):
         '''State object
@@ -166,42 +180,24 @@ if __name__ == '__main__':
             x, y, z, s = np.random.random((4, 100))
             return x, y, z, s
 
-        def scale(self, c):
+        points = Property(Tuple)
+
+        def _get_points(self):
             x, y, z, s = self.p
-            self.p = x * c, y * c, z * c, s * c
+            c = self.vot
+            print 'c', c
+            return x * c, y * c, z * c, s * c
 
-        def viz3d_dict_default(self):
-            return dict(default=PointCloudViz3D(vis3d=self),
-                        something_else=PointCloudViz3D(vis3d=self))
-
-    class PointCloudViz3D(Viz3D):
-        '''Visualization object
-        '''
-
-        def plot(self):
-            x, y, z, s = self.vis3d.p
-            self._pipe = self.ftv.mlab.points3d(x, y, z, s)
-
-        def hide(self):
-            self._pipe.mlab_source.visible = False
-
-        def show(self):
-            self._pipe.mlab_source.visible = True
-
-        def update(self):
-            x, y, z, s = self.vis3d.p
-            points = np.c_[x, y, z]
-            self._pipe.mlab_source.set(points=points)
+        viz3d_classes = dict(default=PointCloudViz3D,
+                             something_else=PointCloudViz3D)
 
     ftv = FTV()
     pc = PointCloud()
     ftv.add(pc.viz3d['default'])
     ftv.plot()
     ftv.mlab.savefig('xxx01.jpg')
-    pc.scale(1.3)
-    ftv.update()
+    ftv.update(vot=0.9)
     ftv.mlab.savefig('xxx02.jpg')
-    pc.scale(1.3)
-    ftv.update()
+    ftv.update(vot=0.8)
     ftv.mlab.savefig('xxx03.jpg')
     ftv.show()

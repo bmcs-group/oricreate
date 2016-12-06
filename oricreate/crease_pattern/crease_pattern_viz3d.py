@@ -63,12 +63,13 @@ class CreasePatternViz3D(Viz3D):
         if len(F) > 0:
             cp_pipe = m.triangular_mesh(x, y, z, F,
                                         line_width=3,
-                                        color=self.facet_color.toTuple()[:-1])
+                                        color=(0.6, 0.625, 0.683))
+#                                        color=self.facet_color.toTuple()[:-1])
             if self.lines is True:
                 cp_pipe.mlab_source.dataset.lines = L
                 tube = m.pipeline.tube(cp_pipe,
                                        tube_radius=self.tube_radius)
-                lines = m.pipeline.surface(tube, color=(1.0, 1.0, 1.0))
+                lines = m.pipeline.surface(tube, color=(0.1, 0.1, 0.1))
                 self.pipes['lines'] = lines
         else:
             cp_pipe = m.points3d(x, y, z, scale_factor=0.2)

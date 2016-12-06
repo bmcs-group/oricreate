@@ -64,3 +64,5 @@ class Visual3D(HasStrictTraits):
     def viz3d_notify_change(self):
         for viz3d in self.viz3d.values():
             viz3d.vis3d_changed = True
+
+Vis3D = Visual3D
