@@ -280,17 +280,12 @@ class CreaseLineOperators(HasStrictTraits):
         return norm_F_normals[self.iL_F]
 
     iL_psi = Property(Array, depends_on=INPUT)
-    r'''Calculate the dihedral angle.
+    r'''Calculate the dihedral angle for the intermediate configuration.
+    
+    psi + 2*(pi/2 - psi) 
     '''
     @cached_property
     def _get_iL_psi(self):
-        return self.iL_psi2
-
-    iL_psi2 = Property(Array, depends_on=INPUT)
-    r'''Calculate the dihedral angle for the intermediate configuration.
-    '''
-    @cached_property
-    def _get_iL_psi2(self):
         l = self.norm_iL_vectors
         n = self.norm_iL_F_normals
         n0, n1 = np.einsum('ijk->jik', n)
@@ -299,7 +294,12 @@ class CreaseLineOperators(HasStrictTraits):
                             n0[:, np.newaxis, :],
                             lxn0[:, np.newaxis, :]], axis=1)
         n1_ = np.einsum('...ij,...j->...i', T, n1)
-        return np.arcsin(n1_[:, -1])
+        n1_cos, n1_sin = n1_[:, 1:].T
+        psi = np.arcsin(n1_sin)
+        oa_idx = np.where(n1_cos < 0.0)[0]
+        shifted_psi = np.sign(n1_sin[oa_idx]) * np.pi - 2.0 * psi[oa_idx]
+        psi[oa_idx] += shifted_psi
+        return psi
 
     iL_psi_0 = Property(Array, depends_on=INPUT)
     r'''Calculate the dihedral angle for the intermediate configuration.
@@ -314,7 +314,12 @@ class CreaseLineOperators(HasStrictTraits):
                             n0[:, np.newaxis, :],
                             lxn0[:, np.newaxis, :]], axis=1)
         n1_ = np.einsum('...ij,...j->...i', T, n1)
-        return np.arcsin(n1_[:, -1])
+        n1_cos, n1_sin = n1_[:, 1:].T
+        oa_idx = np.where(n1_cos < 0.0)[0]
+        psi = np.arcsin(n1_sin)
+        shifted_psi = np.sign(n1_sin[oa_idx]) * np.pi - 2.0 * psi[oa_idx]
+        psi[oa_idx] += shifted_psi
+        return psi
 
     iL_psi_du = Property(Array, depends_on=INPUT)
     r'''Calculate the derivatives of the dihedral angle 
@@ -365,6 +370,9 @@ class CreaseLineOperators(HasStrictTraits):
         if self.debug_level > 0:
             print 'unit_nl01[:,2]', unit_nl01[:, 2]
             print unit_nl01[:, 2]
+
+        n1_cos, n1_sin = unit_nl01[:, 1:].T
+        oa_idx = np.where(n1_cos < 0.0)[0]
 
         psi = np.arcsin(unit_nl01[:, 2])
         if self.debug_level > 0:
@@ -482,6 +490,7 @@ class CreaseLineOperators(HasStrictTraits):
             print l1_map
             print 'psi_du', psi_du.shape
             print psi_du
+        psi_du[oa_idx, ...] *= -1.0
         return psi_du
 
 

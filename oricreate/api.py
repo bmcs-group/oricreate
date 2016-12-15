@@ -6,10 +6,13 @@ from factories import \
     MiuraOriCPFactory, RonReshCPFactory
 from forming_tasks import \
     FormingTask, IFormingTask
-from fu import FuTargetFace, FuTF, FuTargetFaces
+from fu import \
+    FuTargetFace, FuTF, FuTargetFaces, FuPotEngTotal, FuNodeDist
 from gu import \
     fix, link, GuDofConstraints, GuConstantLength, \
     GuPsiConstraints
+from hu import \
+    HuPsiConstraints
 from mapping_tasks import \
     MappingTask, MapToSurface, RotateCopy
 from simulation_step import \

@@ -121,13 +121,12 @@ class OctahederFormingProcess(HasTraits):
     def _get_fold_task(self):
 
         psi_max = np.pi - 138.19 / 180.0 * np.pi
-        print psi_max
-        inner_lines = [1, 7, 10, 11, 12, 13, 14, 16, 17, 18, 19,
-                       22, 24, 25, 26, 32, 34, 35, 37]
+        inner_lines = self.factory_task.formed_object.iL
 
         def fold_step(t, fold_index):
 
             n_steps = len(inner_lines)
+            print 'n_steps', n_steps, fold_index
             dt = 1.0 / float(n_steps)
             start_t = fold_index * dt
             end_t = (fold_index + 1) * dt
@@ -140,10 +139,10 @@ class OctahederFormingProcess(HasTraits):
             else:
                 return (t - start_t) / (end_t - start_t)
 
-        np.random.shuffle(inner_lines)
+        FN = lambda i: lambda t: psi_max * fold_step(t, i)
 
-        psi_constr = [([(i, 1.0)], lambda t: psi_max * fold_step(t, i))
-                      for i in inner_lines]
+        psi_constr = [([(L_idx, 1.0)], FN(i))
+                      for i, L_idx in enumerate(inner_lines)]
 
         gu_psi_constraints = \
             GuPsiConstraints(forming_task=self.factory_task,
@@ -164,65 +163,9 @@ class OctahederFormingProcess(HasTraits):
         return SimulationTask(previous_task=self.factory_task,
                               config=sim_config, n_steps=self.n_steps)
 
-    fold_seq_task = Property(Instance(FormingTask))
-    '''Configure the simulation task.
-    '''
-    @cached_property
-    def _get_fold_seq_task(self):
-
-        psi_max = -self.phi_max
-        dt = 1.0 / 7.0
-
-        def fold_step(t, fold_index):
-
-            n_steps = 7.0
-            dt = 1.0 / n_steps
-            start_t = fold_index * dt
-            end_t = (fold_index + 1) * dt
-
-            if t < start_t:
-                return 0.0
-            elif t > end_t:
-                return 1.0
-            else:
-                return (t - start_t) / (end_t - start_t)
-
-        gu_psi_constraints = \
-            GuPsiConstraints(forming_task=self.factory_task,
-                             psi_constraints=[([(0, 1.0)],
-                                               lambda t: psi_max * fold_step(t, 0)),
-                                              ([(1, 1.0)],
-                                               lambda t: psi_max * fold_step(t, 1)),
-                                              ([(6, 1.0)],
-                                               lambda t: psi_max * fold_step(t, 2)),
-                                              ([(7, 1.0)],
-                                               lambda t: psi_max * fold_step(t, 3)),
-                                              ([(3, 1.0)],
-                                               lambda t: psi_max * fold_step(t, 4)),
-                                              ([(12, 1.0)],
-                                               lambda t: psi_max * fold_step(t, 5)),
-                                              ([(13, 1.0)],
-                                               lambda t: psi_max * fold_step(t, 6)),
-                                              ]
-                             )
-
-        dof_constraints = fix([0], [0, 1, 2]) + fix([1], [1, 2]) \
-            + fix([3], [2])
-
-        gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
-        gu_constant_length = GuConstantLength()
-        sim_config = SimulationConfig(goal_function_type='none',
-                                      gu={'cl': gu_constant_length,
-                                          'u': gu_dof_constraints,
-                                          'psi': gu_psi_constraints},
-                                      acc=1e-5, MAX_ITER=500,
-                                      debug_level=0)
-        return SimulationTask(previous_task=self.factory_task,
-                              config=sim_config, n_steps=self.n_steps)
-
 
 if __name__ == '__main__':
-    bsf_process = OctahederFormingProcess(n_steps=20,
+    bsf_process = OctahederFormingProcess(n_steps=40,
                                           phi_max=np.pi / 2.556)
 
     cp = bsf_process.factory_task.formed_object
@@ -242,6 +185,8 @@ if __name__ == '__main__':
     fts.sim_history.set(anim_t_start=0, anim_t_end=20)
     fts.sim_history.viz3d['cp'].set(tube_radius=0.005)
     ftv.add(fts.sim_history.viz3d['cp'])
+    ftv.plot()
+    ftv.configure_traits()
 
     n_cam_move = 20
     fta = FTA(ftv=ftv)

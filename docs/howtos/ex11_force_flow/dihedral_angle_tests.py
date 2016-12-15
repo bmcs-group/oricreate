@@ -21,8 +21,8 @@ if __name__ == '__main__':
 
     cp.u[3, 2] = 0.5
     cp.u = cp.u
-    print 'iL_psi - u = 1.0', cp.iL_psi, cp.iL_psi2, cp.iL_psi_0
-    phi_iL = cp.iL_psi2 - cp.iL_psi_0
+    print 'iL_psi - u = 1.0', cp.iL_psi, cp.iL_psi_0
+    phi_iL = cp.iL_psi - cp.iL_psi_0
     print 'iL_phi', phi_iL
 
     print 'normed normal vectors of the facets\n', cp.norm_F_normals
@@ -31,8 +31,8 @@ if __name__ == '__main__':
     # change the position
     cp.u[3, 2] = -0.5
     cp.u = cp.u
-    print 'iL_psi - u = -1.0', cp.iL_psi, cp.iL_psi2, cp.iL_psi_0
-    phi_iL = cp.iL_psi2 - cp.iL_psi_0
+    print 'iL_psi - u = -1.0', cp.iL_psi, cp.iL_psi_0
+    phi_iL = cp.iL_psi - cp.iL_psi_0
     print 'iL_phi', phi_iL
 
     print 'normed normal vectors of the facets\n', cp.norm_F_normals

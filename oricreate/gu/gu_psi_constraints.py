@@ -4,10 +4,11 @@ Created on Feb 19, 2015
 @author: rch
 '''
 
+import types
+
 from traits.api import \
     implements, \
     Array, cached_property, Property
-import types
 
 from gu import Gu
 from gu_psi_constraints_viz3d2 import \

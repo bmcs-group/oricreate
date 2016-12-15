@@ -7,7 +7,8 @@ Fold the Miura ori crease pattern using psi control
 
 import numpy as np
 from oricreate.api import \
-    SimulationTask, SimulationConfig, \
+    CreasePatternState, SimulationTask, SimulationConfig, \
+    FuNodeDist, GuDofConstraints, fix, \
     FTV, FTA
 from oricreate.fu import \
     FuTargetPsiValue
@@ -19,13 +20,30 @@ from oricreate.hu import \
 
 def create_cp_factory():
     # begin
-    from oricreate.api import MiuraOriCPFactory
-    cp_factory = MiuraOriCPFactory(L_x=30,
-                                   L_y=21,
-                                   n_x=2,
-                                   n_y=2,
-                                   d_0=3.0,
-                                   d_1=-3.0)
+    from oricreate.api import CustomCPFactory
+
+    cp = CreasePatternState(X=[[-0.5, 0, 0],
+                               [1, 0, 0],
+                               [0, 1, 0],
+                               [1, 1, 0],
+                               [2, 1, 0],
+                               [1, 2, 0]],
+                            L=[[0, 1],
+                               [0, 2],
+                               [1, 3],
+                               [2, 3],
+                               [0, 3],
+                               [1, 4],
+                               [3, 4],
+                               [2, 5],
+                               [3, 5]],
+                            F=[[0, 1, 3],
+                               [0, 3, 2],
+                               [1, 4, 3],
+                               [2, 3, 5]
+                               ])
+    cp_factory = CustomCPFactory(formed_object=cp)
+
     # end
     return cp_factory
 
@@ -40,42 +58,33 @@ if __name__ == '__main__':
     plt.tight_layout()
     plt.show()
 
-    gu_constant_length = GuConstantLength()
-    psi_max = np.pi / 4.0
+    F_u_fix = cp.F_N[0]
+    dof_constraints = fix([F_u_fix[0]], [0, 1, 2]) + \
+        fix([F_u_fix[1]], [1, 2]) + \
+        fix([F_u_fix[2]], [2])
 
-    diag_psi_constraints = [([(i, 1.0)], 0) for i in cpf.L_d_grid.flatten()]
-    gu_psi_constraints = \
-        GuPsiConstraints(forming_task=cpf,
-                         psi_constraints=diag_psi_constraints
-                         )
-    fu_psi_target_value = \
-        FuTargetPsiValue(forming_task=cpf,
-                         psi_value=(cpf.L_h_grid[1, 1], lambda t: -psi_max * t)
-                         )
-    hu_psi_constraints = \
-        HuPsiConstraints(forming_task=cpf,
-                         psi_constraints=[(cpf.L_h_grid[0, 1], True),
-                                          (cpf.L_v_grid[1, 0], True),
-                                          (cpf.L_v_grid[1, 1], True),
-                                          ])
+    gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
+    gu_constant_length = GuConstantLength()
+    fu_node_dist = \
+        FuNodeDist(forming_task=cpf,
+                   L=[[4, 5]])
     sim_config = SimulationConfig(goal_function_type='total potential energy',
                                   gu={'cl': gu_constant_length,
-                                      'psi': gu_psi_constraints},
-                                  hu={'mv': hu_psi_constraints},
+                                      'gu': gu_dof_constraints},
                                   acc=1e-5, MAX_ITER=100)
 
-    sim_config._fu = fu_psi_target_value
+    sim_config._fu = fu_node_dist
 
     sim_task = SimulationTask(previous_task=cpf,
                               config=sim_config,
                               n_steps=5)
 
     cp = sim_task.formed_object
-    cp.u[cpf.N_grid[(0, -1), 1], 2] = -1.0
+    cp.u[(4, 5), 2] = 0.1
     sim_task.u_1
 
     ftv = FTV()
-    #ftv.add(sim_task.sim_history.viz3d['node_numbers'], order=5)
+    sim_task.sim_history.viz3d['cp'].set(tube_radius=0.005)
     ftv.add(sim_task.sim_history.viz3d['cp'])
     ftv.plot()
     ftv.configure_traits()

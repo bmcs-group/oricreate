@@ -201,7 +201,7 @@ class FormingTaskView3D(HasStrictTraits):
                 UItem('vot_slider', editor=RangeEditor(low_name='vot_min',
                                                        high_name='vot_max',
                                                        format='(%s)',
-                                                       auto_set=False,
+                                                       auto_set=True,
                                                        enter_set=False,
                                                        ),
                       show_label=False

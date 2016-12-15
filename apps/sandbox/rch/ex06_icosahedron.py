@@ -242,6 +242,8 @@ if __name__ == '__main__':
     fts.sim_history.set(anim_t_start=0, anim_t_end=20)
     fts.sim_history.viz3d['cp'].set(tube_radius=0.005)
     ftv.add(fts.sim_history.viz3d['cp'])
+    ftv.plot()
+    ftv.configure_traits()
 
     n_cam_move = 20
     fta = FTA(ftv=ftv)
