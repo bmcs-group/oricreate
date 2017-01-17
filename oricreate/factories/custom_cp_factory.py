@@ -14,7 +14,8 @@
 
 from traits.api import \
     Instance
-
+from traitsui.api import \
+    View, Item, UItem, VGroup, HGroup
 from oricreate.crease_pattern import \
     CreasePattern
 from oricreate.forming_tasks import \
@@ -31,16 +32,29 @@ class CustomCPFactory(FactoryTask):
     def _formed_object_default(self):
         return CreasePattern(X=[0, 0, 0])
 
+    traits_view = View(
+        VGroup(
+            HGroup(
+                Item('node', springy=True)
+            ),
+            UItem('formed_object@'),
+        ),
+        resizable=True,
+        title='Custom Factory'
+    )
 
 if __name__ == '__main__':
 
-    cp = CreasePattern(X=[[0, 0, 0],
-                          [1, 1, 0]],
-                       L=[[0, 1]])
+    from oricreate.api import CreasePatternState
+
+    cp = CreasePatternState(X=[[0, 0, 0],
+                               [1, 1, 0]],
+                            L=[[0, 1]])
 
     yf = CustomCPFactory(formed_object=cp)
 
     cp = yf.formed_object
+    yf.configure_traits()
 
     import pylab as p
     cp.plot_mpl(p.axes())

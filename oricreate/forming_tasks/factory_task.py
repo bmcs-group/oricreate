@@ -46,4 +46,5 @@ class FactoryTask(FormingTask):
 if __name__ == '__main__':
     ft = FactoryTask()
     print ft.source_task
-    print ft.formed_object
+    # print ft.formed_object
+    ft.configure_traits()

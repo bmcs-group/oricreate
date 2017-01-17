@@ -12,16 +12,16 @@
 #
 # Created on Jan 29, 2015 by: rch
 
+from oricreate.util import \
+    get_theta, get_theta_du
+from oricreate.util.einsum_utils import \
+    DELTA, EPS
 from traits.api import \
     HasStrictTraits, Float, \
     Property, cached_property, \
     Array
 
 import numpy as np
-from oricreate.util import \
-    get_theta, get_theta_du
-from oricreate.util.einsum_utils import \
-    DELTA, EPS
 
 
 INPUT = '+cp_input'
@@ -1000,9 +1000,6 @@ if __name__ == '__main__':
     print
     print 'iL_psi: dihedral angles around interior lines'
     print cp.iL_psi
-    print
-    print 'iL_psi: dihedral angles around interior lines'
-    print cp.iL_psi2
     print
 #     print 'iL_psi_du: dihedral angles around interior lines'
 #     print cp.get_iL_psi_du(u)

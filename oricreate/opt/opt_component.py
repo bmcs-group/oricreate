@@ -5,7 +5,9 @@ Created on Nov 14, 2014
 '''
 
 from traits.api import \
-    HasStrictTraits, WeakRef, Property
+    HasStrictTraits, WeakRef, Property, Str
+from traitsui.api import \
+    View, Item
 
 
 class OptComponent(HasStrictTraits):
@@ -14,6 +16,10 @@ class OptComponent(HasStrictTraits):
     Base class for goal functions, equality constraints, and inequality
     constraints.
     '''
+    label = Str
+
+    def _label_default(self):
+        return self.__class__.__name__
 
     forming_task = WeakRef
 
@@ -46,3 +52,5 @@ class OptComponent(HasStrictTraits):
 
     def _get_x(self):
         return self.formed_object.x
+
+    traits_view = View(Item('label'))

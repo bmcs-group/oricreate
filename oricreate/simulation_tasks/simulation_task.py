@@ -17,7 +17,8 @@ import time
 from traits.api import Instance, \
     Property, cached_property, Str, \
     Array, Dict, implements, Int, Bool
-
+from traitsui.api import \
+    View, UItem, Item, Group
 from i_simulation_task import \
     ISimulationTask
 import numpy as np
@@ -164,6 +165,13 @@ class SimulationTask(FormingTask):
         time_end = sysclock()
         print '==== solved in ', time_end - time_start, '====='
         return np.array(u_t_list)
+
+    traits_view = View(
+        Group(
+            UItem('config@'),
+        ),
+        Item('n_steps'),
+    )
 
 
 class FindFormForGeometry(SimulationTask):

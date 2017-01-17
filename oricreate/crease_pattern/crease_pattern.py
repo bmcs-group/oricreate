@@ -16,8 +16,10 @@ from traits.api import \
     Property, cached_property, \
     Array, Constant, implements, Int
 from traitsui.api import \
-    View, Item, TabularEditor
-from traitsui.tabular_adapter import TabularAdapter
+    View, Item, TabularEditor, \
+    Tabbed
+from traitsui.tabular_adapter import \
+    TabularAdapter
 from crease_pattern_export import \
     CreasePatternExport
 from crease_pattern_operators import \
@@ -484,17 +486,20 @@ class CreasePattern(CreaseNodeOperators,
             oc.append(neighbors)
         return oc
 
-    view_traits = View(Item('X', show_label=False,
-                            style='readonly',
-                            editor=TabularEditor(adapter=XArrayAdapter())),
-                       Item('L', show_label=False,
-                            style='readonly',
-                            editor=TabularEditor(adapter=LArrayAdapter())),
-                       Item('F', show_label=False,
-                            style='readonly',
-                            editor=TabularEditor(adapter=FArrayAdapter())),
-                       buttons=['OK', 'Cancel'],
-                       resizable=True)
+    view_traits = View(
+        Tabbed(
+            Item('X', show_label=False,
+                 style='readonly',
+                 editor=TabularEditor(adapter=XArrayAdapter())),
+            Item('L', show_label=False,
+                 style='readonly',
+                 editor=TabularEditor(adapter=LArrayAdapter())),
+            Item('F', show_label=False,
+                 style='readonly',
+                 editor=TabularEditor(adapter=FArrayAdapter()))
+        ),
+        buttons=['OK', 'Cancel'],
+        resizable=True)
 
 if __name__ == '__main__':
 

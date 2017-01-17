@@ -15,14 +15,30 @@
 from traits.api import \
     Property, cached_property, \
     Array, on_trait_change, NO_COMPARE
+from traitsui.api import \
+    Tabbed, View, Item, TabularEditor
+from traitsui.tabular_adapter import \
+    TabularAdapter
 
 from crease_pattern import \
-    CreasePattern
-
+    CreasePattern,  XArrayAdapter, LArrayAdapter, FArrayAdapter
 import numpy as np
 
 
 INPUT = '+cp_input'
+
+
+class UArrayAdapter(TabularAdapter):
+
+    columns = [('i', 'index'), ('ux', 0), ('uy', 1),  ('uz', 2), ]
+
+    alignment = 'right'
+    format = '%.4f'
+
+    index_text = Property
+
+    def _get_index_text(self):
+        return str(self.row)
 
 
 class CreasePatternState(CreasePattern):
@@ -87,6 +103,24 @@ class CreasePatternState(CreasePattern):
         '''
         self.x_0 = self.x
         self.u[:, :] = 0.0
+
+    view_traits = View(
+        Tabbed(
+            Item('X', show_label=False,
+                 style='readonly',
+                 editor=TabularEditor(adapter=XArrayAdapter())),
+            Item('u', show_label=False,
+                 style='readonly',
+                 editor=TabularEditor(adapter=XArrayAdapter())),
+            Item('L', show_label=False,
+                 style='readonly',
+                 editor=TabularEditor(adapter=LArrayAdapter())),
+            Item('F', show_label=False,
+                 style='readonly',
+                 editor=TabularEditor(adapter=FArrayAdapter()))
+        ),
+        buttons=['OK', 'Cancel'],
+        resizable=True)
 
 if __name__ == '__main__':
 

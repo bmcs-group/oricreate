@@ -8,7 +8,7 @@ from mayavi.core.ui.mayavi_scene import MayaviScene
 from mayavi.tools.mlab_scene_model import MlabSceneModel
 from traits.api import \
     HasStrictTraits, Dict, \
-    Property, Str, Range, Float, \
+    Property, Str, Float, \
     on_trait_change, Int, Tuple, Instance
 from traitsui.api import \
     View, HSplit, VSplit, VGroup, Item, UItem, TableEditor, ObjectColumn, \

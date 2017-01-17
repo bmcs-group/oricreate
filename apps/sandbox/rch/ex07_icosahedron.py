@@ -1,14 +1,14 @@
+from oricreate.api import \
+    CustomCPFactory,  CreasePatternState,  fix, MapToSurface,\
+    GuConstantLength, GuDofConstraints, GuPsiConstraints,\
+    SimulationConfig, SimulationTask, \
+    FTV, FTA, FTT
+from oricreate.forming_tasks.forming_task import FormingTask
 from traits.api import \
     HasTraits, Float, Property, cached_property, Instance, \
     Int
 
 import numpy as np
-from oricreate.api import \
-    CustomCPFactory,  CreasePatternState,  fix, MapToSurface,\
-    GuConstantLength, GuDofConstraints, GuPsiConstraints,\
-    SimulationConfig, SimulationTask, \
-    FTV, FTA
-from oricreate.forming_tasks.forming_task import FormingTask
 
 
 class OctaHedronFormingProcess(HasTraits):
@@ -233,6 +233,9 @@ if __name__ == '__main__':
 
 #    ft.u_1
     fts.u_1
+
+    ftt = FTT(root=bsf_process.factory_task)
+    ftt.configure_traits()
 
     ftv = FTV()
 

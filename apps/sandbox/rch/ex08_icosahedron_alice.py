@@ -1,8 +1,3 @@
-from traits.api import \
-    HasTraits, Float, Property, cached_property, Instance, \
-    Int
-
-import numpy as np
 from oricreate.api import \
     CustomCPFactory,  CreasePatternState,  fix, link,\
     FuNodeDist, \
@@ -11,6 +6,11 @@ from oricreate.api import \
     FTV, FTA
 from oricreate.forming_tasks.forming_task import FormingTask
 from oricreate.view import FormingTaskTree
+from traits.api import \
+    HasTraits, Float, Property, cached_property, Instance, \
+    Int
+
+import numpy as np
 
 
 class OctaHedronFormingProcess(HasTraits):
@@ -354,10 +354,11 @@ if __name__ == '__main__':
     sscp = single_step_fold_task.formed_object
     print 'phi', sscp.iL_psi
 
+    fts = fts4
     fts = single_step_fold_task
 
-    ftt = FormingTaskTree(root=bsf_process.factory_task)
-    ftt.configure_traits()
+    #ftt = FormingTaskTree(root=bsf_process.factory_task)
+    # ftt.configure_traits()
 
     ftv = FTV()
 

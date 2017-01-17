@@ -3,7 +3,7 @@ from crease_pattern import \
     CreasePattern, CreasePatternState, CreasePatternViz3D
 from factories import \
     WaterBombCPFactory, YoshimuraCPFactory, CustomCPFactory, \
-    MiuraOriCPFactory, RonReshCPFactory
+    MiuraOriCPFactory, RonReshCPFactory, HPCPFactory
 from forming_tasks import \
     FormingTask, IFormingTask
 from fu import \
@@ -23,6 +23,6 @@ from simulation_tasks import \
     FoldRigidly
 from util.sym_vars import r_, s_, t_, x_, y_, z_
 from view import \
-    FormingView
+    FTT, FormingTaskTree
 from viz3d import \
     FTV, FTA, Viz3D, Vis3D

@@ -18,7 +18,7 @@ from traits.api import \
     List, Instance, implements, \
     cached_property, Enum, Array
 from traitsui.api import \
-    View
+    View, Item
 
 from i_formed_object import \
     IFormedObject
@@ -92,8 +92,6 @@ class FormingTask(HasStrictTraits):
         else:
             return self
 
-    traits_view = View()
-
     x_0 = Property(Array(float))
     '''Initial position of the forming task.
     '''
@@ -108,3 +106,9 @@ class FormingTask(HasStrictTraits):
 
     def _get_x_1(self):
         return self.x_0 + self.u_1
+
+    traits_view = View(Item('node'))
+
+if __name__ == '__main__':
+    ft = FormingTask()
+    ft.configure_traits()
