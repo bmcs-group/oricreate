@@ -133,43 +133,30 @@ if __name__ == '__main__':
 #     it.formed_object.viz3d.set(tube_radius=0.002)
 #     ftv.add(it.formed_object.viz3d)
 #     ftv.add(it.formed_object.viz3d_dict['node_numbers'], order=5)
-    lt.formed_object.viz3d.set(tube_radius=0.001)
+    lt.formed_object.viz3d['cp'].set(tube_radius=0.001)
     #ftv.add(ft.formed_object.viz3d_dict['node_numbers'], order=5)
-    ftv.add(lt.formed_object.viz3d_dict['displ'])
-    lt.config.gu['dofs'].viz3d.scale_factor = 0.5
-    ftv.add(lt.config.gu['dofs'].viz3d)
-    ftv.add(lt.config.fu.viz3d)
+    ftv.add(lt.formed_object.viz3d['cp'])
+    lt.config.gu['dofs'].viz3d['default'].scale_factor = 0.5
+    ftv.add(lt.config.gu['dofs'].viz3d['default'])
+    ftv.add(lt.config.fu.viz3d['default'])
 #     ftv.add(lt.config.fu.viz3d_dict['node_load'])
 
 #    ftv.add(lt.sim_history.viz3d)
-    ftv.add(lt.config.fu.viz3d_dict['node_load'])
+    ftv.add(lt.config.fu.viz3d['node_load'])
 #    ftv.add(ft.config.gu['dofs'].viz3d)
 #
     it.u_1
     ft.u_1
     lt.u_1
-#
-#     print 'fu', lt.sim_step.get_f()
-#     print 'Gu', lt.sim_step.get_G()
-#
-#     cp = lt.formed_object
-#     iL_phi = cp.iL_psi2 - cp.iL_psi_0
-#     print 'phi',  iL_phi
-
-    ftv.plot()
-    ftv.update(vot=1, force=True)
-    ftv.show()
 
     n_cam_move = 100
     fta = FTA(ftv=ftv)
     fta.init_view(a=45, e=60, d=10, f=(0, 0, 0), r=-120)
     fta.add_cam_move(n=n_cam_move,  # a=60, e=70, d=6, r=-120,
                      duration=100,
-                     vot_fn=lambda cmt: np.linspace(0.01, 1.0, n_cam_move),
                      azimuth_move='damped',
                      elevation_move='damped',
                      distance_move='damped')
 
     fta.plot()
-    fta.render()
     fta.configure_traits()

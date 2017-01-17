@@ -522,7 +522,7 @@ if __name__ == '__main__':
         fname00 = 'KOA.txt'
         fname08 = 'KOI.txt'
         # Adapt back to your path
-        laura = True
+        laura = False
         if laura:
             test_dir = 'C:\Users\laura\Desktop\Masterarbeit\Schale\AuswertungKO'
         else:

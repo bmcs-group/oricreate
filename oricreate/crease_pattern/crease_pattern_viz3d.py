@@ -10,7 +10,7 @@ from mayavi.filters.api import WarpVector
 from mayavi.modules.api import Surface
 from mayavi.sources.api import VTKDataSource, VTKFileReader
 from traits.api import \
-    Array, Tuple, Property, Bool, Float, Color
+    Array, Tuple, Property, Bool, Float, Color, List
 
 import numpy as np
 from oricreate.viz3d import Viz3D
@@ -31,7 +31,6 @@ class CreasePatternViz3D(Viz3D):
 
     def _get_N_L_F(self):
         cp = self.vis3d
-        print 'viz-cp', cp
         x, L, F = cp.x, cp.L, cp.F
         if len(self.N_selection):
             x = x[self.N_selection]
@@ -64,21 +63,23 @@ class CreasePatternViz3D(Viz3D):
         if len(F) > 0:
             cp_pipe = m.triangular_mesh(x, y, z, F,
                                         line_width=3,
-                                        color=self.facet_color)
+                                        color=(0.6, 0.625, 0.683))
+#                                        color=self.facet_color.toTuple()[:-1])
             if self.lines is True:
                 cp_pipe.mlab_source.dataset.lines = L
                 tube = m.pipeline.tube(cp_pipe,
                                        tube_radius=self.tube_radius)
-                m.pipeline.surface(tube, color=(1.0, 1.0, 1.0))
-
+                lines = m.pipeline.surface(tube, color=(0.1, 0.1, 0.1))
+                self.pipes['lines'] = lines
         else:
             cp_pipe = m.points3d(x, y, z, scale_factor=0.2)
             cp_pipe.mlab_source.dataset.lines = L
-        self.cp_pipe = cp_pipe
+        self.pipes['cp_pipe'] = cp_pipe
 
     def update(self):
         N = self.N_L_F[0]
-        self.cp_pipe.mlab_source.set(points=N)
+        cp_pipe = self.pipes['cp_pipe']
+        cp_pipe.mlab_source.set(points=N)
 
     def _get_bounding_box(self):
         N = self.N_L_F[0]
@@ -99,13 +100,16 @@ class CreasePatternDisplViz3D(CreasePatternViz3D):
     '''Visualize the crease pattern with displacement vectors at the nodes
     '''
 
+    warp_scale_factor = Float(1.0, enter_set=True, auto_set=False)
+    '''Displacement warp scale
+    '''
+
     N_L_F = Property(Tuple)
     '''Geometry with applied selection arrays.
     '''
 
     def _get_N_L_F(self):
         cp = self.vis3d
-        print 'viz-cp', cp
         x, u, L, F = cp.x_0, cp.u, cp.L, cp.F
         if len(self.N_selection):
             x = x[self.N_selection]
@@ -126,13 +130,13 @@ class CreasePatternDisplViz3D(CreasePatternViz3D):
             cp_pipe = m.triangular_mesh(x, y, z, F,
                                         line_width=3,
                                         scalars=w,
-                                        color=self.facet_color)
+                                        color=self.facet_color.toTuple()[:-1])
             if self.lines is True:
                 cp_pipe.mlab_source.dataset.lines = L
                 tube = m.pipeline.tube(cp_pipe,
                                        tube_radius=0.003)
-                m.pipeline.surface(tube, color=(1.0, 1.0, 1.0))
-
+                lines = m.pipeline.surface(tube, color=(1.0, 1.0, 1.0))
+                self.pipes['lines'] = lines
         else:
             cp_pipe = m.points3d(x, y, z, scale_factor=0.2)
             cp_pipe.mlab_source.dataset.lines = L
@@ -141,12 +145,18 @@ class CreasePatternDisplViz3D(CreasePatternViz3D):
         ds.point_data.vectors.name = 'u'
         warp = m.pipeline.warp_vector(cp_pipe)
         surf = m.pipeline.surface(warp)
-        self.cp_pipe = cp_pipe
+        self.pipes['warp'] = warp
+        self.pipes['cp_pipe'] = cp_pipe
 
     def update(self):
-        x_0, u, L, F = self.N_L_F
-        # self.u_pipe.mlab_source.set(vector_data=u)
-        self.cp_pipe.mlab_source.set(points=x_0, vectors=u)
+        x_0, u_, L, F = self.N_L_F
+        u, v, w = u_.T
+        cp_pipe = self.pipes['cp_pipe']
+#         warp = self.pipes['warp']
+#        warp.filter.scale_factor = self.warp_scale_factor
+        cp_pipe.mlab_source.set(points=x_0, vectors=u_, scalars=w)
+        ds = cp_pipe.mlab_source.dataset
+        ds.point_data.vectors = u_
 
 
 class CreasePatternThickViz3D(CreasePatternViz3D):
@@ -192,11 +202,12 @@ class CreasePatternNormalsViz3D(Viz3D):
 
         m = self.ftv.mlab
         x, y, z, u, v, w = self.get_values()
-        self.quifer3d_pipe = m.quiver3d(x, y, z, u, v, w)
+        self.pipes['quifer3d_pipe'] = m.quiver3d(x, y, z, u, v, w)
 
     def update(self):
         x, y, z, u, v, w = self.get_values()
-        self.quifer3d_pipe.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)
+        quifer3d_pipe = self.pipes['quifer3d_pipe']
+        quifer3d_pipe.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)
 
 
 class CreasePatternBasesViz3D(Viz3D):
@@ -218,9 +229,12 @@ class CreasePatternBasesViz3D(Viz3D):
         args_red = tuple(Fa_r.T) + tuple(F_L_bases[..., 0, :].T)
         args_gre = tuple(Fa_r.T) + tuple(F_L_bases[..., 1, :].T)
         args_blu = tuple(Fa_r.T) + tuple(F_L_bases[..., 2, :].T)
-        self.quifer3d_pipe_red = m.quiver3d(*args_red, color=(1, 0, 0))
-        self.quifer3d_pipe_gre = m.quiver3d(*args_gre, color=(0, 1, 0))
-        self.quifer3d_pipe_blu = m.quiver3d(*args_blu, color=(0, 0, 1))
+        self.pipes['quifer3d_pipe_red'] = m.quiver3d(
+            *args_red, color=(1, 0, 0))
+        self.pipes['quifer3d_pipe_gre'] = m.quiver3d(
+            *args_gre, color=(0, 1, 0))
+        self.pipes['quifer3d_pipe_blu'] = m.quiver3d(
+            *args_blu, color=(0, 0, 1))
 
     def update(self):
         '''Update positions of the bases.
@@ -228,11 +242,14 @@ class CreasePatternBasesViz3D(Viz3D):
         Fa_r, F_L_bases = self.get_values()
         x, y, z = Fa_r.T
         u, v, w = F_L_bases[..., 0, :].T
-        self.quifer3d_pipe_red.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)
+        quifer3d_pipe_red = self.pipes['quifer3d_pipe_red']
+        quifer3d_pipe_red.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)
         u, v, w = F_L_bases[..., 1, :].T
-        self.quifer3d_pipe_gre.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)
+        quifer3d_pipe_gre = self.pipes['quifer3d_pipe_gre']
+        quifer3d_pipe_gre.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)
         u, v, w = F_L_bases[..., 2, :].T
-        self.quifer3d_pipe_blu.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)
+        quifer3d_pipe_blu = self.pipes['quifer3d_pipe_blu']
+        quifer3d_pipe_blu.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)
 
 
 class CreasePatternNodeNumbersViz3D(Viz3D):
@@ -242,6 +259,8 @@ class CreasePatternNodeNumbersViz3D(Viz3D):
     label = 'node numbers'
     scale_factor = Float(1.0, auto_set=False, enter_set=True)
     show_node_index = Bool(True)
+
+    text_entries = Array
 
     def plot(self):
         '''
@@ -267,8 +286,9 @@ class CreasePatternNodeNumbersViz3D(Viz3D):
         '''
         cp = self.vis3d
         x, y, z = cp.x.T
+        text_entries = self.text_entries
         for i in range(len(self.text_entries)):
-            self.text_entries[i].actor.actor.visibility = int(
+            text_entries[i].actor.actor.visibility = int(
                 self.show_node_index)
-            self.text_entries[i].actor.actor.position = np.array(
+            text_entries[i].actor.actor.position = np.array(
                 [x[i], y[i], z[i] + 0.2 * self.scale_factor])

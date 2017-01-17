@@ -310,8 +310,4 @@ class GuDofConstraints(Gu, Visual3D):
 
         return G_du
 
-    viz3d_dict = Property
-
-    @cached_property
-    def _get_viz3d_dict(self):
-        return dict(default=GuDofConstraintsViz3D(vis3d=self))
+    viz3d_classes = dict(default=GuDofConstraintsViz3D)

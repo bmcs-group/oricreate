@@ -16,7 +16,7 @@ import types
 
 from traits.api import \
     implements,  List, Tuple, Float, \
-    cached_property, Property, Array, Int
+    Property, Array, Int
 
 from fu import \
     Fu
@@ -103,6 +103,9 @@ class FuPotEngTotal(Fu, Visual3D):
         tot_energy = self.fu_factor * (stored_energy - ext_energy)
         return tot_energy
 
+    rho = Float(0.236, label='material density',
+                enter_set=True, auto_set=False)
+
     def get_f_du(self, t=0):
         '''Get the derivatives with respect to individual displacements.
         '''
@@ -119,16 +122,11 @@ class FuPotEngTotal(Fu, Visual3D):
 
         V_du = cp.V_du.reshape((-1, 3))
 
-#         Pi_ext_du = F_ext
-        Pi_ext_du = F_ext - V_du * 0.236
+        Pi_ext_du = F_ext - V_du * self.rho
 
         Pi_du = Pi_int_du - Pi_ext_du
 
         return Pi_du.flatten()
 
-    viz3d_dict = Property
-
-    @cached_property
-    def _get_viz3d_dict(self):
-        return dict(default=FuPotEngBendingViz3D(vis3d=self),
-                    node_load=FuPotEngNodeLoadViz3D(vis3d=self))
+    viz3d_classes = dict(default=FuPotEngBendingViz3D,
+                         node_load=FuPotEngNodeLoadViz3D)

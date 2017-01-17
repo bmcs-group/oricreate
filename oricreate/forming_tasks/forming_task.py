@@ -36,7 +36,12 @@ class FormingTask(HasStrictTraits):
 
     implements(IFormingTask)
 
-    node = Str('<unnamed>')
+    node = Str
+    '''Name of the tree node
+    '''
+
+    def _node_default(self):
+        return self.__class__.__name__
 
     t = Enum([0, 1], enter_set=True, auto_set=False)
     '''Time scale ranging between 0 and 1 by default.

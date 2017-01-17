@@ -44,12 +44,14 @@ class FuPotEngNodeLoadViz3D(Viz3D):
         m = self.ftv.mlab
         x, y, z, u, v, w = self.get_node_load_values(1.0)
 
-        self.cl_arrow = m.quiver3d(x, y, z, u, v, w, mode='arrow',
-                                   color=(1.0, 0.0, 0.0),
-                                   scale_mode='vector')
-        self.cl_arrow.glyph.glyph_source.glyph_position = 'head'
-        m.pipeline.surface(self.cl_arrow)
+        cl_arrow = m.quiver3d(x, y, z, u, v, w, mode='arrow',
+                              color=(1.0, 0.0, 0.0),
+                              scale_mode='vector')
+        cl_arrow.glyph.glyph_source.glyph_position = 'head'
+        self.pipes['cl_arrow'] = cl_arrow
+        self.pipes['surf'] = m.pipeline.surface(cl_arrow)
 
     def update(self):
         x, y, z, u, v, w = self.get_node_load_values(1.0)
-        self.cl_arrow.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)
+        cl_arrow = self.pipes['cl_arrow']
+        cl_arrow.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)

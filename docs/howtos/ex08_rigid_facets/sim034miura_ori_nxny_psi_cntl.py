@@ -18,10 +18,10 @@ def create_cp_factory():
     from oricreate.api import MiuraOriCPFactory
     cp_factory = MiuraOriCPFactory(L_x=30,
                                    L_y=21,
-                                   n_x=40,
-                                   n_y=20,
-                                   d_0=0.25,
-                                   d_1=-0.25)
+                                   n_x=4,
+                                   n_y=8,
+                                   d_0=0.4,
+                                   d_1=-0.4)
     # end
     return cp_factory
 
@@ -30,11 +30,12 @@ if __name__ == '__main__':
     cpf = create_cp_factory()
     cp = cpf.formed_object
 
-    import matplotlib.pyplot as plt
-    fig, ax = plt.subplots()
-    cp.plot_mpl(ax, facets=True)
-    plt.tight_layout()
-    plt.show()
+    if False:
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots()
+        cp.plot_mpl(ax, facets=True)
+        plt.tight_layout()
+        plt.show()
 
     # Link the crease factory it with the constraint client
     gu_constant_length = GuConstantLength()
@@ -44,7 +45,7 @@ if __name__ == '__main__':
         + fix(cpf.N_grid[nx2, ny2], [0, 1, 2]) \
         + fix(cpf.N_grid[nx2, (ny2 - 1, ny2 + 1)], [2])
     gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
-    psi_max = np.pi * 0.49
+    psi_max = np.pi * 0.498
     diag_psi_mask = np.ones_like(cpf.L_d_grid, dtype=np.bool_)
     diag_psi_mask[1:-1, 1:-1] = False
     diag_psi_constraints = [([(i, 1.0)], 0)
@@ -74,13 +75,13 @@ if __name__ == '__main__':
     ftv = FTV()
 #    ftv.add(sim_task.sim_history.viz3d_dict['node_numbers'], order=5)
     ftv.add(sim_task.sim_history.viz3d)
-    ftv.add(gu_dof_constraints.viz3d)
+#    ftv.add(gu_dof_constraints.viz3d)
 
     fta = FTA(ftv=ftv)
-    fta.init_view(a=200, e=35, d=50, f=(0, 0, 0), r=0)
-    fta.add_cam_move(a=200, e=34, n=5, d=50, r=0,
+    fta.init_view(a=-45, e=65, d=60, f=(0, 0, 0), r=-50)
+    fta.add_cam_move(a=-80, e=80, n=20, d=35, r=-45,
                      duration=10,
-                     vot_fn=lambda cmt: np.linspace(0, 1, 4),
+                     vot_fn=lambda cmt: np.linspace(0, 1, 20),
                      azimuth_move='damped',
                      elevation_move='damped',
                      distance_move='damped')

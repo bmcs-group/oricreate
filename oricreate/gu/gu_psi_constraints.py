@@ -4,10 +4,11 @@ Created on Feb 19, 2015
 @author: rch
 '''
 
+import types
+
 from traits.api import \
     implements, \
     Array, cached_property, Property
-import types
 
 from gu import Gu
 from gu_psi_constraints_viz3d2 import \
@@ -82,8 +83,4 @@ class GuPsiConstraints(Gu, Visual3D):
 
         return G_du
 
-    viz3d_dict = Property
-
-    @cached_property
-    def _get_viz3d_dict(self):
-        return dict(default=GuPsiConstraintsViz3D(vis3d=self))
+    viz3d_classes = dict(psi_constraints=GuPsiConstraintsViz3D)

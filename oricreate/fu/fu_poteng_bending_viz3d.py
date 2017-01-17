@@ -57,8 +57,7 @@ class FuPotEngBendingViz3D(Viz3D):
 
         m = self.ftv.mlab
         x, y, z, u, v, w = self.get_values()
-        self.quiver3d_pipe = m.quiver3d(x, y, z, u, v, w)
-        vectors = self.quiver3d_pipe
+        vectors = m.quiver3d(x, y, z, u, v, w)
         vectors.glyph.glyph_source.glyph_source = vectors.glyph.glyph_source.glyph_dict[
             'cone_source']
         vectors.glyph.glyph.scale_factor *= -1.0
@@ -66,7 +65,9 @@ class FuPotEngBendingViz3D(Viz3D):
             [1.,  0.,  0.])
         vectors.glyph.glyph_source.glyph_source.center = np.array(
             [0.,  0.,  0.])
+        self.pipes['vectors'] = vectors
 
     def update(self):
         x, y, z, u, v, w = self.get_values()
-        self.quiver3d_pipe.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)
+        vectors = self.pipes['vectors']
+        vectors.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)

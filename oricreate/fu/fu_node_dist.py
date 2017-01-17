@@ -12,31 +12,50 @@
 #
 # Created on Nov 18, 2011 by: matthias
 
-from traits.api import Array
+from traits.api import \
+    implements, Array
 
 from fu import \
     Fu
 import numpy as np
+from oricreate.opt import \
+    IFu
+from oricreate.viz3d import \
+    Visual3D
 
 
-class FuNodeDist(Fu):
+class FuNodeDist(Fu, Visual3D):
 
     '''Optimization criteria based on the distance between specified nodes.
     '''
+
+    implements(IFu)
+
     L = Array(int)
 
-    def get_f(self, u, t=0):
-        '''Get the the norm of distances between the individual target faces and nodes.
+    def get_f(self, t=0):
+        '''Get the the norm of distances between the individual nodes.
+
+        ...math::
+            d_l = ld(1,x_{Ie}) - ld(2,x_{Ie})
+
+
         '''
+        cp = self.forming_task.formed_object
+        u = cp.u
         x = self.forming_task.x_0 + u
         L = self.L
         v_arr = x[L[:, 1], :] - x[L[:, 0], :]
         l_arr = np.sqrt(np.sum(v_arr ** 2, axis=1))
         return np.sum(l_arr)
 
-    def get_f_du(self, u, t=0):
-        '''Get the derivatives with respect to individual displacements.
+    def get_f_du(self, t=0):
+        r'''Get the derivatives of the distance vectors with respect 
+        to the displacements.
+
         '''
+        cp = self.forming_task.formed_object
+        u = cp.u
         x = self.forming_task.x_0 + u
         L = self.L
         v_arr = x[L[:, 1], :] - x[L[:, 0], :]
@@ -53,7 +72,7 @@ class FuNodeDist(Fu):
         f_du_J = (x_J - x_I) / L_total
 
         f_du = np.zeros(
-            (self.forming_task.n_N, self.forming_task.n_D), dtype='float_')
+            (cp.n_N, cp.n_D), dtype='float_')
 
         if L.size > 0:
             f_du[I, :] += f_du_I
