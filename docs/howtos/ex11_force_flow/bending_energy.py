@@ -1,10 +1,12 @@
 '''
 '''
-from custom_factory_mpl import create_cp_factory
-import numpy as np
 from oricreate.api import GuConstantLength, GuDofConstraints, \
     SimulationConfig, SimulationTask, fix, FTV
 from oricreate.fu import FuPotEngTotal
+
+from custom_factory_mpl import create_cp_factory
+import numpy as np
+
 
 if __name__ == '__main__':
     cp_factory_task = create_cp_factory()

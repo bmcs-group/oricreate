@@ -1,7 +1,3 @@
-from traits.api import \
-    HasTraits, Float, Property, cached_property, Instance, \
-    Int
-import numpy as np
 from oricreate.api import \
     YoshimuraCPFactory,     fix, link, r_, s_, MapToSurface,\
     GuConstantLength, GuDofConstraints, SimulationConfig, SimulationTask, \
@@ -9,6 +5,11 @@ from oricreate.api import \
 from oricreate.forming_tasks.forming_task import FormingTask
 from oricreate.fu import \
     FuPotEngTotal
+from traits.api import \
+    HasTraits, Float, Property, cached_property, Instance, \
+    Int
+
+import numpy as np
 
 
 class BarrellVaultGravityFormingProcess(HasTraits):
@@ -132,14 +133,14 @@ if __name__ == '__main__':
 #     it.formed_object.viz3d.set(tube_radius=0.002)
 #     ftv.add(it.formed_object.viz3d)
 #     ftv.add(it.formed_object.viz3d_dict['node_numbers'], order=5)
-    lt.formed_object.viz3d.set(tube_radius=0.002)
-    ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
-    ftv.add(lt.formed_object.viz3d_dict['displ'])
-    lt.config.gu['dofs'].viz3d.scale_factor = 0.5
-    ftv.add(lt.config.gu['dofs'].viz3d)
+    lt.formed_object.viz3d['cp'].set(tube_radius=0.002)
+    ftv.add(lt.formed_object.viz3d['node_numbers'], order=5)
+    ftv.add(lt.formed_object.viz3d['displ'])
+    #lt.config.gu['dofs'].viz3d.scale_factor = 0.5
+    # ftv.add(lt.config.gu['dofs'].viz3d)
 
-    ftv.add(lt.config.fu.viz3d)
-    ftv.add(lt.config.fu.viz3d_dict['node_load'])
+    # ftv.add(lt.config.fu.viz3d)
+    # ftv.add(lt.config.fu.viz3d_dict['node_load'])
 
     it.u_1
     ft.u_1

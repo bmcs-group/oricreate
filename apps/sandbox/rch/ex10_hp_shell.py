@@ -15,7 +15,7 @@ from oricreate.fu import \
     FuPotEngTotal
 from traits.api import \
     Float, HasStrictTraits, Property, cached_property, Int, \
-    Instance, Array, Bool
+    Instance, Array, List, Bool
 
 import numpy as np
 
@@ -70,6 +70,17 @@ class HPShellFormingProcess(HasStrictTraits):
         return MapToSurface(previous_task=self.factory_task,
                             target_faces=[(self.ctf, cp.N)])
 
+    psi_lines = List([10, 23, 35, 40, 7, 20, 41, 44])
+
+    psi_max = Float(-np.pi / 2.03)
+
+    fixed_z = List([9, 14])
+    fixed_y = List([8, 15])
+    fixed_x = List([8, 15])
+    link_z = List([[8], [15]])
+
+    n_steps = Int(5)
+
     fold_task = Property(Instance(FormingTask))
     '''Configure the simulation task.
     '''
@@ -77,29 +88,19 @@ class HPShellFormingProcess(HasStrictTraits):
     def _get_fold_task(self):
         self.init_displ_task.x_1
 
-        u_max = 0.1
-        fixed_z = fix(
-            [9, 14], (2))
-        fixed_y = fix(
-            [8, 15], (1))
-        fixed_x = fix(
-            [8, 15], (0))
-        link_z = link(
-            [8], [2], 1, [15], [2], -1)
-        control_left = fix(
-            [9], (0),
-            lambda t: t * u_max)
-        control_right = fix(
-            [14], (0),
-            lambda t: -t * u_max)
+        fixed_z = fix(self.fixed_z, (2))
+        fixed_y = fix(self.fixed_y, (1))
+        fixed_x = fix(self.fixed_x, (0))
+        link_z = link(self.link_z[0], [2], 1, self.link_z[1], [2], -1)
 
         dof_constraints = fixed_x + fixed_z + fixed_y + \
             link_z
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
 
-        psi_lines = [10, 23, 35, 40, 7, 20, 41, 44]
-        psi_constr = [([(i, 1.0)], lambda t: -np.pi / 2.1 * t)
-                      for i in psi_lines]
+        FN = lambda psi: lambda t: psi * t
+
+        psi_constr = [([(i, 1.0)], FN(self.psi_max))
+                      for i in self.psi_lines]
 
         gu_constant_length = GuConstantLength()
 
@@ -115,11 +116,38 @@ class HPShellFormingProcess(HasStrictTraits):
                                       acc=1e-5, MAX_ITER=500,
                                       debug_level=0)
         return SimulationTask(previous_task=self.init_displ_task,
-                              config=sim_config, n_steps=1)
+                              config=sim_config, n_steps=self.n_steps)
 
 if __name__ == '__main__':
-    bsf_process = HPShellFormingProcess(L_x=10, L_y=10, n_stripes=2,
-                                        )
+    kw_2 = dict(L_x=10, L_y=10,
+                psi_lines=[
+                    10, 23, 35, 40, 7, 20, 41, 44],
+                n_stripes=2,
+                n_steps=5,
+                psi_max=-np.pi / 2.03,
+                fixed_z=[9, 14],
+                fixed_y=[8, 15],
+                fixed_x=[8, 15],
+                link_z=[[8], [15]]
+                )
+    kw_3 = dict(L_x=10, L_y=10,
+                psi_lines=[
+                    18, 45, 44, 69,
+                    93, 98, 123, 128,
+                    41, 96, 9, 34,
+                    99, 102, 135, 138,
+                    #                    15, 12, 63, 90,
+                    #                    131, 134, 72, 103,
+                ],
+                n_stripes=4,
+                n_steps=1,
+                psi_max=-np.pi / 2.03 * 0.1,
+                fixed_z=[15, 44],
+                fixed_y=[24, 35],
+                fixed_x=[24, 35],
+                link_z=[[24], [35]]
+                )
+    bsf_process = HPShellFormingProcess(**kw_3)
 
     ftv = FTV()
 
@@ -127,7 +155,7 @@ if __name__ == '__main__':
     if True:
         import pylab as p
         ax = p.axes()
-        fa.formed_object.plot_mpl(ax)
+        fa.formed_object.plot_mpl(ax, nodes=True, facets=False)
         p.show()
 
     it = bsf_process.init_displ_task
