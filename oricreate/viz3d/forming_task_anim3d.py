@@ -542,6 +542,8 @@ if __name__ == '__main__':
     pc = PointCloud(anim_t_start=10, anim_t_end=40)
     ftv = FTV()
     ftv.add(pc.viz3d['default'])
+    ftv.plot()
+    ftv.configure_traits()
 
     fta = FTA(ftv=ftv)
     fta.init_view(a=0, e=0, d=8, f=(0, 0, 0), r=0)

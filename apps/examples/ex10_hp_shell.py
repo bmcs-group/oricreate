@@ -71,7 +71,7 @@ class HPShellFormingProcess(HasStrictTraits):
 
     psi_lines = List([10, 23, 35, 40, 7, 20, 41, 44])
 
-    psi_max = Float(-np.pi / 2.03)
+    psi_max = Float(-np.pi / 2.03 * 0.8)
 
     fixed_z = List([9, 14])
     fixed_y = List([8, 15])
@@ -121,14 +121,14 @@ hp_shell_kw_2 = dict(L_x=10, L_y=10,
                      psi_lines=[
                          10, 23, 35, 40, 7, 20, 41, 44],
                      n_stripes=2,
-                     n_steps=5,
-                     psi_max=-np.pi / 2.03,
+                     n_steps=10,
+                     psi_max=-np.pi / 2.5,
                      fixed_z=[9, 14],
                      fixed_y=[8, 15],
                      fixed_x=[8, 15],
                      link_z=[[8], [15]]
                      )
-hp_shell_kw_3 = dict(L_x=10, L_y=10,
+hp_shell_kw_4 = dict(L_x=10, L_y=10,
                      psi_lines=[
                          18, 45, 44, 69,
                          93, 98, 123, 128,
@@ -156,7 +156,7 @@ if __name__ == '__main__':
     ftv = FTV()
 
     fa = bsf_process.factory_task
-    if True:
+    if False:
         import pylab as p
         ax = p.axes()
         fa.formed_object.plot_mpl(ax, nodes=True, facets=False)
@@ -165,16 +165,14 @@ if __name__ == '__main__':
     it = bsf_process.init_displ_task
     ft = bsf_process.fold_task
 
-    show_init = True
-    if show_init:
-        # ftv.add(it.target_faces[0].viz3d['default'])
-        ft.formed_object.viz3d['cp'].set(tube_radius=0.02)
-        ftv.add(ft.formed_object.viz3d['cp'])
-        #ftv.add(it.formed_object.viz3d['node_numbers'], order=5)
-        ft.config.gu['dofs'].viz3d['default'].scale_factor = 0.5
-        ftv.add(ft.config.gu['dofs'].viz3d['default'])
+    # ftv.add(it.target_faces[0].viz3d['default'])
+    ft.formed_object.viz3d['cp'].set(tube_radius=0.02)
+    ftv.add(ft.sim_history.viz3d['cp'])
+    #ftv.add(it.formed_object.viz3d['node_numbers'], order=5)
+    ft.config.gu['dofs'].viz3d['default'].scale_factor = 0.5
+    ftv.add(ft.config.gu['dofs'].viz3d['default'])
 
-        ft.u_1
+    ft.u_1
 
     ftv.plot()
     ftv.configure_traits()
