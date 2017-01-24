@@ -1,6 +1,5 @@
-'''
-Created on 23.01.2017
-'''
+
+
 from oricreate.api import FTA, FTV
 
 from apps.examples.ex10_hp_shell import  \
@@ -14,7 +13,7 @@ if __name__ == '__main__':
                          psi_lines=[
                              10, 23, 35, 40, 7, 20, 41, 44],
                          n_stripes=2,
-                         n_steps=20,
+                         n_steps=5,
                          psi_max=-np.pi / 2.03,
                          fixed_z=[9, 14],
                          fixed_y=[8, 15],
