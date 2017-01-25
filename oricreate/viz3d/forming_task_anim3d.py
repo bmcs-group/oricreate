@@ -61,7 +61,7 @@ from traits.api import \
 from traitsui.api import \
     View, Item, UItem, HSplit, VGroup, HGroup, \
     TableEditor, ObjectColumn, InstanceEditor, \
-    Handler, Action, ToolBar
+    Handler, Action, ToolBar, VSplit
 
 from forming_task_view3d import \
     FTV
@@ -337,8 +337,10 @@ class FormingTaskAnim3D(HasStrictTraits):
     def init_view(self, a, e, d, f, r):
         self.init_cam_station.set(
             azimuth=a, elevation=e, distance=d, focal_point=f, roll=r)
-        self.ftv.mlab.view(a, e, d, f)
-        self.ftv.mlab.roll(r)
+        if self.ftv.scene.renderer:
+            # encapsulate this in ftv
+            self.ftv.mlab.view(a, e, d, f, figure=self.ftv.scene)
+            self.ftv.mlab.roll(r, figure=self.ftv.scene)
 
     def plot(self):
         self.ftv.plot()
@@ -426,14 +428,17 @@ class FormingTaskAnim3D(HasStrictTraits):
         '''Get the current position from the ftv and set it to the target
         station of the cam move.
         '''
-        if self.selected_cam_move == None:
+        if (self.selected_cam_move == None or
+                self.ftv.scene.renderer == None):
             return
         to_station = self.selected_cam_move.to_station
         self.ftv.mlab.view(azimuth=to_station.azimuth,
                            elevation=to_station.elevation,
                            distance=to_station.distance,
-                           focalpoint=to_station.focal_point)
-        self.ftv.mlab.roll(to_station.roll)
+                           focalpoint=to_station.focal_point,
+                           figure=self.ftv.mlab.figure)
+        self.ftv.mlab.roll(to_station.roll,
+                           figure=self.ftv.mlab.figure)
 
     def anim(self):
         for cam_move in self.cam_moves:
@@ -464,20 +469,23 @@ class FormingTaskAnim3D(HasStrictTraits):
         raise NotImplementedError
 
     trait_view = View(
-        HSplit(
-            VGroup(
-                Item('cam_moves',
-                     style='custom', editor=cam_move_list_editor,
-                     show_label=False, springy=True, width=150),
+        VSplit(
+            UItem('ftv@'),
+            HSplit(
                 VGroup(
-                    UItem('anim_delay'),
-                    label='animation delay'
+                    Item('cam_moves',
+                         style='custom', editor=cam_move_list_editor,
+                         show_label=False, springy=True, width=150),
+                    VGroup(
+                        UItem('anim_delay'),
+                        label='animation delay'
+                    ),
                 ),
+                Item('selected_cam_move@', show_label=False,
+                     springy=True,
+                     width=800, height=200),
+                show_border=True,
             ),
-            Item('selected_cam_move@', show_label=False,
-                 springy=True,
-                 width=800, height=200),
-            show_border=True,
         ),
         toolbar=ToolBar(*actions),
         resizable=True,
@@ -534,16 +542,16 @@ if __name__ == '__main__':
             x, y, z, s = self.p
             s = np.array(s, float)
             s[-1] *= (1.0 - 0.9 * self.vot)
+            print x, y, z, s
             return x, y, z, s
 
         viz3d_classes = dict(default=PointCloudViz3D,
                              something_else=PointCloudViz3D)
 
-    pc = PointCloud(anim_t_start=10, anim_t_end=40)
+    pc = PointCloud(anim_t_start=0, anim_t_end=40)
     ftv = FTV()
     ftv.add(pc.viz3d['default'])
-    ftv.plot()
-    ftv.configure_traits()
+    ftv.add(pc.viz3d['something_else'])
 
     fta = FTA(ftv=ftv)
     fta.init_view(a=0, e=0, d=8, f=(0, 0, 0), r=0)
@@ -557,10 +565,5 @@ if __name__ == '__main__':
                      azimuth_move='damped',
                      elevation_move='damped',
                      distance_move='damped')
-#     fta.add_cam_move(e=90, n=100,
-#                      duration=30,
-#                      azimuth_move='damped',
-#                      elevation_move='damped',
-#                      distance_move='damped')
     fta.plot()
     fta.configure_traits()

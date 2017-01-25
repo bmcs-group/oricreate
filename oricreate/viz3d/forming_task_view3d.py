@@ -9,7 +9,7 @@ from mayavi.tools.mlab_scene_model import MlabSceneModel
 from traits.api import \
     HasStrictTraits, Dict, \
     Property, Str, Float, \
-    on_trait_change, Int, Tuple, Instance
+    on_trait_change, Int, Tuple, Instance, Button
 from traitsui.api import \
     View, HSplit, VSplit, VGroup, Item, UItem, TableEditor, ObjectColumn, \
     RangeEditor
@@ -150,9 +150,12 @@ class FormingTaskView3D(HasStrictTraits):
             map_order_viz3d['%5g%5g' % (order, idx)] = viz3d
         return [map_order_viz3d[key] for key in sorted(map_order_viz3d.keys())]
 
-    scene = Instance(MlabSceneModel, ())
+    scene = Instance(MlabSceneModel)
     '''Scene to plot the vizualization pipeline
     '''
+
+    def _scene_default(self):
+        return MlabSceneModel()
 
     def plot(self):
         '''Plot the current visualization objects.
