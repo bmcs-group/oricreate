@@ -135,6 +135,7 @@ class CamStation(HasStrictTraits):
     azimuth, elevation, distance and focal point
     and roll angle.
     '''
+        
     prev_move = WeakRef
 
     azimuth = Float(0.0)
@@ -193,12 +194,12 @@ class CamMove(HasStrictTraits):
     '''
 
     def __init__(self, *args, **kw):
-        super(CamMove, self).__init__(*args, **kw)
+        super(CamMove, self).__init__() # (*args, **kw) removed by Christoph !!!
 
     fta = WeakRef
     ftv = WeakRef(FTV)
-    from_station = WeakRef(CamStation)
-    to_station = WeakRef(CamStation)
+    from_station = Instance(CamStation) # changed from WeakRef to Instance by Christoph !!!
+    to_station = Instance(CamStation) # changed from WeakRef to Instance by Christoph !!!
 
     changed = Event
 
