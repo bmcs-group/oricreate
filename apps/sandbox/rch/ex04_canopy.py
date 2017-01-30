@@ -4,11 +4,6 @@ Created on Jan 20, 2016
 @author: rch
 '''
 
-from traits.api import \
-    Float, HasTraits, Property, cached_property, Int, \
-    Instance, Array, Bool
-
-import numpy as np
 from oricreate.api import MappingTask
 from oricreate.api import YoshimuraCPFactory, \
     fix, link, r_, s_, t_, MapToSurface,\
@@ -21,6 +16,11 @@ from oricreate.forming_tasks.forming_task import FormingTask
 from oricreate.fu import \
     FuPotEngTotal
 from oricreate.mapping_tasks.mask_task import MaskTask
+from traits.api import \
+    Float, HasTraits, Property, cached_property, Int, \
+    Instance, Array, Bool
+
+import numpy as np
 import sympy as sp
 
 
@@ -446,7 +446,7 @@ if __name__ == '__main__':
         print 'u_max', lt.u_1[n_max_u, 2]
 
         cp = lt.formed_object
-        iL_phi = cp.iL_psi2 - cp.iL_psi_0
+        iL_phi = cp.iL_psi - cp.iL_psi_0
         iL_m = lt.config._fu.kappa * iL_phi
         print 'moments', np.max(np.fabs(iL_m))
 

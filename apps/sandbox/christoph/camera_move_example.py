@@ -71,7 +71,7 @@ class CameraMovementExample(HasStrictTraits):
         '''Print current view
         '''
         print self.mlab.view(), self.mlab.roll()
-    
+
     traits_view = View(
         VGroup(
             UItem('scene',

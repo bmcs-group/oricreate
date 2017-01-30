@@ -11,8 +11,9 @@
 # Thanks for using Simvisage open source!
 #
 
-import numpy as np
 from oricreate.viz3d import Viz3D
+
+import numpy as np
 
 
 class FuPotEngBendingViz3D(Viz3D):
@@ -25,7 +26,7 @@ class FuPotEngBendingViz3D(Viz3D):
         cp = ft.formed_object
         print 'cp.u', cp.u
 
-        iL_phi = cp.iL_psi2 - cp.iL_psi_0
+        iL_phi = cp.iL_psi - cp.iL_psi_0
         iL_m = fu_tot_poteng.kappa * iL_phi
         print 'iL_m', iL_m
         max_m = np.max(iL_m)

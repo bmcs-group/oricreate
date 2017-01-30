@@ -14,6 +14,13 @@
 
 import types
 
+from oricreate.crease_pattern.crease_pattern_operators import CreaseCummulativeOperators
+from oricreate.opt import \
+    IFu
+from oricreate.util.einsum_utils import \
+    EPS
+from oricreate.viz3d import \
+    Visual3D
 from traits.api import \
     implements,  List, Tuple, Float, \
     Property, Array, Int
@@ -25,13 +32,6 @@ from fu_poteng_bending_viz3d import \
 from fu_poteng_node_load_viz3d import \
     FuPotEngNodeLoadViz3D
 import numpy as np
-from oricreate.crease_pattern.crease_pattern_operators import CreaseCummulativeOperators
-from oricreate.opt import \
-    IFu
-from oricreate.util.einsum_utils import \
-    EPS
-from oricreate.viz3d import \
-    Visual3D
 
 
 class FuPotEngTotal(Fu, Visual3D):
@@ -45,6 +45,8 @@ class FuPotEngTotal(Fu, Visual3D):
     implements(IFu)
 
     F_ext_list = List(Tuple, [])
+
+    exclude_lines = Array(int, value=[])
 
     _kappa_arr = Array(float, value=[])
     _kappa = Float(1.0)
@@ -84,8 +86,12 @@ class FuPotEngTotal(Fu, Visual3D):
         '''Get the total potential energy.
         '''
         cp = self.forming_task.formed_object
-        iL_phi = cp.iL_psi - cp.iL_psi_0
-        iL_length = np.linalg.norm(cp.iL_vectors, axis=1)
+
+        iL_mask = np.ones_like(cp.iL, dtype=bool)
+        iL_mask[cp.L_iL[self.exclude_lines]] = True
+
+        iL_phi = cp.iL_psi[iL_mask] - cp.iL_psi_0[iL_mask]
+        iL_length = np.linalg.norm(cp.iL_vectors[iL_mask], axis=1)
 
         stored_energy = np.einsum(
             '...i,...i,...i->...', self.kappa, iL_phi**2, iL_length) / 2.0
@@ -97,7 +103,7 @@ class FuPotEngTotal(Fu, Visual3D):
 #         return tot_energy
 
         F_ext = self._get_F_ext(t)
-        V_ext = cp.V * 0.236
+        V_ext = cp.V * self.rho
         ext_energy = (np.einsum(
             '...i,...i->...', F_ext.flatten(), cp.u.flatten()) - V_ext)
         tot_energy = self.fu_factor * (stored_energy - ext_energy)
@@ -111,11 +117,14 @@ class FuPotEngTotal(Fu, Visual3D):
         '''
         cp = self.forming_task.formed_object
 
+        iL_mask = np.ones_like(cp.iL, dtype=bool)
+        iL_mask[cp.L_iL[self.exclude_lines]] = True
+
         F_ext = self._get_F_ext(t)
 
-        iL_phi = cp.iL_psi - cp.iL_psi_0
-        iL_phi_du = cp.iL_psi_du
-        iL_length = np.linalg.norm(cp.iL_vectors, axis=1)
+        iL_phi = cp.iL_psi[iL_mask] - cp.iL_psi_0[iL_mask]
+        iL_phi_du = cp.iL_psi_du[iL_mask]
+        iL_length = np.linalg.norm(cp.iL_vectors[iL_mask], axis=1)
 
         Pi_int_du = np.einsum('...l,...l,...l,...lId->...Id',
                               iL_length, self.kappa, iL_phi, iL_phi_du)

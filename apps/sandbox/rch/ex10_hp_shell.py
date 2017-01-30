@@ -47,8 +47,8 @@ class HPShellFormingProcess(HasStrictTraits):
     '''control target surface'''
     @cached_property
     def _get_ctf(self):
-        return [r_, s_, t_ * 0.1 * (r_ * r_ / self.L_x +
-                                    -s_ * s_ / self.L_y) + 1e-5]
+        return [r_, s_, t_ * 0.001 * (r_ * r_ / self.L_x +
+                                      -s_ * s_ / self.L_y) + 1e-5]
 
     factory_task = Property(Instance(FormingTask))
     '''Factory task generating the crease pattern.
@@ -79,6 +79,8 @@ class HPShellFormingProcess(HasStrictTraits):
     link_z = List([[8], [15]])
 
     n_steps = Int(5)
+
+    kappa = Float(1.0)
 
     fold_task = Property(Instance(FormingTask))
     '''Configure the simulation task.
@@ -117,33 +119,88 @@ class HPShellFormingProcess(HasStrictTraits):
         return SimulationTask(previous_task=self.init_displ_task,
                               config=sim_config, n_steps=self.n_steps)
 
+    fold_deform_task = Property(Instance(FormingTask))
+    '''Configure the simulation task.
+    '''
+    @cached_property
+    def _get_fold_deform_task(self):
+        ft = self.factory_task
+        it = self.init_displ_task
+
+        fixed_z = fix(self.fixed_z, (2))
+        fixed_y = fix(self.fixed_y, (1))
+        fixed_x = fix(self.fixed_x, (0))
+        link_z = link(self.link_z[0], [2], 1, self.link_z[1], [2], -1)
+
+        dof_constraints = fixed_x + fixed_z + fixed_y + \
+            link_z
+        gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
+
+        FN = lambda psi: lambda t: psi * t
+
+        psi_constr = [([(i, 1.0)], FN(self.psi_max))
+                      for i in self.psi_lines]
+
+        gu_constant_length = GuConstantLength()
+
+        gu_psi_constraints = \
+            GuPsiConstraints(forming_task=ft,
+                             psi_constraints=psi_constr)
+
+        sim_config = SimulationConfig(goal_function_type='gravity potential energy',
+                                      gu={'cl': gu_constant_length,
+                                          'dofs': gu_dof_constraints,
+                                          'psi': gu_psi_constraints
+                                          },
+                                      acc=1e-5, MAX_ITER=500,
+                                      debug_level=0)
+
+        fu_tot_poteng = FuPotEngTotal(kappa=np.array([self.kappa]),
+                                      F_ext_list=[],
+                                      rho=10.0,
+                                      exclude_lines=self.psi_lines)
+
+        sim_config._fu = fu_tot_poteng
+
+        st = SimulationTask(previous_task=ft,
+                            config=sim_config, n_steps=self.n_steps)
+        fu_tot_poteng.forming_task = st
+        gu_psi_constraints.forming_task = st
+
+        cp = st.formed_object
+        cp.u = it.u_1
+        #cp.u[:, 2] = np.random
+        return st
+
+
 hp_shell_kw_2 = dict(L_x=10, L_y=10,
+                     kappa=0.0,
                      psi_lines=[
                          10, 23, 35, 40, 7, 20, 41, 44],
-                     n_stripes=2,
+                     n_stripes=8,
                      n_steps=5,
-                     psi_max=-np.pi / 2.03,
+                     psi_max=-np.pi / 2.03 * 0.2,
                      fixed_z=[9, 14],
                      fixed_y=[8, 15],
                      fixed_x=[8, 15],
                      link_z=[[8], [15]]
                      )
 hp_shell_kw_3 = dict(L_x=10, L_y=10,
+                     kappa=10,
                      psi_lines=[
                          18, 45, 44, 69,
                          93, 98, 123, 128,
                          41, 96, 9, 34,
                          99, 102, 135, 138,
-                         #                    15, 12, 63, 90,
-                         #                    131, 134, 72, 103,
                      ],
+                     #psi_lines=[5, 21, 37, 53, 100, 118, 136, 154],
                      n_stripes=4,
-                     n_steps=1,
-                     psi_max=-np.pi / 2.03 * 0.1,
-                     fixed_z=[15, 44],
+                     n_steps=3,
+                     psi_max=-np.pi / 2.03 * 0.3,
+                     fixed_z=[24, 35],
                      fixed_y=[24, 35],
                      fixed_x=[24, 35],
-                     link_z=[[24], [35]]
+                     link_z=[[15], [44]]
                      )
 
 if __name__ == '__main__':
@@ -163,13 +220,13 @@ if __name__ == '__main__':
         p.show()
 
     it = bsf_process.init_displ_task
-    ft = bsf_process.fold_task
+    ft = bsf_process.fold_deform_task
 
     show_init = True
     if show_init:
         # ftv.add(it.target_faces[0].viz3d['default'])
-        ft.formed_object.viz3d['cp'].set(tube_radius=0.02)
-        ftv.add(ft.formed_object.viz3d['cp'])
+        ft.sim_history.viz3d['cp'].set(tube_radius=0.02)
+        ftv.add(ft.sim_history.viz3d['cp'])
         #ftv.add(it.formed_object.viz3d['node_numbers'], order=5)
         ft.config.gu['dofs'].viz3d['default'].scale_factor = 0.5
         ftv.add(ft.config.gu['dofs'].viz3d['default'])

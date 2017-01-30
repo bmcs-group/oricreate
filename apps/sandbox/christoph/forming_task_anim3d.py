@@ -52,6 +52,9 @@ loop on their own. The viz object declares the loop.
 import os
 import tempfile
 from time import sleep
+
+from oricreate.api import \
+    FTV, Viz3D
 from traits.api import \
     HasStrictTraits,  \
     Property, Instance, List, \
@@ -63,11 +66,7 @@ from traitsui.api import \
     TableEditor, ObjectColumn, InstanceEditor, \
     Handler, Action, ToolBar, VSplit
 
-from forming_task_view3d import \
-    FTV
 import numpy as np
-from viz3d import \
-    Viz3D
 
 
 class FTAHandler(Handler):
@@ -192,9 +191,6 @@ class CamMove(HasStrictTraits):
     Attach functional mapping depending on time variable
     for azimuth, elevation, distance, focal point and roll angle.
     '''
-
-    def __init__(self, *args, **kw):
-        super(CamMove, self).__init__(*args, **kw)
 
     fta = WeakRef
     ftv = WeakRef
@@ -500,7 +496,24 @@ FTA = FormingTaskAnim3D
 
 if __name__ == '__main__':
 
-    from visual3d import Visual3D
+    from oricreate.api import Vis3D
+
+    class BarChartViz3D(Viz3D):
+        '''Visualization object
+        '''
+
+        def plot(self):
+            x, y, z, s = [-1, 0, 1], [-1, 0, 1], [0, 0, 0], [1, 3, 2]
+            self.pipes['points'] = self.ftv.mlab.barchart(x, y, z, s,
+                                                          colormap='Spectral')
+
+        def update(self):
+            return
+
+    class BarChart(Vis3D):
+        '''State object
+        '''
+        viz3d_classes = dict(default=BarChartViz3D)
 
     class PointCloudViz3D(Viz3D):
         '''Visualization object
@@ -516,7 +529,7 @@ if __name__ == '__main__':
             pipe = self.pipes['points']
             pipe.mlab_source.set(points=points, scalars=s)
 
-    class PointCloud(Visual3D):
+    class PointCloud(Vis3D):
         '''State object
         '''
         p = Tuple
@@ -549,10 +562,12 @@ if __name__ == '__main__':
         viz3d_classes = dict(default=PointCloudViz3D,
                              something_else=PointCloudViz3D)
 
+    bc = BarChartViz3D()
     pc = PointCloud(anim_t_start=0, anim_t_end=40)
     ftv = FTV()
     ftv.add(pc.viz3d['default'])
     ftv.add(pc.viz3d['something_else'])
+    ftv.add(bc)
 
     fta = FTA(ftv=ftv)
     fta.init_view(a=0, e=0, d=8, f=(0, 0, 0), r=0)
