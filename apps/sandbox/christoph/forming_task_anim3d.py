@@ -120,6 +120,7 @@ cam_move_list_editor = TableEditor(
 
 # UItem is Unlabeled Item
 
+
 class InstanceUItem(UItem):
     """Convenience class for including an Instance in a View"""
     style = Str('custom')
@@ -225,13 +226,8 @@ class CamMove(HasStrictTraits):
         return self.from_station.time_stemp + self.duration
 
     n_t = Int(10, input=True)
-
-    cmt = Property(Array('float_'), depends_on='n_t')
-    '''Relative camera move time (CMT) running from zero to one.
+    '''Number of frames within the camera move.
     '''
-    @cached_property
-    def _get_cmt(self):
-        return np.linspace(0, 1, self.n_t)
 
     viz_t_move = Property(Array('float_'))
     '''Time line range during the camera move
@@ -260,7 +256,7 @@ class CamMove(HasStrictTraits):
 
     transition_arr = Property(
         Array(dtype='float_'), depends_on='changed,+input')
-    '''Array with azimuth values along the transition 
+    '''Array with azimuth values along the transition .
     '''
     @cached_property
     def _get_transition_arr(self):
@@ -273,16 +269,25 @@ class CamMove(HasStrictTraits):
 
     def reset_cam(self, m, a, e, d, f, r):
         m.view(azimuth=a, elevation=e, distance=d, focalpoint=f)
-        m.roll(r)
+        # m.roll(r)
 
-    def take(self, ftv):
+    def take_at_viz_t(self, viz_t):
+        '''Take a picture at the specified animation time.
+        '''
+        ix = np.argmax(self.viz_t_move > viz_t)
+        a, e, d, f, r, vot, viz_t = self.transition_arr
+        self.ftv.update(vot[ix], viz_t[ix], force=True)
+        self.reset_cam(self.ftv.mlab, a[ix], float(e[ix]), d[ix], f[ix], r[ix])
+
+    def take(self):
         for a, e, d, f, r, vot, viz_t in zip(*self.transition_arr):
-            ftv.update(vot, viz_t, force=True)
-            self.reset_cam(ftv.mlab, a, float(e), d, f, r)
+            self.ftv.update(vot, viz_t, force=True)
+            self.reset_cam(self.ftv.mlab, a, float(e), d, f, r)
             sleep(self.fta.anim_delay)
 
-    def render_take(self, ftv, fname_base, format_, idx_offset):
+    def render_take(self, fname_base, format_, idx_offset):
         im_files = []
+        ftv = self.ftv
         for idx, (a, e, d, f, r, vot, viz_t) \
                 in enumerate(zip(*self.transition_arr)):
             ftv.update(vot, viz_t, force=True)
@@ -332,11 +337,11 @@ class FormingTaskAnim3D(HasStrictTraits):
 
     def init_view(self, a, e, d, f, r):
         self.init_cam_station.set(
-            azimuth=a, elevation=e, distance=d, focal_point=f, roll=r)
+            azimuth=a, elevation=e, distance=d, focal_point=f)  # , roll=r)
         if self.ftv.scene.renderer:
             # encapsulate this in ftv
             self.ftv.mlab.view(a, e, d, f, figure=self.ftv.scene)
-            self.ftv.mlab.roll(r, figure=self.ftv.scene)
+            #self.ftv.mlab.roll(r, figure=self.ftv.scene)
 
     def plot(self):
         self.ftv.plot()
@@ -350,7 +355,7 @@ class FormingTaskAnim3D(HasStrictTraits):
 
     selected_cam_move = Instance(CamMove, None)
 
-    def _selected_cam_move_changed(self):
+    def x_selected_cam_move_changed(self):
         self.set_cam_pos()
 
     def add_cam_move(self, **kw):
@@ -431,11 +436,11 @@ class FormingTaskAnim3D(HasStrictTraits):
                            elevation=to_station.elevation,
                            distance=to_station.distance,
                            focalpoint=to_station.focal_point,
-                           #figure=self.ftv.mlab.figure
+                           # figure=self.ftv.mlab.figure
                            )
-        self.ftv.mlab.roll(to_station.roll,
-                           #figure=self.ftv.mlab.figure
-                           )
+        # self.ftv.mlab.roll(to_station.roll,
+        # figure=self.ftv.mlab.figure
+        #                   )
 
     def anim(self):
         for cam_move in self.cam_moves:
@@ -464,45 +469,30 @@ class FormingTaskAnim3D(HasStrictTraits):
 
     def load_timeline(self):
         raise NotImplementedError
-    
-    
+
     '''Christophs part:'''
-    
-    cur_frame_min = Int(0)
-    cur_frame_max = Property(Int, depends_on='cam_moves,selected_cam_move.n_t')
-    
-    def _get_cur_frame_max(self):
-        '''return the count of frames of all cam_moves
+
+    anim_time_start = Float(0)
+    anim_time_end = Property(Float)
+
+    def _get_anim_time_end(self):
+        '''Return the end time-stamp fo the last cam_moves.
         '''
-        n = 0
-        for cm in self.cam_moves:
-            n += cm.n_t
-        return n - 1 if n > 0 else 0
-    
-    cur_frame = Int(0)
-    
-    def _cur_frame_changed(self):
+        return self.cam_moves[-1].ets
+
+    anim_time_cur = Float(0)
+
+    def _anim_time_cur_changed(self):
         '''Change camera of the slelected_cam_move to the selected frame
         '''
-        temp_frame = self.cur_frame
+        viz_t = self.anim_time_cur
+
         # find the current cam_move
         for cam_move in self.cam_moves:
-            if cam_move.n_t <= temp_frame:
-                temp_frame -= cam_move.n_t
-            else:
-                cur_cam_move = cam_move
+            if viz_t < cam_move.ets:
+                cam_move.take_at_viz_t(viz_t)
+                self.selected_cam_move = cam_move
                 break
-        trans_arr = cur_cam_move.transition_arr
-        a = trans_arr[0][temp_frame]
-        e = trans_arr[1][temp_frame]
-        d = trans_arr[2][temp_frame]
-        f = trans_arr[3][temp_frame]
-        r = trans_arr[4][temp_frame]
-        vot = trans_arr[5][temp_frame]
-        viz_t = trans_arr[6][temp_frame]
-        self.ftv.update(vot, viz_t)
-        self.ftv.mlab.view(a, e, d ,f) # without roll
-#         self.ftv.mlab.view(a, e, d ,f, r) # with roll
 
     trait_view = View(
         HSplit(
@@ -512,18 +502,18 @@ class FormingTaskAnim3D(HasStrictTraits):
                     Item('cam_moves',
                          style='custom', editor=cam_move_list_editor,
                          show_label=False, springy=True, width=150),
-#                     VGroup(
-#                         UItem('anim_delay'),
-#                         label='animation delay'
-#                     ),
+                    #                     VGroup(
+                    #                         UItem('anim_delay'),
+                    #                         label='animation delay'
+                    #                     ),
                 ),
                 VGroup(
                     Item('selected_cam_move@', show_label=False,
                          springy=True,
                          width=600, height=200),
-                    Item('cur_frame',
-                         editor=RangeEditor(low_name='cur_frame_min',
-                                           high_name='cur_frame_max')
+                    Item('anim_time_cur',
+                         editor=RangeEditor(low_name='anim_time_start',
+                                            high_name='anim_time_end')
                          )
                 ),
                 show_border=True,
@@ -540,7 +530,6 @@ class FormingTaskAnim3D(HasStrictTraits):
 FTA = FormingTaskAnim3D
 
 if __name__ == '__main__':
-
 
     class BarChartViz3D(Viz3D):
         '''Visualization object
@@ -563,13 +552,13 @@ if __name__ == '__main__':
         p = Tuple
         '''Point positions
         '''
-        
+
         def _p_default(self):
             x, y, z, s = [-1, 0, 1], [-1, 0, 1], [0, 0, 0], [1, 3, 2]
             return x, y, z, s
 
         x = Property
-        
+
         def _get_x(self):
             x, y, z, s = self.p
             return np.c_[x, y, z]
@@ -582,9 +571,8 @@ if __name__ == '__main__':
             s = np.array(s, float)
             s *= self.vot
             return x, y, z, s
-        
-        viz3d_classes = dict(default=BarChartViz3D)
 
+        viz3d_classes = dict(default=BarChartViz3D)
 
     class PointCloudViz3D(Viz3D):
         '''Visualization object
@@ -632,7 +620,7 @@ if __name__ == '__main__':
         viz3d_classes = dict(default=PointCloudViz3D,
                              something_else=PointCloudViz3D)
 
-    bc = BarChart(anim_t_start=0, anim_t_end=20)
+    bc = BarChart(anim_t_start=0, anim_t_end=100)
 #     pc = PointCloud(anim_t_start=0, anim_t_end=40)
     ftv = FTV()
 #     ftv.add(pc.viz3d['default'])
@@ -667,4 +655,3 @@ if __name__ == '__main__':
                      distance_move='linear')
     fta.plot()
     fta.configure_traits()
-    
