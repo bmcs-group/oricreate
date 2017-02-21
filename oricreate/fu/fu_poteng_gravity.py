@@ -12,13 +12,13 @@
 #
 # Created on Nov 18, 2011 by: matthias
 
+from oricreate.opt import \
+    IFu
 from traits.api import \
-    implements
+    implements, Float
 
 from fu import \
     Fu
-from oricreate.opt import \
-    IFu
 
 
 class FuPotEngGravity(Fu):
@@ -31,12 +31,14 @@ class FuPotEngGravity(Fu):
 
     implements(IFu)
 
+    rho = Float(0.234, auto_set=False, enter_set=True)
+
     def get_f(self, t=0):
         '''Get the potential energy of gravity.
         '''
-        return self.forming_task.formed_object.V
+        return self.forming_task.formed_object.V * self.rho
 
     def get_f_du(self, t=0):
         '''Get the derivatives with respect to individual displacements.
         '''
-        return self.forming_task.formed_object.V_du
+        return self.forming_task.formed_object.V_du * self.rho

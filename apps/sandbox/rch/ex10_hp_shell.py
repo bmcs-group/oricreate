@@ -11,7 +11,7 @@ from oricreate.api import HPCPFactory, \
 
 from oricreate.forming_tasks.forming_task import FormingTask
 from oricreate.fu import \
-    FuPotEngTotal
+    FuPotEngTotal, FuPotEngGravity
 from traits.api import \
     Float, HasStrictTraits, Property, cached_property, Int, \
     Instance, Array, List, Bool
@@ -81,6 +81,8 @@ class HPShellFormingProcess(HasStrictTraits):
     n_steps = Int(5)
 
     kappa = Float(1.0)
+    rho = Float(0.0)
+    MAXITER = Int(500)
 
     fold_task = Property(Instance(FormingTask))
     '''Configure the simulation task.
@@ -125,6 +127,59 @@ class HPShellFormingProcess(HasStrictTraits):
     @cached_property
     def _get_fold_deform_task(self):
         ft = self.factory_task
+        self.init_displ_task.x_1
+
+        fixed_z = fix(self.fixed_z, (2))
+        fixed_y = fix(self.fixed_y, (1))
+        fixed_x = fix(self.fixed_x, (0))
+        link_z = link(self.link_z[0], [2], 1, self.link_z[1], [2], -1)
+
+        dof_constraints = fixed_x + fixed_z + fixed_y + \
+            link_z
+        gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
+
+        FN = lambda psi: lambda t: psi * t
+
+        psi_constr = [([(i, 1.0)], FN(self.psi_max))
+                      for i in self.psi_lines]
+
+        gu_constant_length = GuConstantLength()
+
+        gu_psi_constraints = \
+            GuPsiConstraints(forming_task=ft,
+                             psi_constraints=psi_constr)
+
+        sim_config = SimulationConfig(goal_function_type='gravity potential energy',
+                                      gu={'cl': gu_constant_length,
+                                          'dofs': gu_dof_constraints,
+                                          'psi': gu_psi_constraints
+                                          },
+                                      acc=1e-5, MAX_ITER=self.MAXITER,
+                                      debug_level=0)
+
+        fu_tot_poteng = FuPotEngTotal(kappa=np.array([self.kappa]),
+                                      F_ext_list=[],
+                                      rho=self.rho,
+                                      exclude_lines=self.psi_lines)
+
+        sim_config._fu = fu_tot_poteng
+
+        st = SimulationTask(previous_task=self.init_displ_task,
+                            config=sim_config, n_steps=self.n_steps)
+
+#
+#         st = SimulationTask(previous_task=ft,
+#                             config=sim_config, n_steps=self.n_steps)
+        fu_tot_poteng.forming_task = st
+#         gu_psi_constraints.forming_task = st
+#
+#         cp = st.formed_object
+#         cp.u = it.u_1
+
+        return st
+
+    def x_get_fold_deform_task(self):
+        ft = self.factory_task
         it = self.init_displ_task
 
         fixed_z = fix(self.fixed_z, (2))
@@ -152,12 +207,12 @@ class HPShellFormingProcess(HasStrictTraits):
                                           'dofs': gu_dof_constraints,
                                           'psi': gu_psi_constraints
                                           },
-                                      acc=1e-5, MAX_ITER=500,
+                                      acc=1e-4, MAX_ITER=self.MAXITER,
                                       debug_level=0)
 
         fu_tot_poteng = FuPotEngTotal(kappa=np.array([self.kappa]),
                                       F_ext_list=[],
-                                      rho=10.0,
+                                      rho=self.rho,
                                       exclude_lines=self.psi_lines)
 
         sim_config._fu = fu_tot_poteng
@@ -174,19 +229,20 @@ class HPShellFormingProcess(HasStrictTraits):
 
 
 hp_shell_kw_2 = dict(L_x=10, L_y=10,
-                     kappa=0.0,
-                     psi_lines=[
-                         10, 23, 35, 40, 7, 20, 41, 44],
-                     n_stripes=8,
-                     n_steps=5,
-                     psi_max=-np.pi / 2.03 * 0.2,
+                     kappa=0.00001,
+                     psi_lines=[10, 23, 35, 40, 7, 20, 41, 44],
+                     n_stripes=2,
+                     n_steps=1,
+                     rho=1,
+                     MAXITER=1000,
+                     psi_max=-np.pi / 2.03 * 0.5,
                      fixed_z=[9, 14],
                      fixed_y=[8, 15],
                      fixed_x=[8, 15],
                      link_z=[[8], [15]]
                      )
 hp_shell_kw_3 = dict(L_x=10, L_y=10,
-                     kappa=10,
+                     kappa=0.01,
                      psi_lines=[
                          18, 45, 44, 69,
                          93, 98, 123, 128,
@@ -196,6 +252,7 @@ hp_shell_kw_3 = dict(L_x=10, L_y=10,
                      #psi_lines=[5, 21, 37, 53, 100, 118, 136, 154],
                      n_stripes=4,
                      n_steps=3,
+                     rho=10.0,
                      psi_max=-np.pi / 2.03 * 0.3,
                      fixed_z=[24, 35],
                      fixed_y=[24, 35],
