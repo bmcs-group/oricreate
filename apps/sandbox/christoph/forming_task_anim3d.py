@@ -444,19 +444,19 @@ class FormingTaskAnim3D(HasStrictTraits):
 
     def anim(self):
         for cam_move in self.cam_moves:
-            cam_move.take(self.ftv)
+            cam_move.take()
 
     def render(self):
-        self.ftv.mlab.options.offscreen = True
+        # self.ftv.mlab.options.offscreen = True
         im_files = []
         fname_base = 'anim'
-        tdir = tempfile.mkdtemp()
+        tdir = 'C:\Users\cthoennessen\Pictures\Oricreate' # tempfile.mkdtemp()
         fname_path = os.path.join(tdir, fname_base)
 
         idx_offset = 0
         for cam_move in self.cam_moves:
             take_im_files = cam_move.render_take(
-                self.ftv, fname_path, 'jpg', idx_offset)
+                fname_path, 'jpg', idx_offset)
             idx_offset += len(take_im_files)
             im_files.append(take_im_files)
 
@@ -473,10 +473,10 @@ class FormingTaskAnim3D(HasStrictTraits):
     '''Christophs part:'''
 
     anim_time_start = Float(0)
-    anim_time_end = Property(Float)
+    anim_time_end = Property(Float, depends_on='selected_cam_move.duration')
 
     def _get_anim_time_end(self):
-        '''Return the end time-stamp fo the last cam_moves.
+        '''Return the end time-stamp to the last cam_moves.
         '''
         return self.cam_moves[-1].ets
 
@@ -502,10 +502,10 @@ class FormingTaskAnim3D(HasStrictTraits):
                     Item('cam_moves',
                          style='custom', editor=cam_move_list_editor,
                          show_label=False, springy=True, width=150),
-                    #                     VGroup(
-                    #                         UItem('anim_delay'),
-                    #                         label='animation delay'
-                    #                     ),
+                    VGroup(
+                        UItem('anim_delay'),
+                        label='animation delay'
+                    ),
                 ),
                 VGroup(
                     Item('selected_cam_move@', show_label=False,
