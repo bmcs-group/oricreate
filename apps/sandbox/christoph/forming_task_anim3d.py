@@ -436,11 +436,11 @@ class FormingTaskAnim3D(HasStrictTraits):
                            elevation=to_station.elevation,
                            distance=to_station.distance,
                            focalpoint=to_station.focal_point,
-                           # figure=self.ftv.mlab.figure
+                           figure=self.ftv.mlab.scene
                            )
-        # self.ftv.mlab.roll(to_station.roll,
-        # figure=self.ftv.mlab.figure
-        #                   )
+#         self.ftv.mlab.roll(to_station.roll,
+#                            figure=self.ftv.mlab.scene
+#                           )
 
     def anim(self):
         for cam_move in self.cam_moves:
