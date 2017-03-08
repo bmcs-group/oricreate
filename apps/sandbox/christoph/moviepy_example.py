@@ -6,7 +6,7 @@ import moviepy.editor as mpy
 import numpy as np
 
 
-if __name__ == 'x__main__':
+if __name__ == '__main__':
 
     duration = 2  # duration of the animation in seconds (it will loop)
 
