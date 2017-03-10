@@ -265,7 +265,6 @@ class Lift(SimulationTask):
 
 if __name__ == '__main__':
 
-    from oricreate.view import FormingView
     from oricreate.util import t_, x_, z_
 
     cp = CreasePattern(X=[[0, 0, 0],
@@ -306,5 +305,3 @@ if __name__ == '__main__':
     lift.cnstr_rhs[0] = 0.9
     print lift.U_1
 #
-    v = FormingView(root=init)
-    v.configure_traits()

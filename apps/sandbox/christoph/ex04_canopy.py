@@ -4,6 +4,12 @@ Created on Jan 20, 2016
 @author: rch
 '''
 
+from traits.api import \
+    Float, HasTraits, Property, cached_property, Int, \
+    Instance, Array, Bool
+
+from forming_task_anim3d import FTA
+import numpy as np
 from oricreate.api import MappingTask
 from oricreate.api import YoshimuraCPFactory, \
     fix, link, r_, s_, t_, MapToSurface,\
@@ -16,12 +22,6 @@ from oricreate.forming_tasks.forming_task import FormingTask
 from oricreate.fu import \
     FuPotEngTotal
 from oricreate.mapping_tasks.mask_task import MaskTask
-from traits.api import \
-    Float, HasTraits, Property, cached_property, Int, \
-    Instance, Array, Bool
-from forming_task_anim3d import FTA
-
-import numpy as np
 import sympy as sp
 
 
@@ -306,8 +306,18 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
 
         H = 0
         P = 3.5 * self.load_factor
-        F_ext_list = [(33, 2, FN(-P)), (34, 2, FN(-P)), (11, 2, FN(-P)), (39, 2, FN(-P)), (40, 2, FN(-P)), (4, 0, FN(0.1609 * H)), (4, 2, FN(-0.2385 * H)), (10, 2, FN(-0.3975 * H)), (16, 0, FN(-0.1609 * H)), (16, 2, FN(-0.2385 * H)),
-                      (6, 0, FN(0.1609 * H)), (6, 2, FN(-0.2385 * H)), (12, 2, FN(-0.3975 * H)), (18, 0, FN(-0.1609 * H)), (18, 2, FN(-0.2385 * H))]
+        F_ext_list = [(33, 2, FN(-P)), (34, 2, FN(-P)),
+                      (11, 2, FN(-P)), (39, 2, FN(-P)),
+                      (40, 2, FN(-P)), (4, 0, FN(0.1609 * H)),
+                      (4, 2, FN(-0.2385 * H)),
+                      (10, 2, FN(-0.3975 * H)),
+                      (16, 0, FN(-0.1609 * H)),
+                      (16, 2, FN(-0.2385 * H)),
+                      (6, 0, FN(0.1609 * H)),
+                      (6, 2, FN(-0.2385 * H)),
+                      (12, 2, FN(-0.3975 * H)),
+                      (18, 0, FN(-0.1609 * H)),
+                      (18, 2, FN(-0.2385 * H))]
 
         fu_tot_poteng = FuPotEngTotal(kappa=np.array([5.28]),
                                       F_ext_list=F_ext_list)
@@ -370,8 +380,8 @@ if __name__ == '__main__':
 
     animate = False
     show_init_task = False
-    show_fold_task = True
-    show_turn_task = True
+    show_fold_task = False
+    show_turn_task = False
     show_turn_task2 = False
     show_load_task = True
     show_measure_task = False

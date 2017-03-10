@@ -154,8 +154,6 @@ if __name__ == '__main__':
                                   acc=1e-7, MAX_ITER=1000)
 
     F_nodes = np.linspace(0, -10, n)
-    F_ext_list = [(i + 1, 2, lambda t: t * F_n)
-                  for i, F_n in enumerate(F_nodes)]
     FN = lambda F: lambda t: t * F
     F_ext_list = [(i + 1, 2, FN(F_n)) for i, F_n in enumerate(F_nodes)]
 
@@ -176,7 +174,7 @@ if __name__ == '__main__':
     print 'kinematic simulation: u', sim_task.u_1
 
     cp = sim_task.formed_object
-    iL_phi = cp.iL_psi2 - cp.iL_psi_0
+    iL_phi = cp.iL_psi - cp.iL_psi_0
     print 'phi',  iL_phi
     iL_length = np.linalg.norm(cp.iL_vectors, axis=1)
     iL_m = sim_config._fu.kappa * iL_phi * iL_length
@@ -184,10 +182,10 @@ if __name__ == '__main__':
     print 'moments', iL_m
 
     ftv = FTV()
-    ftv.add(sim_task.formed_object.viz3d)
-    ftv.add(gu_dof_constraints.viz3d)
-    ftv.add(fu_tot_poteng.viz3d)
-    ftv.add(fu_tot_poteng.viz3d_dict['node_load'])
+    ftv.add(sim_task.sim_history.viz3d['displ'])
+    ftv.add(sim_task.config.gu['dofs'].viz3d['default'])
+    ftv.add(sim_task.config.fu.viz3d['default'])
+    sim_task.config.fu.viz3d['default'].set(anim_t_start=30, anim_t_end=50)
+    ftv.add(sim_task.config.fu.viz3d['node_load'])
     ftv.plot()
-    ftv.update(vot=1, force=True)
-    ftv.show()
+    ftv.configure_traits()
