@@ -8,13 +8,12 @@ from traits.api import \
     Float, HasTraits, Property, cached_property, Int, \
     Instance, Array, Bool
 
-from forming_task_anim3d import FTA
 import numpy as np
 from oricreate.api import MappingTask
 from oricreate.api import YoshimuraCPFactory, \
     fix, link, r_, s_, t_, MapToSurface,\
     GuConstantLength, GuDofConstraints, SimulationConfig, SimulationTask, \
-    FTV
+    FTV, FTA
 from oricreate.crease_pattern.crease_pattern_state import CreasePatternState
 from oricreate.export import \
     InfoCadMeshExporter, ScaffoldingExporter
@@ -22,6 +21,8 @@ from oricreate.forming_tasks.forming_task import FormingTask
 from oricreate.fu import \
     FuPotEngTotal
 from oricreate.mapping_tasks.mask_task import MaskTask
+from oricreate.simulation_tasks.simulation_history import \
+    SimulationHistory
 import sympy as sp
 
 
@@ -306,18 +307,8 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
 
         H = 0
         P = 3.5 * self.load_factor
-        F_ext_list = [(33, 2, FN(-P)), (34, 2, FN(-P)),
-                      (11, 2, FN(-P)), (39, 2, FN(-P)),
-                      (40, 2, FN(-P)), (4, 0, FN(0.1609 * H)),
-                      (4, 2, FN(-0.2385 * H)),
-                      (10, 2, FN(-0.3975 * H)),
-                      (16, 0, FN(-0.1609 * H)),
-                      (16, 2, FN(-0.2385 * H)),
-                      (6, 0, FN(0.1609 * H)),
-                      (6, 2, FN(-0.2385 * H)),
-                      (12, 2, FN(-0.3975 * H)),
-                      (18, 0, FN(-0.1609 * H)),
-                      (18, 2, FN(-0.2385 * H))]
+        F_ext_list = [(33, 2, FN(-P)), (34, 2, FN(-P)), (11, 2, FN(-P)), (39, 2, FN(-P)), (40, 2, FN(-P)), (4, 0, FN(0.1609 * H)), (4, 2, FN(-0.2385 * H)), (10, 2, FN(-0.3975 * H)), (16, 0, FN(-0.1609 * H)), (16, 2, FN(-0.2385 * H)),
+                      (6, 0, FN(0.1609 * H)), (6, 2, FN(-0.2385 * H)), (12, 2, FN(-0.3975 * H)), (18, 0, FN(-0.1609 * H)), (18, 2, FN(-0.2385 * H))]
 
         fu_tot_poteng = FuPotEngTotal(kappa=np.array([5.28]),
                                       F_ext_list=F_ext_list)
@@ -356,7 +347,7 @@ if __name__ == '__main__':
     bsf_process = DoublyCurvedYoshiFormingProcess(L_x=3.0, L_y=2.41, n_x=4,
                                                   n_y=12, u_x=0.1,
                                                   n_fold_steps=20,
-                                                  n_load_steps=20,
+                                                  n_load_steps=10,
                                                   load_factor=5,
                                                   stiffening_bundary=False)
 
@@ -383,8 +374,8 @@ if __name__ == '__main__':
     show_fold_task = False
     show_turn_task = False
     show_turn_task2 = False
-    show_load_task = True
-    show_measure_task = False
+    show_load_task = False
+    show_measure_task = True
     export_and_show_mesh = False
     export_scaffolding = False
 
@@ -438,23 +429,26 @@ if __name__ == '__main__':
                          distance_move='damped')
 
     if show_load_task == True:
-        lt.sim_history.set(anim_t_start=20, anim_t_end=50)
-        lt.config.gu['dofs'].set(anim_t_start=20, anim_t_end=50)
-        lt.config.fu.set(anim_t_start=20, anim_t_end=50)
+        lt.sim_history.set(anim_t_start=0, anim_t_end=50)
+        lt.config.gu['dofs'].set(anim_t_start=0, anim_t_end=50)
+        lt.config.fu.set(anim_t_start=0, anim_t_end=50)
         lt.sim_history.viz3d['displ'].set(tube_radius=0.002,
                                           warp_scale_factor=5.0)
         #    ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
         ftv.add(lt.sim_history.viz3d['displ'])
-        lt.config.gu['dofs'].viz3d['default'].scale_factor = 0.5
+        #lt.config.gu['dofs'].viz3d['default'].scale_factor = 0.5
         ftv.add(lt.config.gu['dofs'].viz3d['default'])
         ftv.add(lt.config.fu.viz3d['default'])
-        lt.config.fu.viz3d['default'].set(anim_t_start=30, anim_t_end=50)
+        lt.config.fu.viz3d['default'].set(anim_t_start=00, anim_t_end=50)
         ftv.add(lt.config.fu.viz3d['node_load'])
 
         print 'u_13', lt.u_1[13, 2]
         n_max_u = np.argmax(lt.u_1[:, 2])
         print 'node max_u', n_max_u
         print 'u_max', lt.u_1[n_max_u, 2]
+
+        ftv.plot()
+        ftv.configure_traits()
 
         cp = lt.formed_object
         iL_phi = cp.iL_psi - cp.iL_psi_0
@@ -471,22 +465,33 @@ if __name__ == '__main__':
         import os.path as path
         from os.path import expanduser
         home = expanduser("~")
-        fname = 'KO8.txt'
+
         test_dir = path.join(home, 'simdb', 'exdata',
                              'shell_tests', '2016-09-09-FSH04-Canopy')
-        fname = path.join(test_dir, fname)
-        measured = np.loadtxt(fname)
-        node_idx_measured = np.array(measured[:, 0], dtype='int_')
-        x_measured = measured[:, 1:]
 
-        cp = mt.formed_object
-        x_mes = np.copy(cp.x)
-        x_mes[node_idx_measured, :] = x_measured
-        u = x_mes - cp.x
-        cp.u[:, :] = u
+        states = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
+        measured_states = []
+        for state in states:
+            fname = 'KO%s.txt' % state
+            fname = path.join(test_dir, fname)
+            print 'read', fname
+            measured_state = np.loadtxt(fname)
+            x = measured_state[:, 1:]
+            measured_states.append(x)
 
-        mt.formed_object.viz3d['displ'].set(tube_radius=0.002)
-        ftv.add(mt.formed_object.viz3d['displ'])
+        x_t = np.array(measured_states)
+        x_0 = x_t[0, ...]
+        u_t = x_t[:, :, :] - x_0[np.newaxis, :, :]
+
+        cp = lt.formed_object
+        sh = SimulationHistory(x_0=x_0, L=cp.L, F=cp.F,
+                               u_t=u_t)
+        sh.set(anim_t_start=0, anim_t_end=50)
+
+        sh.viz3d['displ'].set(tube_radius=0.002)
+        ftv.add(sh.viz3d['displ'])
+        ftv.plot()
+        ftv.configure_traits()
 
     if export_and_show_mesh:
         lt = bsf_process.load_task
