@@ -22,7 +22,7 @@ from simulation_tasks import \
     SimulationTask, \
     FoldRigidly
 from util.sym_vars import r_, s_, t_, x_, y_, z_
-from view import \
-    FTT, FormingTaskTree
+# from view import \
+#     FTT, FormingTaskTree
 from viz3d import \
     FTV, FTA, Viz3D, Vis3D

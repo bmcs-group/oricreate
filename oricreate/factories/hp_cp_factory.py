@@ -12,15 +12,16 @@
 #
 # Created on Sep 7, 2011 by: rch
 
-from oricreate.crease_pattern import \
-    CreasePatternState
-from oricreate.forming_tasks import \
-    FactoryTask
 from traits.api import \
     Float, Int, Property, cached_property, Callable
 
 import numpy as np
+from oricreate.crease_pattern import \
+    CreasePatternState
+from oricreate.forming_tasks import \
+    FactoryTask
 import sympy as sp
+
 
 x_, y_ = sp.symbols('x, y')
 
@@ -153,6 +154,7 @@ class HPCPFactory(FactoryTask):
 
         return (x_red, l_red, f_red,)
 
+
 if __name__ == '__main__':
 
     def geo_transform(x_arr):
@@ -170,7 +172,7 @@ if __name__ == '__main__':
 
     yf = HPCPFactory(L_x=30,
                      L_y=30,
-                     n_stripes=2,
+                     n_stripes=8,
                      geo_transform=geo_transform
                      )
 
