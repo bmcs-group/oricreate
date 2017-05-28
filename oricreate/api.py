@@ -3,7 +3,8 @@ from crease_pattern import \
     CreasePattern, CreasePatternState, CreasePatternViz3D
 from factories import \
     WaterBombCPFactory, YoshimuraCPFactory, CustomCPFactory, \
-    MiuraOriCPFactory, RonReshCPFactory, HPCPFactory
+    MiuraOriCPFactory, RonReshCPFactory, HPCPFactory, \
+    HexagonalCPFactory
 from forming_tasks import \
     FormingTask, IFormingTask
 from fu import \

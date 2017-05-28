@@ -13,9 +13,10 @@
 # Created on Jan 29, 2013 by: rch
 
 import platform
+import time
+
 from scipy.optimize import \
     fmin_slsqp
-import time
 from traits.api import \
     HasStrictTraits, Event, Property, cached_property, \
     Float, DelegatesTo, \
@@ -239,7 +240,7 @@ class SimulationStep(HasStrictTraits):
                           f_ieqcons=get_H_t,
                           fprime_ieqcons=get_H_du_t,
                           acc=acc, iter=max_iter,
-                          iprint=0,
+                          iprint=2,
                           full_output=True,
                           epsilon=eps)
         U, f, n_iter, imode, smode = info

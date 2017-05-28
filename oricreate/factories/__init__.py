@@ -1,6 +1,8 @@
 
 from custom_cp_factory import \
     CustomCPFactory
+from hexagonal_cp_factory import \
+    HexagonalCPFactory
 from hp_cp_factory import \
     HPCPFactory
 from miura_ori_cp_factory import \

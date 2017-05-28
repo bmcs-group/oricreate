@@ -153,7 +153,7 @@ class SimulationTask(FormingTask):
         for t in self.t_arr[1:]:
             print 'time: %g' % t
             self.sim_step.t = t
-            U = self.sim_step.U_t
+            #U = self.sim_step.U_t
             try:
                 U = self.sim_step.U_t
             except Exception as inst:
@@ -262,6 +262,7 @@ class Lift(SimulationTask):
                 'ps': GuPointsOnSurface(FormingTask=self),
                 'dc': GuDofConstraints(FormingTask=self)
                 }
+
 
 if __name__ == '__main__':
 
