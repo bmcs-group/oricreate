@@ -25,6 +25,7 @@ def create_cp_factory():
     # end
     return cp_factory
 
+
 if __name__ == '__main__':
 
     cpf = create_cp_factory()
@@ -73,15 +74,14 @@ if __name__ == '__main__':
     sim_task.u_1
 
     ftv = FTV()
-#    ftv.add(sim_task.sim_history.viz3d_dict['node_numbers'], order=5)
-    ftv.add(sim_task.sim_history.viz3d)
-#    ftv.add(gu_dof_constraints.viz3d)
+#    ftv.add(sim_task.sim_history.viz3d['node_numbers'], order=5)
+    ftv.add(sim_task.sim_history.viz3d['cp'])
+#    ftv.add(gu_dof_constraints.viz3d['default'])
 
     fta = FTA(ftv=ftv)
     fta.init_view(a=-45, e=65, d=60, f=(0, 0, 0), r=-50)
     fta.add_cam_move(a=-80, e=80, n=20, d=35, r=-45,
                      duration=10,
-                     vot_fn=lambda cmt: np.linspace(0, 1, 20),
                      azimuth_move='damped',
                      elevation_move='damped',
                      distance_move='damped')

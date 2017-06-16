@@ -70,7 +70,7 @@ class SimulationTask(FormingTask):
     '''Number of simulation steps.
     '''
 
-    sim_step = Property(depends_on='sim_config')
+    sim_step = Property(depends_on='config')
     '''Simulation step resim_step =alizing the transition
     from initial to final state for the increment
     of the time-dependent constraints.
@@ -78,7 +78,7 @@ class SimulationTask(FormingTask):
     @cached_property
     def _get_sim_step(self):
         return SimulationStep(forming_task=self,
-                              config=self.config, )
+                              config=self.config)
 
     # =========================================================================
     # Geometric data

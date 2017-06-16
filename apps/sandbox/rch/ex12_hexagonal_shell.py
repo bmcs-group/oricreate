@@ -133,6 +133,9 @@ class HexagonalShellFormingProcess(HasStrictTraits):
         st = SimulationTask(previous_task=self.init_displ_task,
                             config=sim_config, n_steps=self.n_steps,
                             record_iter=False)
+
+        gu_dof_constraints.forming_task = st
+
         cp = st.formed_object
         cp.u[N_up, 2] += 0.01
         cp.u[N_down, 2] -= 0.01
@@ -215,7 +218,7 @@ shell_kw_4 = dict(L_x=5, L_y=2.5,
                   n_stripes=4,
                   n_steps=1,
                   rho=10,
-                  MAXITER=10,
+                  MAXITER=100,
                   #psi_max=-np.pi / 2.03 * 0.5,
                   fixed_z=[8, 88, 72, 152],
                   fixed_y=[8, 72],
@@ -243,7 +246,6 @@ if __name__ == '__main__':
 
     print 'n_dofs', it.formed_object.n_dofs
     ft = bsf_process.fold_task
-    #fd = bsf_process.fold_deform_task
 
     show_init_task = False
     show_fold_task = True
@@ -266,6 +268,7 @@ if __name__ == '__main__':
         ft.u_1
 
     if show_deform_fold_task:
+        fd = bsf_process.fold_deform_task
         # ftv.add(it.target_faces[0].viz3d['default'])
         fd.sim_history.viz3d['cp'].set(tube_radius=0.02)
         ftv.add(ft.sim_history.viz3d['cp'])
