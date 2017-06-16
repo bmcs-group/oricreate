@@ -82,6 +82,8 @@ class HexagonalShellFormingProcess(HasStrictTraits):
     rho = Float(1.0)
     MAXITER = Int(500)
 
+    u_max = Float(0.02)
+
     fold_task = Property(Instance(FormingTask))
     '''Configure the simulation task.
     '''
@@ -90,10 +92,9 @@ class HexagonalShellFormingProcess(HasStrictTraits):
         L_rigid = self.factory_task.L_rigid
         N_up = self.factory_task.N_up
         N_down = self.factory_task.N_down
-        print self.factory_task.N_x_sym.shape
-        N_x_sym = self.factory_task.N_x_sym[-1]
-        print N_x_sym
-        N_x_sym = []  # self.factory_task.N_x_sym[[0, -1]]
+        N_x_sym = self.factory_task.N_x_sym[::2]
+        print 'N_x_sym', N_x_sym
+#        N_x_sym = []  # self.factory_task.N_x_sym[[0, -1]]
 
         print 'n_dofs', self.factory_task.formed_object.n_dofs
 
@@ -103,9 +104,9 @@ class HexagonalShellFormingProcess(HasStrictTraits):
         fixed_y = fix(self.fixed_y, (1))
         fixed_x = fix(N_x_sym, (0))
         fixed_x_plus = fix(self.fixed_x_plus, (0),
-                           lambda t: t * 0.01)
+                           lambda t: t * self.u_max)
         fixed_x_minus = fix(self.fixed_x_minus, (0),
-                            lambda t: -t * 0.01)
+                            lambda t: -t * self.u_max)
 
         dof_constraints = fixed_x_minus + \
             fixed_x_plus + fixed_x + fixed_z + fixed_y
@@ -130,10 +131,11 @@ class HexagonalShellFormingProcess(HasStrictTraits):
                                       acc=1e-4, MAX_ITER=self.MAXITER,
                                       debug_level=0)
         st = SimulationTask(previous_task=self.init_displ_task,
-                            config=sim_config, n_steps=self.n_steps)
+                            config=sim_config, n_steps=self.n_steps,
+                            record_iter=False)
         cp = st.formed_object
-        cp.u[N_up, 2] += 0.1
-        cp.u[N_down, 2] -= 0.1
+        cp.u[N_up, 2] += 0.01
+        cp.u[N_down, 2] -= 0.01
         return st
 
     fold_deform_task = Property(Instance(FormingTask))
@@ -208,12 +210,12 @@ shell_kw_2 = dict(L_x=12, L_y=4,
                   fixed_x_minus=[6, 14],
                   )
 
-shell_kw_4 = dict(L_x=10, L_y=4,
+shell_kw_4 = dict(L_x=5, L_y=2.5,
                   kappa=0.00001,
                   n_stripes=4,
                   n_steps=1,
                   rho=10,
-                  MAXITER=1000,
+                  MAXITER=10,
                   #psi_max=-np.pi / 2.03 * 0.5,
                   fixed_z=[8, 88, 72, 152],
                   fixed_y=[8, 72],
@@ -226,7 +228,7 @@ if __name__ == '__main__':
     from oricreate.api import \
         FTV
 
-    bsf_process = HexagonalShellFormingProcess(**shell_kw_2)
+    bsf_process = HexagonalShellFormingProcess(**shell_kw_4)
 
     ftv = FTV()
 
@@ -238,10 +240,14 @@ if __name__ == '__main__':
         p.show()
 
     it = bsf_process.init_displ_task
+
+    print 'n_dofs', it.formed_object.n_dofs
     ft = bsf_process.fold_task
+    #fd = bsf_process.fold_deform_task
 
     show_init_task = False
     show_fold_task = True
+    show_deform_fold_task = False
 
     if show_init_task:
         # ftv.add(it.target_faces[0].viz3d['default'])
@@ -258,6 +264,16 @@ if __name__ == '__main__':
         ftv.add(ft.config.gu['dofs'].viz3d['default'])
 
         ft.u_1
+
+    if show_deform_fold_task:
+        # ftv.add(it.target_faces[0].viz3d['default'])
+        fd.sim_history.viz3d['cp'].set(tube_radius=0.02)
+        ftv.add(ft.sim_history.viz3d['cp'])
+        #ftv.add(it.formed_object.viz3d['node_numbers'], order=5)
+        fd.config.gu['dofs'].viz3d['default'].scale_factor = 0.5
+        ftv.add(fd.config.gu['dofs'].viz3d['default'])
+
+        fd.u_1
 
     ftv.plot()
     ftv.configure_traits()

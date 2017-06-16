@@ -112,37 +112,22 @@ class HexagonalCPFactory(FactoryTask):
 
         Nf1 = np.arange(n_x * n_x).reshape(n_x, n_x)
         n_x2 = n_x - 1
-        Nf2 = np.arange((n_x2) * (n_x2)).reshape(n_x2, n_x2)
 
-        Nf2 += Nf1.size
-
-        def get_facets(N1, N2):
+        def get_facets(N1):
             f1 = np.array(
                 [N1[:-1, :-1].flatten(),
                  N1[1:, :-1].flatten(),
-                 N2[:, :].flatten()]).T
+                 N1[1:, 1:].flatten()]).T
 
             f2 = np.array(
-                [N1[1:, :-1].flatten(),
+                [N1[:-1, :-1].flatten(),
                  N1[1:, 1:].flatten(),
-                 N2[:, :].flatten()]).T
+                 N1[:-1, 1:].flatten()]).T
 
-            f3 = np.array(
-                [N1[1:, 1:].flatten(),
-                 N1[:-1, 1:].flatten(),
-                 N2[:, :].flatten()]).T
+            return np.vstack([f1, f2])
 
-            f4 = np.array(
-                [N1[:-1, 1:].flatten(),
-                 N1[:-1, :-1].flatten(),
-                 N2[:, :].flatten()]).T
-
-            return np.vstack([f1, f2, f3, f4])
-
-        ff1 = get_facets(Nf1[:n2 + 1, :n2 + 1],
-                         Nf2[:n2, :n2])
-        ff2 = get_facets(Nf1[n2:, n2:],
-                         Nf2[n2:, n2:])
+        ff1 = get_facets(Nf1[:n2 + 1, :n2 + 1])
+        ff2 = get_facets(Nf1[n2:, n2:])
         nlh = Nf1[:, n2]
         nlv = Nf1[n2, ::-1]
         f5 = np.array(
@@ -190,8 +175,7 @@ class HexagonalCPFactory(FactoryTask):
         N_enum[N_connected] = np.arange(len(N_connected))
 
         Nf1_x_sym = Nf1[np.arange(len(Nf1)), np.arange(len(Nf1))]
-        Nf2_x_sym = Nf2[np.arange(len(Nf2)), np.arange(len(Nf2))]
-        Nf_x_sym = N_enum[np.hstack([Nf1_x_sym, Nf2_x_sym])]
+        Nf_x_sym = N_enum[np.hstack([Nf1_x_sym])]
 
         x_red = x[N_connected, :]
         l_red = N_enum[lines]
@@ -204,6 +188,8 @@ class HexagonalCPFactory(FactoryTask):
         Nuph2 = N_enum[Nf1[-i_arr - 1, -j_arr * 2 - 1]]
         Nupv1 = N_enum[Nf1[j_arr * 2, i_arr]]
         Nupv2 = N_enum[Nf1[-j_arr * 2 - 1, -i_arr - 1]]
+
+        print 'N_uph1', Nuph1
 
         Nf_up = np.unique(np.hstack([Nuph1, Nuph2, Nupv1, Nupv2]))
 
@@ -218,7 +204,8 @@ class HexagonalCPFactory(FactoryTask):
 
         x_red = self.geo_transform(x_red)
 
-        return (x_red, l_red, f_red, l_fixed_red, Nf_x_sym, Nf_up, Nf_do)
+        return (x_red, l_red, f_red, l_fixed_red,
+                Nf_x_sym, Nf_up, Nf_do)
 
 
 if __name__ == '__main__':
@@ -240,14 +227,15 @@ if __name__ == '__main__':
         x_rot[:, 1] *= L_y
         return x_rot
 
-    yf = HexagonalCPFactory(L_x=4,
-                            L_y=4,
-                            n_seg=4,
-                            # geo_transform=geo_transform
+    yf = HexagonalCPFactory(L_x=2,
+                            L_y=1,
+                            n_seg=2,
+                            geo_transform=geo_transform
                             )
 
     cp = yf.formed_object
     print yf.L_rigid
+    print 'N_x_sym', yf.N_x_sym
     print yf.N_up
     print yf.N_down
 

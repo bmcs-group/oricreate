@@ -16,7 +16,7 @@ import platform
 import time
 from traits.api import Instance, \
     Property, cached_property, Str, \
-    Array, Dict, implements, Int, Bool
+    Array, Dict, implements, Int, Bool, DelegatesTo
 from traitsui.api import \
     View, UItem, Item, Group
 from i_simulation_task import \
@@ -141,6 +141,8 @@ class SimulationTask(FormingTask):
         cp = self.cp
         return SimulationHistory(x_0=cp.x_0, L=cp.L, F=cp.F, u_t=self.u_t)
 
+    record_iter = DelegatesTo('sim_step')
+
     u_t = Property(depends_on='source_config_changed, unfold')
     '''Displacement history for the current FoldRigidly process.
     '''
@@ -159,6 +161,11 @@ class SimulationTask(FormingTask):
             except Exception as inst:
                 print inst
                 break
+
+            if self.sim_step.record_iter:
+                u_t_list += self.sim_step.u_it_list
+                print 'here'
+                self.sim_step.clear_iter()
 
             u_t_list.append(U.reshape(-1, 3))
 

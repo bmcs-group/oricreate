@@ -19,7 +19,7 @@ from scipy.optimize import \
     fmin_slsqp
 from traits.api import \
     HasStrictTraits, Event, Property, cached_property, \
-    Float, DelegatesTo, \
+    Bool, Float, DelegatesTo, List, \
     Instance, WeakRef, Array
 
 import numpy as np
@@ -253,12 +253,20 @@ class SimulationStep(HasStrictTraits):
                 (self.t, n_iter, f, imode, smode)
         return U
 
+    def clear_iter(self):
+        self.u_it_list = []
+
+    record_iter = Bool(False)
+    u_it_list = List
     # ==========================================================================
     # Goal function
     # ==========================================================================
+
     def get_f_t(self, U):
         '''Get the goal function value.
         '''
+        if self.record_iter:
+            self.u_it_list.append(np.copy(U.reshape(-1, 3)))
         self.cp_state.U = U
         f = self.get_f()
         if self.debug_level > 0:
