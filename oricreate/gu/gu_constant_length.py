@@ -25,6 +25,16 @@ class GuConstantLength(Gu):
     '''
     implements(IGu)
 
+    def __str__(self):
+        cp = self.formed_object
+        L_N = cp.L
+        s = 'Gu: %s - %d\n' % (self.label, len(L_N))
+        for i, l_N in enumerate(L_N):
+            s += '#:%3d; ' % i
+            l1, l2 = l_N
+            s += '(%3d, %3d)\n' % (l1, l2)
+        return s
+
     def get_G(self, t=0.0):
         '''Calculate the residue for constant crease length
         given the fold vector dX.
@@ -66,6 +76,7 @@ class GuConstantLength(Gu):
         #
         G_du = G_du.reshape(cp.n_L, cp.n_N * cp.n_D)
         return G_du
+
 
 if __name__ == '__main__':
 

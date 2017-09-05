@@ -54,6 +54,20 @@ class GuPsiConstraints(Gu, Visual3D):
                         'not refer to an interior line: '\
                         'must be one of %s' % (l, cp.iL)
 
+    def __str__(self):
+        s = 'Gu: %s - %d\n' % (self.label, len(self.psi_constraints))
+        cp = self.formed_object
+        iL_psi = cp.iL_psi
+        for i, psi_cnstr in enumerate(self.psi_constraints):
+            s += '#:%3d;\n' % i
+            lhs, rhs = psi_cnstr
+            for l, c in lhs:  # @UnusedVariable
+                s += '\t+ l:%3d; c:%g; ' % (l, c)
+                il = cp.L_iL[l]
+                s += ' il: %d = %g\n' % (il, c * iL_psi[il])
+            s += '\t= r: %s\n' % str(rhs)
+        return s
+
     def get_G(self, t=0):
         ''' Calculate the residue for given constraint equations
         '''

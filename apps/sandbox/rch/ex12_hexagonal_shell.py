@@ -72,17 +72,18 @@ class HexagonalShellFormingProcess(HasStrictTraits):
                             target_faces=[(self.ctf, cp.N)])
 
     fixed_z = List([2, 10, 6, 14])
-    fixed_y = List([2, 6])
-    fixed_x_plus = List([2, 10])
-    fixed_x_minus = List([6, 14])
+    fixed_x = List([2, 6])
+    fixed_y = List([])
+    fixed_y_plus = List([2, 10])
+    fixed_y_minus = List([6, 14])
 
-    n_steps = Int(5)
+    n_steps = Int(1)
 
     kappa = Float(1.0)
     rho = Float(1.0)
     MAXITER = Int(500)
 
-    u_max = Float(0.02)
+    u_max = Float(0.002)
 
     fold_task = Property(Instance(FormingTask))
     '''Configure the simulation task.
@@ -92,7 +93,9 @@ class HexagonalShellFormingProcess(HasStrictTraits):
         L_rigid = self.factory_task.L_rigid
         N_up = self.factory_task.N_up
         N_down = self.factory_task.N_down
-        N_x_sym = self.factory_task.N_x_sym[::2]
+        print 'N_up', N_up
+        print 'N_down', N_down
+        N_x_sym = self.factory_task.N_x_sym[2]
         print 'N_x_sym', N_x_sym
 #        N_x_sym = []  # self.factory_task.N_x_sym[[0, -1]]
 
@@ -101,15 +104,17 @@ class HexagonalShellFormingProcess(HasStrictTraits):
         self.init_displ_task.x_1
 
         fixed_z = fix(self.fixed_z, (2))
+        fixed_x = fix(self.fixed_x, (1))
         fixed_y = fix(self.fixed_y, (1))
-        fixed_x = fix(N_x_sym, (0))
-        fixed_x_plus = fix(self.fixed_x_plus, (0),
+        fixed_y_plus = fix(self.fixed_y_plus, (1),
                            lambda t: t * self.u_max)
-        fixed_x_minus = fix(self.fixed_x_minus, (0),
+        fixed_y_minus = fix(self.fixed_y_minus, (1),
                             lambda t: -t * self.u_max)
+        link_x1 = link([2], 0, 1, [6], 0, 1)
+        link_x2 = link([10], 0, 1, [14], 0, 1)
 
-        dof_constraints = fixed_x_minus + \
-            fixed_x_plus + fixed_x + fixed_z + fixed_y
+        dof_constraints = fixed_y_minus + \
+            fixed_y_plus + fixed_x + fixed_z + fixed_y + link_x1 + link_x2
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
 
         def FN(psi): return lambda t: psi * t
@@ -123,22 +128,34 @@ class HexagonalShellFormingProcess(HasStrictTraits):
             GuPsiConstraints(forming_task=self.init_displ_task,
                              psi_constraints=psi_constr)
 
-        sim_config = SimulationConfig(goal_function_type='gravity potential energy',
+        sim_config = SimulationConfig(goal_function_type='none',
                                       gu={'cl': gu_constant_length,
                                           'dofs': gu_dof_constraints,
                                           'psi': gu_psi_constraints
                                           },
                                       acc=1e-4, MAX_ITER=self.MAXITER,
                                       debug_level=0)
+
         st = SimulationTask(previous_task=self.init_displ_task,
                             config=sim_config, n_steps=self.n_steps,
                             record_iter=False)
 
         gu_dof_constraints.forming_task = st
 
+        st.sim_step.print_gu_lst()
+        print 'dofs', st.formed_object.n_dofs
+
         cp = st.formed_object
-        cp.u[N_up, 2] += 0.01
-        cp.u[N_down, 2] -= 0.01
+        cp.u[N_up, 2] += 0.1
+        cp.u[N_down, 2] -= 0.1
+        cp.u[(1, 3, 13, 15), 2] += 0.2
+        cp.u[(5, 7, 9, 11), 2] -= 0.2
+        cp.u[(0, 16), 2] += 0.5
+        cp.u[(0), 1] += 0.5
+        cp.u[(16), 1] -= 0.5
+        cp.u[(4), 1] += 0.3
+        cp.u[(12), 1] -= 0.3
+        cp.u[(4, 12), 2] -= 0.2
         return st
 
     fold_deform_task = Property(Instance(FormingTask))
@@ -203,14 +220,15 @@ class HexagonalShellFormingProcess(HasStrictTraits):
 shell_kw_2 = dict(L_x=12, L_y=4,
                   kappa=0.00001,
                   n_stripes=2,
-                  n_steps=4,
-                  rho=10,
+                  n_steps=1,
+                  rho=100,
+                  u_max=0.5,
                   MAXITER=1000,
-                  #psi_max=-np.pi / 2.03 * 0.5,
                   fixed_z=[2, 10, 6, 14],
-                  fixed_y=[2, 6],
-                  fixed_x_plus=[2, 10],
-                  fixed_x_minus=[6, 14],
+                  fixed_x=[0, 16],
+                  fixed_y=[8],
+                  fixed_y_plus=[0],
+                  fixed_y_minus=[16],
                   )
 
 shell_kw_4 = dict(L_x=5, L_y=2.5,
@@ -231,12 +249,12 @@ if __name__ == '__main__':
     from oricreate.api import \
         FTV
 
-    bsf_process = HexagonalShellFormingProcess(**shell_kw_4)
+    bsf_process = HexagonalShellFormingProcess(**shell_kw_2)
 
     ftv = FTV()
 
     fa = bsf_process.factory_task
-    if False:
+    if True:
         import pylab as p
         ax = p.axes()
         fa.formed_object.plot_mpl(ax, nodes=True, facets=False)

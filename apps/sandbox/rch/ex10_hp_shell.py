@@ -4,19 +4,18 @@ Created on Jan 20, 2016
 @author: rch
 '''
 
-from oricreate.api import HPCPFactory, \
-    fix, link, r_, s_, t_, MapToSurface,\
-    GuConstantLength, GuDofConstraints, \
-    GuPsiConstraints, SimulationConfig, SimulationTask
-
-from oricreate.forming_tasks.forming_task import FormingTask
-from oricreate.fu import \
-    FuPotEngTotal, FuPotEngGravity
 from traits.api import \
     Float, HasStrictTraits, Property, cached_property, Int, \
     Instance, Array, List, Bool
 
 import numpy as np
+from oricreate.api import HPCPFactory, \
+    fix, link, r_, s_, t_, MapToSurface,\
+    GuConstantLength, GuDofConstraints, \
+    GuPsiConstraints, SimulationConfig, SimulationTask
+from oricreate.forming_tasks.forming_task import FormingTask
+from oricreate.fu import \
+    FuPotEngTotal, FuPotEngGravity
 
 
 def geo_transform(x_arr):
@@ -100,7 +99,7 @@ class HPShellFormingProcess(HasStrictTraits):
             link_z
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
 
-        FN = lambda psi: lambda t: psi * t
+        def FN(psi): return lambda t: psi * t
 
         psi_constr = [([(i, 1.0)], FN(self.psi_max))
                       for i in self.psi_lines]
@@ -138,7 +137,7 @@ class HPShellFormingProcess(HasStrictTraits):
             link_z
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
 
-        FN = lambda psi: lambda t: psi * t
+        def FN(psi): return lambda t: psi * t
 
         psi_constr = [([(i, 1.0)], FN(self.psi_max))
                       for i in self.psi_lines]
@@ -191,7 +190,7 @@ class HPShellFormingProcess(HasStrictTraits):
             link_z
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
 
-        FN = lambda psi: lambda t: psi * t
+        def FN(psi): return lambda t: psi * t
 
         psi_constr = [([(i, 1.0)], FN(self.psi_max))
                       for i in self.psi_lines]

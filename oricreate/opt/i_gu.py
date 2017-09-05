@@ -19,3 +19,7 @@ class IGu(Interface):
     def get_G_du(self, t=0):
         '''Return the jacobian of equality constraint values.
         '''
+
+    def __str__(self):
+        '''Print as a string.
+        '''

@@ -283,6 +283,16 @@ class GuDofConstraints(Gu, Visual3D):
     :func:`oricrete.fix` and :func:`oricrete.link`.
     '''
 
+    def __str__(self):
+        s = 'Gu: %s - %d\n' % (self.label, len(self.dof_constraints))
+        for i, dof_cnstr in enumerate(self.dof_constraints):
+            s += '#:%3d;\n' % i
+            lhs, rhs = dof_cnstr
+            for n, d, c in lhs:  # @UnusedVariable
+                s += '\t+ l:%3d; d:%2d; c:%g;\n' % (n, d, c)
+            s += '\t= r: %s\n' % str(rhs)
+        return s
+
     def get_G(self, t=0):
         ''' Calculate the residue for given constraint equations
         '''

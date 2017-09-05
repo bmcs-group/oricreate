@@ -102,6 +102,12 @@ class SimulationStep(HasStrictTraits):
             hu.forming_task = self.forming_task
         return self.config.hu_lst
 
+    def __str__(self):
+        s = ''
+        for gu in self.gu_lst:
+            s += str(gu)
+        return s
+
     debug_level = DelegatesTo("config")
     # ===========================================================================
     # Configuration parameters for the iterative solver
@@ -174,6 +180,7 @@ class SimulationStep(HasStrictTraits):
             U_t = self._solve_fmin()
         else:
             # no goal function - switch to an implicit time-stepping algorithm
+            print 'SOLVING NR'
             U_t = self._solve_nr()
 
         return U_t
@@ -237,8 +244,8 @@ class SimulationStep(HasStrictTraits):
                           fprime=get_f_du_t,
                           f_eqcons=self.get_G_t,
                           fprime_eqcons=get_G_du_t,
-                          f_ieqcons=get_H_t,
-                          fprime_ieqcons=get_H_du_t,
+                          #                           f_ieqcons=get_H_t,
+                          #                           fprime_ieqcons=get_H_du_t,
                           acc=acc, iter=max_iter,
                           iprint=2,
                           full_output=True,
