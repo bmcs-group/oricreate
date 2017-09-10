@@ -45,6 +45,7 @@ def create_cp_factory():
     # end
     return cp_factory
 
+
 if __name__ == '__main__':
 
     cp_factory_task = create_cp_factory()
@@ -84,12 +85,6 @@ if __name__ == '__main__':
 
     fta = FTA(ftv=ftv)
     fta.init_view(a=200, e=35, d=5, f=(0, 0, 0), r=0)
-    fta.add_cam_move(a=200, e=34, n=5, d=5, r=0,
-                     duration=10,
-                     azimuth_move='damped',
-                     elevation_move='damped',
-                     distance_move='damped')
 
     fta.plot()
-    fta.render()
     fta.configure_traits()

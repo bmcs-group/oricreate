@@ -140,30 +140,44 @@ class HexYoshiFormingProcess(HasTraits):
     def _get_fold_task(self):
         self.init_displ_task.x_1
         u_max = self.u_max
+        fa = self.factory_task
+        N_h = fa.N_h
+        N_i = fa.N_i
+        N_v = fa.N_v
+        n_x, n_y = N_h.shape
+        mid_n_x = n_x / 2
+        i_fixed_x = N_h[mid_n_x, (0, -1)]
         fixed_nodes_x = fix(
-            [16, 19], (0))
+            i_fixed_x, (0))
+
+        n_x, n_y = N_i.shape
+        mid_n_y = n_y / 2
+        i_fixed_z = np.hstack([N_i[:-1:3, mid_n_y],
+                               N_i[1::3, mid_n_y]])
+        i_fixed_z = np.hstack([N_i[:-1:6, mid_n_y],
+                               N_i[1::6, mid_n_y]])
         fixed_nodes_z = fix(
-            [43, 46, 52, 55, 61, 64], (2))
+            i_fixed_z, (2))
+
+        i_fixed_y = N_i[(1, -2), mid_n_y]
         fixed_nodes_y = fix(
-            [46, 61], (1))
+            i_fixed_y, (1))
+
+        i_link_xh_r = N_h[2::3, :]
+        i_link_xh_l = N_h[0:-2:3, :]
+        i_link_xi_r = N_i[3::3, :]
+        i_link_xi_l = N_i[1:-2:3, :]
         link_mid = link(
-            (8, 9, 10, 11,
-             # 20,
-             21, 22,
-             # 23,
-             32, 33, 34, 35,
-             51, 52, 53, 60, 61, 62), (0), 1.0,
-            (0, 1, 2, 3,
-             # 12,
-             13, 14,
-             # 15,
-             24, 25, 26, 27,
-             45, 46, 47, 54, 55, 56), (0), -1.0,
+            np.hstack([i_link_xh_r.flatten(), i_link_xi_r.flatten()]),
+            (0), 1.0,
+            np.hstack([i_link_xh_l.flatten(), i_link_xi_l.flatten()]),
+            (0), -1.0,
             lambda t: -t * u_max
         )
         sym_y = link(
-            [0, 12, 20, 32], [2], 1.0,
-            [3, 15, 23, 35], [2], -1.0)
+            N_h[(0, -1), 0], [2], 1.0,
+            N_h[(0, -1), -1], [2], -1.0
+        )
 
         dof_constraints = fixed_nodes_x + fixed_nodes_z + fixed_nodes_y + \
             link_mid + sym_y
@@ -179,15 +193,20 @@ class HexYoshiFormingProcess(HasTraits):
                             config=sim_config, n_steps=self.n_fold_steps)
 
         cp = st.formed_object
-        cp.u[(
-            36, 48, 57, 39,
-            37, 49, 58, 40,
-            38, 50, 59, 41,
-            4, 16, 28,
-            5, 17, 29,
-            6, 18, 30,
-            7, 19, 31,
-        ), 2] -= 0.2
+
+        i_down_h = N_h[1::3, :]
+        i_down_i = N_i[2::3, :]
+
+        cp.u[np.hstack([i_down_h.flatten(), i_down_i.flatten()]), 2] -= 0.2
+#         cp.u[(
+#             36, 48, 57, 39,
+#             37, 49, 58, 40,
+#             38, 50, 59, 41,
+#             4, 16, 28,
+#             5, 17, 29,
+#             6, 18, 30,
+#             7, 19, 31,
+#         ), 2] -= 0.2
 
         return st
 
@@ -198,14 +217,21 @@ class HexYoshiFormingProcessFTV(FTV):
 
 
 if __name__ == '__main__':
-    bsf_process = HexYoshiFormingProcess(L_x=4, L_y=7, n_x=8,
-                                         n_y=6, u_max=0.7,
-                                         n_fold_steps=50,
+    bsf_process = HexYoshiFormingProcess(L_x=4, L_y=12, n_x=8,
+                                         n_y=6, u_max=0.8,
+                                         n_fold_steps=30,
                                          n_load_steps=1)
 
     ftv = HexYoshiFormingProcessFTV(model=bsf_process)
 
     fa = bsf_process.factory_task
+
+    it = bsf_process.init_displ_task
+    ft = bsf_process.fold_task
+
+    cp = ft.formed_object
+    print 'n_dofs', cp.n_dofs
+    # print ft.sim_step
 
     if True:
         import pylab as p
@@ -213,29 +239,8 @@ if __name__ == '__main__':
         fa.formed_object.plot_mpl(ax)
         p.show()
 
-    it = bsf_process.init_displ_task
-    ft = bsf_process.fold_task
-
-    cp = ft.formed_object
-    print 'n_dofs', cp.n_dofs
-    print ft.sim_step
-
-    animate = False
     show_init_task = False
     show_fold_task = True
-    show_turn_task = False
-    show_load_task = False
-    export_and_show_mesh = False
-    export_scaffolding = False
-
-    fta = FTA(ftv=ftv)
-    fta.init_view(a=33.4389721223,
-                  e=61.453898329,
-                  d=5.0,
-                  f=(1.58015494765,
-                     1.12671403563,
-                     -0.111520325399),
-                  r=-105.783218753)
 
     if show_init_task:
         ftv.add(it.target_faces[0].viz3d['default'])
@@ -254,82 +259,5 @@ if __name__ == '__main__':
         ftv.add(ft.config.gu['dofs'].viz3d['default'])
         ft.u_1
 
-        fta.add_cam_move(duration=10, n=20)
-
-    if show_turn_task:
-        tt.formed_object.set(anim_t_start=10, anim_t_end=20)
-        tt.formed_object.viz3d['cp'].set(tube_radius=0.002)
-        ftv.add(tt.formed_object.viz3d['cp'])
-
-        fta.add_cam_move(duration=10, n=20,
-                         )
-    if show_load_task == True:
-        lt.sim_history.set(anim_t_start=0, anim_t_end=50)
-        lt.config.gu['dofs'].set(anim_t_start=0, anim_t_end=50)
-        lt.config.fu.set(anim_t_start=0, anim_t_end=50)
-        lt.sim_history.viz3d['displ'].set(tube_radius=0.002,
-                                          warp_scale_factor=5.0)
-        #    ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
-        ftv.add(lt.sim_history.viz3d['displ'])
-        #lt.config.gu['dofs'].viz3d['default'].scale_factor = 0.5
-        ftv.add(lt.config.gu['dofs'].viz3d['default'])
-        ftv.add(lt.config.fu.viz3d['default'])
-        lt.config.fu.viz3d['default'].set(anim_t_start=00, anim_t_end=50)
-        ftv.add(lt.config.fu.viz3d['node_load'])
-
-        print 'u_13', lt.u_1[13, 2]
-        n_max_u = np.argmax(lt.u_1[:, 2])
-        print 'node max_u', n_max_u
-        print 'u_max', lt.u_1[n_max_u, 2]
-
-        ftv.plot()
-        ftv.configure_traits()
-
-        cp = lt.formed_object
-        iL_phi = cp.iL_psi - cp.iL_psi_0
-        iL_m = lt.config._fu.kappa * iL_phi
-        print 'moments', np.max(np.fabs(iL_m))
-
-        fta.add_cam_move(duration=10, n=20)
-        fta.add_cam_move(duration=10, n=20, vot_start=1.0)
-        fta.add_cam_move(duration=10, n=20, vot_start=1.0)
-
-    if export_and_show_mesh:
-        lt = bsf_process.load_task
-        me = InfoCadMeshExporter(forming_task=lt, n_l_e=4)
-        me.write()
-        X, F = me._get_geometry()
-        x, y, z = X.T
-        import mayavi.mlab as m
-        me.plot_mlab(m)
-        m.show()
-#
-    if export_scaffolding:
-        sf = ScaffoldingExporter(forming_task=ft)
-
-    fta.plot()
-    fta.configure_traits()
-
-    if animate:
-        n_cam_move = 20
-        fta = FTA(ftv=ftv)
-        fta.init_view(a=33.4389721223,
-                      e=61.453898329,
-                      d=4.13223140496, f=(1.58015494765,
-                                          1.12671403563,
-                                          -0.111520325399), r=-105.783218753)
-        fta.add_cam_move(a=60, e=70, n=n_cam_move, d=8, r=-120,
-                         duration=10,
-                         vot_fn=lambda cmt: np.linspace(0.01, 0.5, n_cam_move),
-                         azimuth_move='damped',
-                         elevation_move='damped',
-                         distance_move='damped')
-        fta.add_cam_move(a=80, e=80, d=7, n=n_cam_move, r=-132,
-                         duration=10,
-                         vot_fn=lambda cmt: np.linspace(0.5, 1.0, n_cam_move),
-                         azimuth_move='damped',
-                         elevation_move='damped',
-                         distance_move='damped')
-
-        fta.plot()
-        fta.configure_traits()
+    ftv.plot()
+    ftv.configure_traits()

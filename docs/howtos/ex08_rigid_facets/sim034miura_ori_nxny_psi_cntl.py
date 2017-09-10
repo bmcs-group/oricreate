@@ -41,7 +41,7 @@ if __name__ == '__main__':
     # Link the crease factory it with the constraint client
     gu_constant_length = GuConstantLength()
     nx2 = 1
-    ny2 = 1
+    ny2 = 2
     dof_constraints = fix(cpf.N_grid[nx2 - 1, ny2], [1]) \
         + fix(cpf.N_grid[nx2, ny2], [0, 1, 2]) \
         + fix(cpf.N_grid[nx2, (ny2 - 1, ny2 + 1)], [2])
@@ -51,12 +51,13 @@ if __name__ == '__main__':
     diag_psi_mask[1:-1, 1:-1] = False
     diag_psi_constraints = [([(i, 1.0)], 0)
                             for i in cpf.L_d_grid[diag_psi_mask].flatten()]
-    print diag_psi_constraints
+    print 'psi constraints', diag_psi_constraints
+    print 'controlled line', cpf.L_h_grid[nx2, ny2]
     gu_psi_constraints = \
         GuPsiConstraints(forming_task=cpf,
                          psi_constraints=diag_psi_constraints +
                          [([(cpf.L_h_grid[nx2, ny2], 1.0)],
-                           lambda t: -psi_max * t),
+                           lambda t: psi_max * t),
                           ])
 
     sim_config = SimulationConfig(goal_function_type='none',
@@ -72,6 +73,10 @@ if __name__ == '__main__':
     cp.u[cpf.N_grid[::2, :].flatten(), 2] = -0.1
     cp.u[cpf.N_grid[0, ::2].flatten(), 2] = -0.2
     sim_task.u_1
+
+    import pylab as p
+    cp.plot_mpl(p.axes())
+    p.show()
 
     ftv = FTV()
 #    ftv.add(sim_task.sim_history.viz3d['node_numbers'], order=5)

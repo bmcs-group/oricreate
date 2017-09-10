@@ -49,18 +49,21 @@ def create_cp_factory():
     # end
     return cp_factory
 
+
 if __name__ == '__main__':
 
     import mayavi.mlab as m
-
+    import pylab as p
     cp_factory_task = create_cp_factory()
     cp = cp_factory_task.formed_object
-
+    ax = p.axes()
+    cp.plot_mpl(ax)
+    p.show()
     # Link the crease factory it with the constraint client
     gu_constant_length = GuConstantLength()
-    dof_constraints = fix([0], [0, 1, 2]) + fix([1], [1, 2]) + fix([3], [2])
+    dof_constraints = fix([0], [0, 1, 2]) + fix([1], [1, 2]) + fix([4], [2])
     gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
-    psi_max = np.pi / 2.0
+    psi_max = np.pi / 4.0
     gu_psi_constraints = \
         GuPsiConstraints(forming_task=cp_factory_task,
                          psi_constraints=[([(5, 1.0)], lambda t: psi_max * t),
