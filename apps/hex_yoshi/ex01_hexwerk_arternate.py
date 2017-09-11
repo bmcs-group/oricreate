@@ -229,8 +229,8 @@ if __name__ == '__main__':
                n_fold_steps=10,
                n_load_steps=1)
     kw2 = dict(L_x=8,
-               L_y=14,
-               d_x=0.4,
+               L_y=30,
+               d_x=0.36,
                h=0.5, d_up=0.001, d_down=0.001,
                psi_max=-np.pi * 0.52,
                n_cell_x=2, n_cell_y=2,
@@ -244,7 +244,7 @@ if __name__ == '__main__':
                n_cell_x=3, n_cell_y=2,
                n_fold_steps=20,
                n_load_steps=1)
-    bsf_process = HexYoshiFormingProcess(**kw3)
+    bsf_process = HexYoshiFormingProcess(**kw2)
 
     ftv = HexYoshiFormingProcessFTV(model=bsf_process)
 
