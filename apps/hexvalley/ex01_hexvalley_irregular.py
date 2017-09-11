@@ -4,6 +4,8 @@ Created on Jan 20, 2016
 @author: rch
 '''
 
+from math import sqrt
+
 from traits.api import \
     Float, HasStrictTraits, Property, cached_property, Int, \
     Instance, Array, Bool, List
@@ -15,7 +17,6 @@ from oricreate.api import YoshimuraCPFactory, \
     GuConstantLength, GuDofConstraints, \
     GuPsiConstraints, SimulationConfig, SimulationTask, \
     FTV, FTA
-from oricreate.crease_pattern.crease_pattern_state import CreasePatternState
 from oricreate.export import \
     InfoCadMeshExporter, ScaffoldingExporter
 from oricreate.forming_tasks.forming_task import FormingTask
@@ -134,14 +135,12 @@ class HexYoshiFormingProcess(HasStrictTraits):
         base_h_y = corner2_h_y
 
         for c_x in range(0, self.n_cell_x):
-            print 'c_x', c_x
             base_i_x = np.hstack([base_i_x, 3 * c_x + tb2_i_x])
             base_i_y = np.hstack([base_i_y, tb2_i_y])
             base_h_x = np.hstack([base_h_x, 3 * c_x + tb2_h_x])
             base_h_y = np.hstack([base_h_y, tb2_h_y])
 
         for c_x in range(0, self.n_cell_x - 1):
-            print 'c_x', c_x
             base_i_x = np.hstack([base_i_x, 3 * c_x + right2_i_x])
             base_i_y = np.hstack([base_i_y, right2_i_y])
             base_h_x = np.hstack([base_h_x, 3 * c_x + right2_h_x])
@@ -244,7 +243,15 @@ if __name__ == '__main__':
                n_cell_x=3, n_cell_y=2,
                n_fold_steps=20,
                n_load_steps=1)
-    bsf_process = HexYoshiFormingProcess(**kw2)
+    kw4 = dict(L_x=6.0,
+               L_y=sqrt(6.0**2 / 2.),
+               d_x=00,
+               h=0.2, d_up=0.001, d_down=0.3,
+               psi_max=-np.pi * 0.345,
+               n_cell_x=3, n_cell_y=4,
+               n_fold_steps=30,
+               n_load_steps=1)
+    bsf_process = HexYoshiFormingProcess(**kw1)
 
     ftv = HexYoshiFormingProcessFTV(model=bsf_process)
 
