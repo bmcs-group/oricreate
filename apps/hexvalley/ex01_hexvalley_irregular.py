@@ -45,7 +45,7 @@ class HexYoshiFormingProcess(HasStrictTraits):
 
     n_cell_x = Int(1, auto_set=False, enter_set=True, input=True)
     n_cell_y = Int(1, auto_set=False, enter_set=True, input=True)
-    d_x = Float(0.45, auto_set=False, enter_set=True, input=True)
+    xi = Float(1.0, auto_set=False, enter_set=True, input=True)
     h = Float(0.0, auto_set=False, enter_set=True, input=True)
 
     n_x = Property
@@ -76,14 +76,17 @@ class HexYoshiFormingProcess(HasStrictTraits):
     '''
     @cached_property
     def _get_factory_task(self):
-        yf = YoshimuraCPFactory(L_x=self.L_x * self.n_x,
-                                L_y=self.L_y * self.n_y,
+        yf = YoshimuraCPFactory(L_x=self.L_x * self.n_cell_x,
+                                L_y=self.L_y * self.n_cell_y,
                                 n_x=self.n_x, n_y=self.n_y)
         cp = yf.formed_object
         N_h = yf.N_h
         N_i = yf.N_i
 
-        dx = self.L_x * self.d_x
+        dx = self.L_x / 3 * (1.0 - self.xi)
+
+        print '***shortest length', self.L_x / 2.0 - dx
+
         cp.X[N_h[1::3, :].flatten(), 0] -= dx
         cp.X[N_h[2::3, :].flatten(), 0] += dx
         cp.X[N_i[0::3, :].flatten(), 0] += dx
@@ -227,12 +230,12 @@ if __name__ == '__main__':
                n_cell_x=4, n_cell_y=3,
                n_fold_steps=10,
                n_load_steps=1)
-    kw2 = dict(L_x=8,
-               L_y=30,
-               d_x=0.36,
-               h=0.5, d_up=0.001, d_down=0.001,
+    kw2 = dict(L_x=0.6,
+               L_y=1.1,
+               xi=0.67,
+               h=0.005, d_up=0.001, d_down=0.001,
                psi_max=-np.pi * 0.52,
-               n_cell_x=2, n_cell_y=2,
+               n_cell_x=1, n_cell_y=2,
                n_fold_steps=20,
                n_load_steps=1)
     kw3 = dict(L_x=6,
@@ -244,20 +247,20 @@ if __name__ == '__main__':
                n_fold_steps=20,
                n_load_steps=1)
     kw4 = dict(L_x=6.0,
-               L_y=sqrt(6.0**2 / 2.),
+               L_y=3.0 * sqrt(6.0**2 / 2.),
                d_x=00,
                h=0.2, d_up=0.001, d_down=0.3,
                psi_max=-np.pi * 0.345,
                n_cell_x=3, n_cell_y=4,
                n_fold_steps=30,
                n_load_steps=1)
-    bsf_process = HexYoshiFormingProcess(**kw1)
+    bsf_process = HexYoshiFormingProcess(**kw2)
 
     ftv = HexYoshiFormingProcessFTV(model=bsf_process)
 
     fa = bsf_process.factory_task
 
-    if False:
+    if True:
         import pylab as p
         ax = p.axes()
         fa.formed_object.plot_mpl(ax)
