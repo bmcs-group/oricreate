@@ -112,7 +112,7 @@ class WBShellFormingProcess(HasStrictTraits):
         return MapToSurface(previous_task=self.factory_task,
                             target_faces=[(self.ctf, cp.N)])
 
-    psi_max = Float(-np.pi * 0.45)
+    t_max = Float(1.0)
 
     fold_angle_cntl = Property(Instance(FormingTask))
     '''Configure the simulation task.
@@ -185,7 +185,7 @@ class WBShellFormingProcess(HasStrictTraits):
         fixed_nodes_z = fix(
             [N_h[0, 0], N_h[-1, 0], N_h[0, -1]], (2))
 
-        u_max = 1.999 * self.c
+        u_max = (1.999 * self.c * self.t_max)
         link_mid = link(
             N_i[0, 0], (0), 1.0,
             N_i[2, 0], (0), -1.0,
@@ -202,8 +202,6 @@ class WBShellFormingProcess(HasStrictTraits):
 
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
 
-        def FN(psi): return lambda t: psi * t
-        psi_constr = [([(psi_lines[0], 1.0)], FN(self.psi_max))]
         lpsi_constr = [([(psi_lines[0], 1.0), (i, -1.0)], 0.0)
                        for i in psi_lines[1:]]
 
@@ -251,7 +249,7 @@ if __name__ == '__main__':
                c=0.16,
                h=0.55,
                d_r=0.001, d_up=0.05, d_down=0.05,
-               psi_max=-np.pi * 0.52,
+               t_max=0.25,
                n_cell_x=1, n_cell_y=2,
                n_fold_steps=20,
                n_load_steps=1)
@@ -267,7 +265,7 @@ if __name__ == '__main__':
                h=0.8,
                c=0.2,
                d_r=0.0001, d_up=0.005, d_down=0.005,
-               psi_max=-np.pi * 0.8,
+               t_max=1.0,
                n_cell_x=1, n_cell_y=1,
                n_fold_steps=20,
                n_load_steps=1)
@@ -309,6 +307,7 @@ if __name__ == '__main__':
     if show_fold_angle_cntl:
         ft = bsf_process.fold_angle_cntl
         print 'NDOFS', ft.formed_object.n_dofs
+
         print ft.sim_step
         ft.sim_history.set(anim_t_start=0, anim_t_end=10)
         ft.config.gu['dofs'].set(anim_t_start=0, anim_t_end=5)
@@ -319,6 +318,14 @@ if __name__ == '__main__':
         ftv.add(ft.config.gu['dofs'].viz3d['default'])
         ft.u_1
         fta.add_cam_move(duration=10, n=20)
+
+        cp = ft.formed_object
+        n = cp.norm_F_normals[0, :]
+        n1, n2, n3 = n
+        n12 = np.sqrt(n1**2 + n2**2)
+        phi = np.arctan(n3 / n12)
+        print 'facet_slope with respect the the ground plane', \
+            180.0 / np.pi * phi
 
     fta.plot()
     fta.configure_traits()
