@@ -19,8 +19,6 @@ from oricreate.api import YoshimuraCPFactory, \
     FTV, FTA
 from oricreate.export import \
     InfoCadMeshExporter, ScaffoldingExporter
-from oricreate.export import \
-    InfoCadMeshExporter, ScaffoldingExporter
 from oricreate.forming_tasks.forming_task import FormingTask
 from oricreate.fu import \
     FuPotEngTotal
@@ -29,6 +27,7 @@ from oricreate.simulation_tasks.simulation_history import \
     SimulationHistory
 from oricreate.util.einsum_utils import \
     DELTA, EPS
+import pylab as p
 import sympy as sp
 
 
@@ -268,7 +267,7 @@ class WBShellFormingProcess(HasStrictTraits):
             i = np.argmax(phi)
             phi_argmax.append(i)
             phi_arr.append(180.0 / np.pi * phi[i])
-        return phi_argmax, phi_arr
+        return phi_argmax, np.array(phi_arr, dtype=np.float_)
 
     curvature_t = Property(Array)
     '''Configure the simulation task.
@@ -290,23 +289,8 @@ class WBShellFormingProcess(HasStrictTraits):
         n_vv = np.sqrt(np.einsum('...i,...i', v, v))
         phi = np.arcsin(s_uxv * n_uxv / (n_uu * n_vv))
 
-        print n_uu
+        print type(phi)
         return n_uu, n_vv, phi
-
-    def generate_fe_mesh(self, t):
-        ft = self.fold_angle_cntl
-        cp = ft.formed_object
-        u_t = ft.sim_history.u_t
-        arg_t = np.argwhere(ft.t_arr > t)[0][0]
-        cp.u = u_t[arg_t]
-
-        me = InfoCadMeshExporter(forming_task=ft, n_l_e=4)
-        me.write()
-        X, F = me._get_geometry()
-        x, y, z = X.T
-        import mayavi.mlab as m
-        me.plot_mlab(m)
-        m.show()
 
 
 class WBShellFormingProcessFTV(FTV):
@@ -315,40 +299,55 @@ class WBShellFormingProcessFTV(FTV):
 
 
 if __name__ == '__main__':
-    kw1 = dict(a=0.25,
-               c=0.35 / 2.0,
-               h=0.55,
-               d_r=0.001, d_up=0.005, d_down=0.005,
-               t_max=0.25,
-               n_cell_x=1, n_cell_y=2,
-               n_fold_steps=20,
-               n_load_steps=1)
-    kw3 = dict(a=2,
-               h=3,
-               c=2,
-               d_r=1, d_up=0.001, d_down=0.02,
-               t_max=1.0,
-               n_cell_x=1, n_cell_y=1,
-               n_fold_steps=40,
-               n_load_steps=1)
 
-    bsf_process = WBShellFormingProcess(**kw1)
+    L_x = 0.6
+    a_arr = np.array([0.36, 0.28, 0.20, 0.12, 0.04], dtype=np.float_)
+    a_arr = np.linspace(0.04, 0.36, 30)
+    eta = a_arr / L_x
+    c_arr = L_x * (1 - eta) / 2.0
+    kw_arr = [dict(a=a,
+                   c=c,
+                   h=0.55,
+                   d_r=0.01, d_up=0.005, d_down=0.005,
+                   t_max=0.25,
+                   n_cell_x=1, n_cell_y=2,
+                   n_fold_steps=20,
+                   n_load_steps=1) for a, c in zip(a_arr, c_arr)]
 
-    ftv = WBShellFormingProcessFTV(model=bsf_process)
+    bsf_processes = [WBShellFormingProcess(**kw)
+                     for kw in kw_arr]
 
-    fa = bsf_process.factory_task
+    fig, (ax1, ax3, ax4, ax_t_45) = p.subplots(4, 1)
+    ax2 = ax1.twinx()
 
-    if True:
-        import pylab as p
-        ax = p.axes()
-        fa.formed_object.plot_mpl(ax)
-        p.show()
+    t_45 = []
+    c_45 = []
+    z_45 = []
+    for bsf_process in bsf_processes:
+        ftv = WBShellFormingProcessFTV(model=bsf_process)
 
-    it = bsf_process.init_displ_task
+        fa = bsf_process.factory_task
+        it = bsf_process.init_displ_task
+        ft = bsf_process.fold_angle_cntl
 
-    animate = False
-    show_init_task = False
-    show_fold_angle_cntl = True
+        arg_phi, phi = bsf_process.max_slope
+        n_u, n_v, c = bsf_process.curvature_t
+        ax1.plot(ft.t_arr, c, 'b-',
+                 label='curvature')
+        ax2.plot(ft.t_arr, n_u, 'g-', label='height u')
+        ax2.plot(ft.t_arr, n_v, 'y-', label='height v')
+
+        arg_t_45 = np.argwhere(phi > 45.0)[0][0]
+        t_45.append(ft.t_arr[arg_t_45])
+        c_45.append(c[arg_t_45])
+        z_45.append(n_v[arg_t_45])
+        ax3.plot(ft.t_arr, phi, 'r-', label='slope')
+
+    ax4.plot(a_arr, c_45, 'b-')
+    ax5 = ax4.twinx()
+    ax5.plot(a_arr, z_45, 'g-')
+    ax_t_45.plot(a_arr, t_45, 'r-')
+    p.show()
 
     fta = FTA(ftv=ftv)
     fta.init_view(a=33.4389721223,
@@ -358,42 +357,6 @@ if __name__ == '__main__':
                      1.12671403563,
                      -0.111520325399),
                   r=-105.783218753)
-
-    if show_init_task:
-        ftv.add(it.target_faces[0].viz3d['default'])
-        it.formed_object.viz3d['cp'].set(tube_radius=0.002)
-        ftv.add(it.formed_object.viz3d['cp'])
-        #ftv.add(it.formed_object.viz3d['node_numbers'], order=5)
-        it.u_1
-
-    if show_fold_angle_cntl:
-        ft = bsf_process.fold_angle_cntl
-
-        ft.sim_history.set(anim_t_start=0, anim_t_end=10)
-        ft.config.gu['dofs'].set(anim_t_start=0, anim_t_end=5)
-        ft.sim_history.viz3d['cp'].set(tube_radius=0.002)
-        ftv.add(ft.sim_history.viz3d['cp'])
-#        ftv.add(ft.sim_history.viz3d['node_numbers'])
-        ft.config.gu['dofs'].viz3d['default'].scale_factor = 0.5
-        ftv.add(ft.config.gu['dofs'].viz3d['default'])
-        ft.u_1
-
-        bsf_process.generate_fe_mesh(0.5)
-
-        fta.add_cam_move(duration=10, n=20)
-
-        arg_phi, phi = bsf_process.max_slope
-
-        fig, (ax1, ax3) = p.subplots(2, 1, sharex=True)
-        ax2 = ax1.twinx()
-        n_u, n_v, c = bsf_process.curvature_t
-        ax1.plot(ft.t_arr, c, 'b-',
-                 label='curvature')
-        ax2.plot(ft.t_arr, n_u, 'g-', label='height u')
-        ax2.plot(ft.t_arr, n_v, 'y-', label='height v')
-        ax3.plot(ft.t_arr, phi, 'r-', label='slope')
-
-        p.show()
 
     fta.plot()
     fta.configure_traits()
