@@ -127,12 +127,6 @@ def create_cp_factory():
     return cp_factory
 
 
-def oricreate_mlab_label(m):
-    atext_width = 0.18
-    m.text(1 - atext_width, 0.003, 'oricreate',
-           color=(.7, .7, .7), width=atext_width)
-
-
 class TwistFolding(SimulationTask):
 
     def _previous_task_default(self):

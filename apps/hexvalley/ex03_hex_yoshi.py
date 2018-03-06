@@ -113,7 +113,7 @@ class HexYoshiFormingProcess(HasTraits):
     '''control target surface'''
     @cached_property
     def _get_ctf(self):
-        h = 0.5
+        h = 0.05
         return [r_, s_, h * t_ * s_ * (1 - s_ / self.L_y) - h * t_]
 
     factory_task = Property(Instance(FormingTask))
@@ -197,7 +197,7 @@ class HexYoshiFormingProcess(HasTraits):
         i_down_h = N_h[1::3, :]
         i_down_i = N_i[2::3, :]
 
-        cp.u[np.hstack([i_down_h.flatten(), i_down_i.flatten()]), 2] -= 0.2
+        cp.u[np.hstack([i_down_h.flatten(), i_down_i.flatten()]), 2] -= 0.1
 #         cp.u[(
 #             36, 48, 57, 39,
 #             37, 49, 58, 40,

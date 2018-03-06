@@ -52,6 +52,7 @@ loop on their own. The viz object declares the loop.
 import os
 import tempfile
 from time import sleep
+
 from traits.api import \
     HasStrictTraits,  \
     Property, Instance, List, \
@@ -63,9 +64,9 @@ from traitsui.api import \
     TableEditor, ObjectColumn, InstanceEditor, \
     Handler, Action, ToolBar, VSplit
 
-from forming_task_view3d import \
-    FTV
 import numpy as np
+from oricreate.view.window.forming_task_view3d import \
+    FTV
 from viz3d import \
     Viz3D
 
@@ -95,6 +96,7 @@ class FTAHandler(Handler):
 
     def load(self, info):
         info.object.load()
+
 
 action_strings = \
     [('Add', 'add_cam_move', 'Add a camera move'),
@@ -294,7 +296,7 @@ class CamMove(HasStrictTraits):
             # @todo: temporary focal point determination - make it optional
             self.reset_cam(ftv.mlab, a, e, d, f, r)
             fname = '%s%03d.%s' % (fname_base, idx + idx_offset, format_)
-            ftv.mlab.savefig(fname, magnification=2.2)  # size=(3200, 2000))  #
+            ftv.mlab.savefig(fname, size=(800, 500))  #
             im_files.append(fname)
         return im_files
 
@@ -447,6 +449,9 @@ class FormingTaskAnim3D(HasStrictTraits):
 
     def render(self):
         self.ftv.mlab.options.offscreen = True
+        self.ftv.mlab.clf()
+        self.plot()
+
         im_files = []
         fname_base = 'anim'
         tdir = tempfile.mkdtemp()
@@ -471,21 +476,24 @@ class FormingTaskAnim3D(HasStrictTraits):
 
     trait_view = View(
         VSplit(
-            UItem('ftv@'),
-            HSplit(
-                VGroup(
-                    Item('cam_moves',
-                         style='custom', editor=cam_move_list_editor,
-                         show_label=False, springy=True, width=150),
+            UItem('ftv'),
+            VGroup(
+                HSplit(
                     VGroup(
-                        UItem('anim_delay'),
-                        label='animation delay'
+                        Item('cam_moves',
+                             style='custom', editor=cam_move_list_editor,
+                             show_label=False, springy=True, width=150),
+                        VGroup(
+                            UItem('anim_delay'),
+                            label='animation delay'
+                        ),
                     ),
+                    Item('selected_cam_move@', show_label=False,
+                         springy=True,
+                         width=800, height=200),
+                    show_border=True,
                 ),
-                Item('selected_cam_move@', show_label=False,
-                     springy=True,
-                     width=800, height=200),
-                show_border=True,
+                scrollable=True,
             ),
         ),
         toolbar=ToolBar(*actions),

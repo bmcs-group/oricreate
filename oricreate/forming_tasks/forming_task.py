@@ -24,7 +24,6 @@ from i_formed_object import \
     IFormedObject
 from i_forming_task import \
     IFormingTask
-import numpy as np
 
 
 class FormingTask(HasStrictTraits):
@@ -108,6 +107,7 @@ class FormingTask(HasStrictTraits):
         return self.x_0 + self.u_1
 
     traits_view = View(Item('node'))
+
 
 if __name__ == '__main__':
     ft = FormingTask()

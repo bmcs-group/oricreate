@@ -12,16 +12,16 @@
 #
 # Created on Sep 8, 2011 by: matthias
 
-
-from traits.api import \
-    HasTraits, Instance
 from traitsui.api import \
     View, Item, UItem, Group, \
     TreeEditor, VSplit, \
     TreeNode
 
-from oricreate.api import \
-    IFormingTask, FormingTask
+from oricreate.forming_tasks import FormingTask
+from oricreate.forming_tasks.forming_process import FormingProcess
+from oricreate.forming_tasks.i_forming_task import \
+    IFormingTask
+import traits.api as tr
 
 
 FormingTask_tree_editor = TreeEditor(
@@ -38,18 +38,20 @@ FormingTask_tree_editor = TreeEditor(
 )
 
 
-class FormingTaskTree(HasTraits):
-    '''Forming task tree editor with a section
+class FormingProcessView(tr.HasStrictTraits):
+    '''Forming process viewer with task tree editor
     '''
 
-    root = Instance(FormingTask)
+    forming_process = tr.Instance(FormingProcess)
+    root = tr.Property(tr.Instance(FormingTask))
     '''All FormingTask steps.
     '''
 
-    selected = Instance(IFormingTask)
+    def _get_root(self):
+        return self.forming_process.factory_task
 
-    # The layout of the dialog created
-    # The main view
+    selected = tr.Instance(IFormingTask)
+
     view1 = View(
         VSplit(
             Group(Item('root',
@@ -64,12 +66,13 @@ class FormingTaskTree(HasTraits):
         ),
         dock='tab',
         resizable=True,
-        title='Forming Task Tree',
+        title='Forming Process View',
         width=1.0,
         height=1.0
     )
 
-FTT = FormingTaskTree
+
+FPV = FormingProcessView
 
 # =========================================================================
 # Test Pattern
@@ -83,5 +86,6 @@ if __name__ == '__main__':
     ft4 = FormingTask(node='copy_task #1', previous_task=ft2)
     ft5 = FormingTask(node='turn_task #2', previous_task=ft4)
 
-    view = FormingTaskTree(root=ft1, data=ft4)
+    fp = FormingProcess(factory_task=ft1)
+    view = FormingProcessView(forming_process=fp)
     view.configure_traits()

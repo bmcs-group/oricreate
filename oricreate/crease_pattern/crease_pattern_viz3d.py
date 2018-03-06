@@ -4,16 +4,12 @@ Created on Dec 3, 2015
 @author: rch
 '''
 
-from mayavi.filters.api import ExtractTensorComponents, \
-    ExtractVectorComponents
-from mayavi.filters.api import WarpVector
-from mayavi.modules.api import Surface
-from mayavi.sources.api import VTKDataSource, VTKFileReader
 from traits.api import \
     Array, Tuple, Property, Bool, Float, Color, List
 
 import numpy as np
 from oricreate.viz3d import Viz3D
+import traitsui.api as tui
 
 
 class CreasePatternViz3D(Viz3D):
@@ -94,6 +90,16 @@ class CreasePatternViz3D(Viz3D):
 
     def _get_line_width(self):
         return self._get_max_length() * self.line_width_factor
+
+    traits_view = tui.View(
+        tui.VGroup(
+            tui.Include('viz3d_view'),
+            tui.UItem('tube_radius'),
+            tui.UItem('line_width_factor')
+        )
+    )
+
+    selection_view = traits_view
 
 
 class CreasePatternDisplViz3D(CreasePatternViz3D):

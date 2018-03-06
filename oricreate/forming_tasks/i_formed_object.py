@@ -10,7 +10,7 @@ from traits.api import \
 import traits.has_traits as ht
 
 
-ht.CHECK_INTERFACES = 2
+ht.CHECK_INTERFACES = 1
 
 
 class IFormedObject(Interface):

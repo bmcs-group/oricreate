@@ -224,11 +224,11 @@ class HexYoshiFormingProcessFTV(FTV):
 if __name__ == '__main__':
     kw1 = dict(L_x=8,
                L_y=6,
-               d_x=0.52,
-               h=0.001, d_up=0.2, d_down=0.2,
-               psi_max=-np.pi * 0.52,
+               # d_x=0.52,
+               h=0.001, d_up=0.1, d_down=0.1,
+               psi_max=-np.pi * 0.4,
                n_cell_x=4, n_cell_y=3,
-               n_fold_steps=10,
+               n_fold_steps=20,
                n_load_steps=1)
     kw2 = dict(L_x=0.6,
                L_y=1.1,
@@ -248,7 +248,7 @@ if __name__ == '__main__':
                n_load_steps=1)
     kw4 = dict(L_x=6.0,
                L_y=3.0 * sqrt(6.0**2 / 2.),
-               d_x=00,
+               # d_x=00,
                h=0.2, d_up=0.001, d_down=0.3,
                psi_max=-np.pi * 0.345,
                n_cell_x=3, n_cell_y=4,
@@ -256,13 +256,13 @@ if __name__ == '__main__':
                n_load_steps=1)
     kw5 = dict(L_x=0.6,
                L_y=1.1,
-               xi=0.5,
+               xi=0.66,
                h=0.005, d_up=0.001, d_down=0.001,
                psi_max=-np.pi * 0.52,
                n_cell_x=1, n_cell_y=2,
                n_fold_steps=20,
                n_load_steps=1)
-    bsf_process = HexYoshiFormingProcess(**kw5)
+    bsf_process = HexYoshiFormingProcess(**kw4)
 
     ftv = HexYoshiFormingProcessFTV(model=bsf_process)
 

@@ -7,7 +7,7 @@ Created on Dec 3, 2015
 from traits.api import \
     HasStrictTraits, WeakRef, Str, Event, Property, Int, Bool, \
     Dict, PrototypedFrom
-
+import traitsui.api as tui
 from visual3d import \
     Visual3D
 
@@ -59,17 +59,17 @@ class Viz3D(HasStrictTraits):
         '''
         return
 
-    _hidden = Bool(False)
+    hidden = Bool(False)
 
     def _show(self):
-        if self._hidden == True:
+        if self.hidden == True:
             self.show()
-            self._hidden = False
+            self.hidden = False
 
     def _hide(self):
-        if self._hidden == False:
+        if self.hidden == False:
             self.hide()
-            self._hidden = True
+            self.hidden = True
 
     def hide(self):
         for pipe in self.pipes.values():
@@ -100,3 +100,5 @@ class Viz3D(HasStrictTraits):
 
     def _get_min_max(self):
         return None, None
+
+    viz3d_view = tui.Group(tui.Item('hode', resizable=True))

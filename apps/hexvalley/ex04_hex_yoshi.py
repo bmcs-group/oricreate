@@ -44,8 +44,8 @@ class HexYoshiFormingProcess(HasTraits):
     '''control target surface'''
     @cached_property
     def _get_ctf(self):
-        h = 0.5
-        return [r_, s_, h * t_ * s_ * (1 - s_ / self.L_y) - h * t_]
+        h = 0.05
+        return [r_, s_, h * t_ * s_ * (1 - s_ / self.L_y) - .01 * h * t_]
 
     factory_task = Property(Instance(FormingTask))
     '''Factory task generating the crease pattern.
@@ -125,10 +125,14 @@ class HexYoshiFormingProcess(HasTraits):
 
         cp = st.formed_object
 
+        d_u = 0.02
         i_down_h = N_h[1::3, :]
         i_down_i = N_i[2::3, :]
-
-        cp.u[np.hstack([i_down_h.flatten(), i_down_i.flatten()]), 2] -= 0.2
+        i_left = N_v[0, :]
+        i_right = N_v[-1, :]
+        cp.u[np.hstack([i_down_h.flatten(), i_down_i.flatten()]), 2] -= d_u
+        cp.u[i_left, 0] -= d_u
+        cp.u[i_right, 0] += d_u
 #         cp.u[(
 #             36, 48, 57, 39,
 #             37, 49, 58, 40,
@@ -148,9 +152,9 @@ class HexYoshiFormingProcessFTV(FTV):
 
 
 if __name__ == '__main__':
-    bsf_process = HexYoshiFormingProcess(L_x=4, L_y=10, n_x=8,
-                                         n_y=6, u_max=0.8,
-                                         n_fold_steps=30,
+    bsf_process = HexYoshiFormingProcess(L_x=4, L_y=8, n_x=8,
+                                         n_y=6, u_max=0.99,
+                                         n_fold_steps=150,
                                          n_load_steps=1)
 
     ftv = HexYoshiFormingProcessFTV(model=bsf_process)
@@ -167,7 +171,7 @@ if __name__ == '__main__':
     if True:
         import pylab as p
         ax = p.axes()
-        fa.formed_object.plot_mpl(ax)
+        fa.formed_object.plot_mpl(ax, nodes=False, lines=False, facets=False)
         p.show()
 
     show_init_task = False
@@ -191,15 +195,15 @@ if __name__ == '__main__':
 
     if show_fold_task:
         ft.sim_history.set(anim_t_start=0, anim_t_end=10)
-        ft.config.gu['dofs'].set(anim_t_start=0, anim_t_end=5)
-        ft.sim_history.viz3d['cp'].set(tube_radius=0.002)
+#        ft.config.gu['dofs'].set(anim_t_start=0, anim_t_end=5)
+        ft.sim_history.viz3d['cp'].set(tube_radius=0.02)
         ftv.add(ft.sim_history.viz3d['cp'])
 #        ftv.add(ft.sim_history.viz3d['node_numbers'])
-        ft.config.gu['dofs'].viz3d['default'].scale_factor = 0.5
-        ftv.add(ft.config.gu['dofs'].viz3d['default'])
+#        ft.config.gu['dofs'].viz3d['default'].scale_factor = 0.5
+#        ftv.add(ft.config.gu['dofs'].viz3d['default'])
         ft.u_1
 
-        fta.add_cam_move(duration=10, n=20)
+        fta.add_cam_move(duration=10, n=50)
 
     fta.plot()
     fta.configure_traits()

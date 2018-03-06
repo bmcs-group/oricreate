@@ -14,13 +14,6 @@
 
 import types
 
-from oricreate.crease_pattern.crease_pattern_operators import CreaseCummulativeOperators
-from oricreate.opt import \
-    IFu
-from oricreate.util.einsum_utils import \
-    EPS
-from oricreate.viz3d import \
-    Visual3D
 from traits.api import \
     implements,  List, Tuple, Float, \
     Property, Array, Int
@@ -32,6 +25,13 @@ from fu_poteng_bending_viz3d import \
 from fu_poteng_node_load_viz3d import \
     FuPotEngNodeLoadViz3D
 import numpy as np
+from oricreate.crease_pattern.crease_pattern_operators import CreaseCummulativeOperators
+from oricreate.opt import \
+    IFu
+from oricreate.util.einsum_utils import \
+    EPS
+from oricreate.viz3d import \
+    Visual3D
 
 
 class FuPotEngTotal(Fu, Visual3D):
@@ -47,6 +47,12 @@ class FuPotEngTotal(Fu, Visual3D):
     F_ext_list = List(Tuple, [])
 
     exclude_lines = Array(int, value=[])
+
+    rho = Float(0.236, label='material density',
+                enter_set=True, auto_set=False)
+
+    thickness = Float(0.01, label='thickness',
+                      enter_set=True, auto_set=False)
 
     _kappa_arr = Array(float, value=[])
     _kappa = Float(1.0)
@@ -103,14 +109,11 @@ class FuPotEngTotal(Fu, Visual3D):
 #         return tot_energy
 
         F_ext = self._get_F_ext(t)
-        V_ext = cp.V * self.rho
+        V_ext = cp.V * self.rho * self.thickness
         ext_energy = (np.einsum(
             '...i,...i->...', F_ext.flatten(), cp.u.flatten()) - V_ext)
         tot_energy = self.fu_factor * (stored_energy - ext_energy)
         return tot_energy
-
-    rho = Float(0.236, label='material density',
-                enter_set=True, auto_set=False)
 
     def get_f_du(self, t=0):
         '''Get the derivatives with respect to individual displacements.
@@ -131,7 +134,7 @@ class FuPotEngTotal(Fu, Visual3D):
 
         V_du = cp.V_du.reshape((-1, 3))
 
-        Pi_ext_du = F_ext - V_du * self.rho
+        Pi_ext_du = F_ext - V_du * self.rho * self.thickness
 
         Pi_du = Pi_int_du - Pi_ext_du
 

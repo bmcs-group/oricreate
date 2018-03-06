@@ -9,24 +9,32 @@ from mayavi.tools.mlab_scene_model import MlabSceneModel
 from traits.api import \
     HasStrictTraits, Dict, \
     Property, Str, Float, \
-    on_trait_change, Int, Tuple, Instance, Button
+    on_trait_change, Int, Tuple, Instance
 from traitsui.api import \
     View, HSplit, VSplit, VGroup, Item, UItem, TableEditor, ObjectColumn, \
-    RangeEditor
+    RangeEditor, Tabbed
 from tvtk.pyface.scene_editor import SceneEditor
 
 import numpy as np
-from viz3d import \
+from oricreate.viz3d.viz3d import \
     Viz3D
+
+
+def oricreate_mlab_label(m):
+    atext_width = 0.15
+    m.text(1 - atext_width, 0.003, 'oricreate',
+           color=(.7, .7, .7),
+           width=atext_width)
 
 
 viz3d_dict_editor = TableEditor(
     columns=[ObjectColumn(label='Label', name='label', editable=False),
+             ObjectColumn(label='Hidden', name='hidden', editable=True),
              ObjectColumn(label='Start', name='anim_t_start', editable=False),
              ObjectColumn(label='End', name='anim_t_end', editable=False),
              ],
     selection_mode='row',
-    selected='object.selected_viz3d',
+    selected='object.selected_viz3d'
 )
 
 
@@ -166,6 +174,7 @@ class FormingTaskView3D(HasStrictTraits):
         self.mlab.figure(fig, bgcolor=bgcolor, fgcolor=fgcolor)
         for viz3d in self.viz3d_list:
             viz3d.plot()
+        oricreate_mlab_label(self.mlab)
 
     def update(self, vot=0.0, anim_t=0.0, force=False):
         '''Update current visualization.
@@ -185,82 +194,55 @@ class FormingTaskView3D(HasStrictTraits):
         self.mlab.show(*args, **kw)
 
     traits_view = View(
-        HSplit(
-            VSplit(
-                Item('viz3d_list',
-                     style='custom', editor=viz3d_dict_editor,
-                     show_label=False, springy=True, width=150),
-                Item('selected_viz3d@', show_label=False,
-                     springy=True,
-                     width=200, height=300),
-                show_border=True,
+        VGroup(
+            HSplit(
+                VGroup(
+                    UItem(name='scene',
+                          editor=SceneEditor(scene_class=MayaviScene),
+                          resizable=True,
+                          springy=True,
+                          height=800,
+                          width=1000),
+                ),
+                VGroup(
+                    VSplit(
+                        Item('viz3d_list@', editor=viz3d_dict_editor,
+                             show_label=False, width=200),
+                        Item('selected_viz3d@', show_label=False,
+                             width=100),
+                        show_border=True,
+                    ),
+                ),
             ),
-            VGroup(
-                UItem(name='scene',
-                      editor=SceneEditor(scene_class=MayaviScene),
-                      resizable=True,
-                      height=500,
-                      width=500),
-                UItem('vot_slider', editor=RangeEditor(low_name='vot_min',
-                                                       high_name='vot_max',
-                                                       format='(%s)',
-                                                       auto_set=True,
-                                                       enter_set=False,
-                                                       ),
-                      show_label=False
-                      ),
-
-            )
+            UItem(
+                'vot_slider',
+                editor=RangeEditor(
+                    low_name='vot_min',
+                    high_name='vot_max',
+                    format='(%s)',
+                    auto_set=True,
+                    enter_set=False,
+                ),
+                resizable=False, height=40, springy=False,
+            ),
         ),
         resizable=True,
-        width=800,
-        height=600,
+        width=1.0,
+        height=1.0,
         kind='subpanel',
         title='Forming task viewer',
     )
 
+
 FTV = FormingTaskView3D
 
 if __name__ == '__main__':
-
-    from visual3d import Visual3D
-
-    class PointCloudViz3D(Viz3D):
-        '''Visualization object
-        '''
-
-        def plot(self):
-            x, y, z, s = self.vis3d.p
-            self.pipes['points'] = self.ftv.mlab.points3d(x, y, z, s)
-
-        def update(self):
-            x, y, z, s = self.vis3d.points
-            points = np.c_[x, y, z]
-            self.pipes['points'].mlab_source.set(points=points)
-
-    class PointCloud(Visual3D):
-        '''State object
-        '''
-        p = Tuple
-        '''Point positions
-        '''
-
-        def _p_default(self):
-            x, y, z, s = np.random.random((4, 100))
-            return x, y, z, s
-
-        points = Property(Tuple)
-
-        def _get_points(self):
-            x, y, z, s = self.p
-            c = self.vot
-            return x * c, y * c, z * c, s * c
-
-        viz3d_classes = dict(default=PointCloudViz3D,
-                             something_else=PointCloudViz3D)
-
+    from point_cloud_viz3d import PointCloud
     ftv = FTV()
     pc = PointCloud()
     ftv.add(pc.viz3d['default'])
+    ftv.mlab.options.offscreen = False
     ftv.plot()
+    ftv.viz3d_list
+    # ftv.mlab.savefig('/home/rch/testing.jpg')
     ftv.configure_traits()
