@@ -433,8 +433,8 @@ if __name__ == '__main__':
         lt.sim_history.set(anim_t_start=0, anim_t_end=50)
         lt.config.gu['dofs'].set(anim_t_start=0, anim_t_end=50)
         lt.config.fu.set(anim_t_start=0, anim_t_end=50)
-        lt.sim_history.viz3d['displ'].set(tube_radius=0.002,
-                                          warp_scale_factor=5.0)
+#         lt.sim_history.viz3d['displ'].set(tube_radius=0.002,
+#                                           warp_scale_factor=5.0)
         #    ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
         ftv.add(lt.sim_history.viz3d['displ'])
         #lt.config.gu['dofs'].viz3d['default'].scale_factor = 0.5

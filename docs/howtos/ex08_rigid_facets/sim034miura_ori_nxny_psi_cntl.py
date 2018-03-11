@@ -18,10 +18,10 @@ def create_cp_factory():
     from oricreate.api import MiuraOriCPFactory
     cp_factory = MiuraOriCPFactory(L_x=30,
                                    L_y=21,
-                                   n_x=4,
+                                   n_x=8,
                                    n_y=8,
-                                   d_0=0.4,
-                                   d_1=-0.4)
+                                   d_0=0.6,
+                                   d_1=-0.6)
     # end
     return cp_factory
 
@@ -81,7 +81,7 @@ if __name__ == '__main__':
     ftv = FTV()
 #    ftv.add(sim_task.sim_history.viz3d['node_numbers'], order=5)
     ftv.add(sim_task.sim_history.viz3d['cp'])
-#    ftv.add(gu_dof_constraints.viz3d['default'])
+    ftv.add(gu_dof_constraints.viz3d['default'])
 
     fta = FTA(ftv=ftv)
     fta.init_view(a=-45, e=65, d=60, f=(0, 0, 0), r=-50)
@@ -92,5 +92,4 @@ if __name__ == '__main__':
                      distance_move='damped')
 
     fta.plot()
-    fta.render()
     fta.configure_traits()

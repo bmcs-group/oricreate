@@ -18,7 +18,7 @@ class FuTargetPsiValueViz3D(Viz3D):
         cp = self.vis3d.formed_object
         x_t = cp.x
 
-    def update(self):
+    def update(self, vot=0.0):
 
         cp = self.vis3d.formed_object
         x_t = cp.x

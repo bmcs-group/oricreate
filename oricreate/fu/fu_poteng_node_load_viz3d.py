@@ -51,7 +51,7 @@ class FuPotEngNodeLoadViz3D(Viz3D):
         self.pipes['cl_arrow'] = cl_arrow
         self.pipes['surf'] = m.pipeline.surface(cl_arrow)
 
-    def update(self):
+    def update(self, vot=0.0):
         x, y, z, u, v, w = self.get_node_load_values(1.0)
         cl_arrow = self.pipes['cl_arrow']
         cl_arrow.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)

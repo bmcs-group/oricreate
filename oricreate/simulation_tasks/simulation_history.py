@@ -32,7 +32,6 @@ class SimulationHistory(CreasePattern):
 
     It maintains an array :math:`\bm{u}_t` of displacement vectors
     corresponding to each time step.
-
     '''
 
     u_t = Array(dtype='float_', cp_input=True)
@@ -68,6 +67,7 @@ class SimulationHistory(CreasePattern):
 
     def _get_u(self):
         return self.u_t[self.time_step]
+
 
 if __name__ == '__main__':
 

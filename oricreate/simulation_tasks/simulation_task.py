@@ -164,7 +164,6 @@ class SimulationTask(FormingTask):
 
             if self.sim_step.record_iter:
                 u_t_list += self.sim_step.u_it_list
-                print 'here'
                 self.sim_step.clear_iter()
 
             u_t_list.append(U.reshape(-1, 3))

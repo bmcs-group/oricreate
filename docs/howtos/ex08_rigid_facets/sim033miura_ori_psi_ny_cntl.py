@@ -80,5 +80,4 @@ if __name__ == '__main__':
                      distance_move='damped')
 
     fta.plot()
-    fta.render()
     fta.configure_traits()

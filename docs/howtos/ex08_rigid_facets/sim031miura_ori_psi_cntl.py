@@ -66,7 +66,7 @@ if __name__ == '__main__':
     sim_task.u_1
 
     ftv = FTV()
-    ftv.add(sim_task.sim_history.viz3d['node_numbers'], order=5)
+    #ftv.add(sim_task.sim_history.viz3d['node_numbers'], order=5)
     ftv.add(sim_task.sim_history.viz3d['cp'])
     ftv.add(gu_dof_constraints.viz3d['default'])
 
@@ -80,5 +80,4 @@ if __name__ == '__main__':
                      distance_move='damped')
 
     fta.plot()
-    fta.render()
     fta.configure_traits()

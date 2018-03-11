@@ -79,17 +79,17 @@ class Viz3D(HasStrictTraits):
         for pipe in self.pipes.values():
             pipe.visible = True
 
-    def update_t(self, anim_t=0.0):
+    def update_t(self, anim_t=0.0, vot=0.0):
         '''Update with regard to the global time line.
         '''
         if anim_t >= self.anim_t_start and anim_t <= self.anim_t_end \
                 or self.anim_t_end < 0.0:
             self._show()
-            self.update()
+            self.update(vot)
         else:
             self._hide()
 
-    def update(self):
+    def update(self, vot=0.0):
         '''Update the visualization within the view3d object.
         '''
         return

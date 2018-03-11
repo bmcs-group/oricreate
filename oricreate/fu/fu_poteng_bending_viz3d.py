@@ -11,9 +11,8 @@
 # Thanks for using Simvisage open source!
 #
 
-from oricreate.viz3d import Viz3D
-
 import numpy as np
+from oricreate.viz3d import Viz3D
 
 
 class FuPotEngBendingViz3D(Viz3D):
@@ -24,13 +23,18 @@ class FuPotEngBendingViz3D(Viz3D):
         fu_tot_poteng = self.vis3d
         ft = fu_tot_poteng.forming_task
         cp = ft.formed_object
-        print 'cp.u', cp.u
+
+        sim_hist = ft.sim_history
+        sim_hist.vot = self.vis3d.vot
+        cp.x_0 = np.copy(sim_hist.x_t[0])
+        cp.u = np.copy(sim_hist.u)
 
         iL_phi = cp.iL_psi - cp.iL_psi_0
+        print iL_phi
         iL_m = fu_tot_poteng.kappa * iL_phi
-        print 'iL_m', iL_m
         max_m = np.max(iL_m)
-        iL_m /= max_m
+        if max_m != 0:
+            iL_m /= max_m
 
         norm_F_normals = cp.F_normals
         iL_norm_F_normals = norm_F_normals[cp.iL_F]
@@ -45,8 +49,9 @@ class FuPotEngBendingViz3D(Viz3D):
 
         iL_N = cp.L[cp.iL]
 
-        iL_x0 = cp.x[iL_N[:, 0]]
-        iL_x1 = cp.x[iL_N[:, 1]]
+        x_t = cp.x_0 + cp.u
+        iL_x0 = x_t[iL_N[:, 0]]
+        iL_x1 = x_t[iL_N[:, 1]]
         L_ref = iL_x0 + 0.5 * (iL_x1 - iL_x0)
 
         x, y, z = L_ref.reshape(-1, 3).T
@@ -55,12 +60,11 @@ class FuPotEngBendingViz3D(Viz3D):
         return x, y, z, u, v, w
 
     def plot(self):
-
         m = self.ftv.mlab
         x, y, z, u, v, w = self.get_values()
         vectors = m.quiver3d(x, y, z, u, v, w)
-        vectors.glyph.glyph_source.glyph_source = vectors.glyph.glyph_source.glyph_dict[
-            'cone_source']
+        vectors.glyph.glyph_source.glyph_source = \
+            vectors.glyph.glyph_source.glyph_dict['cone_source']
         vectors.glyph.glyph.scale_factor *= -1.0
         vectors.glyph.glyph_source.glyph_source.direction = np.array(
             [1.,  0.,  0.])
@@ -68,7 +72,9 @@ class FuPotEngBendingViz3D(Viz3D):
             [0.,  0.,  0.])
         self.pipes['vectors'] = vectors
 
-    def update(self):
+    def update(self, vot=0.0):
         x, y, z, u, v, w = self.get_values()
         vectors = self.pipes['vectors']
         vectors.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)
+        ds = vectors.mlab_source.dataset
+        ds.points = np.c_[x, y, z]

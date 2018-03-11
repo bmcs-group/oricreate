@@ -72,7 +72,7 @@ class CreasePatternViz3D(Viz3D):
             cp_pipe.mlab_source.dataset.lines = L
         self.pipes['cp_pipe'] = cp_pipe
 
-    def update(self):
+    def update(self, vot=0.0):
         N = self.N_L_F[0]
         cp_pipe = self.pipes['cp_pipe']
         cp_pipe.mlab_source.set(points=N)
@@ -136,7 +136,9 @@ class CreasePatternDisplViz3D(CreasePatternViz3D):
             cp_pipe = m.triangular_mesh(x, y, z, F,
                                         line_width=3,
                                         scalars=w,
-                                        color=self.facet_color.toTuple()[:-1])
+                                        color=(0.6, 0.625, 0.683)
+                                        # color=self.facet_color.toTuple()[:-1]
+                                        )
             if self.lines is True:
                 cp_pipe.mlab_source.dataset.lines = L
                 tube = m.pipeline.tube(cp_pipe,
@@ -144,7 +146,9 @@ class CreasePatternDisplViz3D(CreasePatternViz3D):
                 lines = m.pipeline.surface(tube, color=(1.0, 1.0, 1.0))
                 self.pipes['lines'] = lines
         else:
-            cp_pipe = m.points3d(x, y, z, scale_factor=0.2)
+            cp_pipe = m.points3d(x, y, z,
+                                 color=(0.6, 0.625, 0.683),
+                                 scale_factor=0.2)
             cp_pipe.mlab_source.dataset.lines = L
         ds = cp_pipe.mlab_source.dataset
         ds.point_data.vectors = u_
@@ -154,13 +158,13 @@ class CreasePatternDisplViz3D(CreasePatternViz3D):
         self.pipes['warp'] = warp
         self.pipes['cp_pipe'] = cp_pipe
 
-    def update(self):
+    def update(self, vot=0.0):
         x_0, u_, L, F = self.N_L_F
         u, v, w = u_.T
         cp_pipe = self.pipes['cp_pipe']
 #         warp = self.pipes['warp']
 #        warp.filter.scale_factor = self.warp_scale_factor
-        cp_pipe.mlab_source.set(points=x_0, vectors=u_, scalars=w)
+        cp_pipe.mlab_source.set(points=x_0, scalars=w)
         ds = cp_pipe.mlab_source.dataset
         ds.point_data.vectors = u_
 
@@ -210,7 +214,7 @@ class CreasePatternNormalsViz3D(Viz3D):
         x, y, z, u, v, w = self.get_values()
         self.pipes['quifer3d_pipe'] = m.quiver3d(x, y, z, u, v, w)
 
-    def update(self):
+    def update(self, vot=0.0):
         x, y, z, u, v, w = self.get_values()
         quifer3d_pipe = self.pipes['quifer3d_pipe']
         quifer3d_pipe.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)

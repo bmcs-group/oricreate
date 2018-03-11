@@ -250,7 +250,7 @@ class GuDofConstraintsViz3D(Viz3D):
         self.pipes['cc_arrow'] = cc_arrow
         self.pipes['cc_arrow_s'] = cc_arrow_s
 
-    def update(self):
+    def update(self, vot=0.0):
 
         cp = self.vis3d.formed_object
         x_t = cp.x

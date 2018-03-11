@@ -46,7 +46,7 @@ class FuTargetFaceViz3D(Viz3D):
 #         ff_nodes.visible = self.show_ff_nodes
 #         return ff_nodes
 
-    def update(self):
+    def update(self, vot=0.0):
         if self.show_ff_pipe:
             vot = self.vis3d.vot
             tf = self.vis3d.control_face
