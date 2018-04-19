@@ -34,6 +34,10 @@ class SimulationHistory(CreasePattern):
     corresponding to each time step.
     '''
 
+    t_record = Array(dtype='float_', cp_input=True)
+    r'''Array of time values traced during the history.
+    '''
+
     u_t = Array(dtype='float_', cp_input=True)
     r'''Displacement array with ``(n_t,n_N,n_D)`` values.
     '''
@@ -45,11 +49,21 @@ class SimulationHistory(CreasePattern):
     def _get_x_t(self):
         return self.x_0[np.newaxis, ...] + self.u_t
 
+    def get_time_idx_arr(self, vot):
+        '''Get the index corresponding to visual time
+        '''
+        x = self.t_record
+        n_t = len(self.x_t)
+        idx = np.array(np.arange(n_t), dtype=np.float_)
+        t_idx = np.interp(vot, x, idx)
+        return np.array(t_idx + 0.5, np.int_)
+
+    def get_time_idx(self, vot):
+        return int(self.get_time_idx_arr(vot))
+
     @on_trait_change('vot')
     def _set_time_step(self):
-        n_t = len(self.x_t) - 1
-        i_t = int(self.vot * n_t)
-        self.time_step = i_t
+        self.time_step = self.get_time_idx(self.vot)
 
     time_step = Int(0, cp_input=True)
     r'''Current time step
@@ -66,6 +80,7 @@ class SimulationHistory(CreasePattern):
     '''
 
     def _get_u(self):
+        print 'TIME STEP', self.time_step
         return self.u_t[self.time_step]
 
 

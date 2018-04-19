@@ -17,8 +17,7 @@ from traits.api import \
     implements, HasTraits, List, \
     Property, cached_property, Any,\
     DelegatesTo, Float, Str, Array, \
-    Instance, WeakRef
-from traits.has_traits import on_trait_change
+    Instance
 
 from fu import \
     Fu
@@ -176,8 +175,10 @@ class ParamFaceOperator(HasTraits):
     def get_r_pnt(self, r0_pnt, x_pnt, t):
         '''Get the parametric coordinates of a nearest point on a surface.
         '''
-        get_norm_cond = lambda r_pnt: self.get_norm_cond(r_pnt, x_pnt, t)
-        get_d_norm_cond = lambda r_pnt: self.get_d_norm_cond(r_pnt, x_pnt, t)
+        def get_norm_cond(r_pnt): return self.get_norm_cond(r_pnt, x_pnt, t)
+
+        def get_d_norm_cond(
+            r_pnt): return self.get_d_norm_cond(r_pnt, x_pnt, t)
 
         r_pnt, infodict, ier, m = fsolve(get_norm_cond,  # @UnusedVariable
                                          r0_pnt,
@@ -299,8 +300,7 @@ class FuTargetFace(Fu, Visual3D):
     control_face = Instance(FuFaceNodeDistance)
     nodes = Array(int, value=[])
 
-    def _viz3d_dict_default(self):
-        return dict(default=FuTargetFaceViz3D(vis3d=self))
+    viz3d_classes = dict(default=FuTargetFaceViz3D)
 
 
 def FuTF(expr, nodes):
@@ -372,6 +372,7 @@ class FuTargetFaces(Fu, Visual3D):
 
     def _viz3d_dict_default(self):
         raise NotImplemented
+
 
 if __name__ == '__main__':
     cp = ParamFaceOperator(F=[r_, s_, t_])

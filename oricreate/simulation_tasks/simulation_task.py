@@ -139,7 +139,9 @@ class SimulationTask(FormingTask):
     @cached_property
     def _get_sim_history(self):
         cp = self.cp
-        return SimulationHistory(x_0=cp.x_0, L=cp.L, F=cp.F, u_t=self.u_t)
+        return SimulationHistory(
+            x_0=cp.x_0, L=cp.L, F=cp.F, u_t=self.u_t, t_record=self.t_arr
+        )
 
     record_iter = DelegatesTo('sim_step')
 

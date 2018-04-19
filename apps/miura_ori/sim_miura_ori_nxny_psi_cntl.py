@@ -92,21 +92,35 @@ class MiuraOriFormingProcess(FormingProcess):
     @t.cached_property
     def _get_load_task(self):
         self.fold_task.x_1
+        fat = self.factory_task
 
-#        fixed_n = fat.N_grid[(0, 0, -1, -1), (1, -2, 1, -2)].flatten()
+        fixed_corner_n = fat.N_grid[(0, 0, -1, -1), (1, -2, 1, -2)].flatten()
         fixed_n = fat.N_grid[(0, 0), (1, -2)].flatten()
-        slide_z = fix(fat.N_grid[-1, -2], [2], lambda t: -0.0 * self.L_x * t)
-        slide_x = fix(fat.N_grid[-1, -2], [0], lambda t: 0.1 * self.L_x * t)
+        slide_z = fix(fat.N_grid[-1, -2], [2], lambda t: -0.8 * self.L_x * t)
+        slide_x = fix(fat.N_grid[-1, -2], [0], lambda t: 0.1 * self.L_y * t)
         loaded_n = fat.N_grid[self.n_x / 2, self.n_y / 2]
-        fixed_nodes_xyz = fix(fixed_n, (0, 1, 2)) + slide_z + slide_x
+        fixed_nodes_xyz = fix(fixed_n, (0, 2)) + slide_z
+        #fixed_nodes_xyz = fix(fixed_corner_n, (0, 1, 2))
 
         dof_constraints = fixed_nodes_xyz
         gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
         gu_constant_length = GuConstantLength()
+
+        diag_psi_mask = np.ones_like(fat.L_d_grid, dtype=np.bool_)
+        diag_psi_mask[1:-1, 1:-1] = False
+        diag_lines = fat.L_d_grid[diag_psi_mask].flatten()
+        diag_psi_constraints = [([(i, 1.0)], 0)
+                                for i in diag_lines]
+        gu_psi_constraints = \
+            GuPsiConstraints(forming_task=fat,
+                             psi_constraints=diag_psi_constraints)
+
         sim_config = SimulationConfig(
             goal_function_type='total potential energy',
             gu={'cl': gu_constant_length,
-                'dofs': gu_dof_constraints},
+                'dofs': gu_dof_constraints,
+                'psi': gu_psi_constraints
+                },
             acc=1e-5, MAX_ITER=1000,
             debug_level=0
         )
@@ -117,7 +131,10 @@ class MiuraOriFormingProcess(FormingProcess):
         F_ext_list = [(loaded_n, 2, FN(-P))]
 
         fu_tot_poteng = FuPotEngTotal(kappa=np.array([1.0]),
-                                      F_ext_list=F_ext_list)
+                                      F_ext_list=F_ext_list,
+                                      thickness=1,
+                                      exclude_lines=diag_lines
+                                      )
         sim_config._fu = fu_tot_poteng
         st = SimulationTask(previous_task=self.fold_task,
                             config=sim_config, n_steps=self.n_load_steps)
@@ -130,7 +147,10 @@ class MiuraOriFormingProcess(FormingProcess):
 
 if __name__ == '__main__':
 
-    miura_fp = MiuraOriFormingProcess(n_x=8, n_y=8, n_load_steps=30)
+    miura_fp = MiuraOriFormingProcess(
+        L_x=30, L_y=21,
+        n_x=8, n_y=8, n_load_steps=10
+    )
     fat = miura_fp.factory_task
     cp = fat.formed_object
 
@@ -149,21 +169,14 @@ if __name__ == '__main__':
 
     ftv = FTV()
     lot.sim_history.set(anim_t_start=0, anim_t_end=50)
-
-#    ftv.add(sim_task.sim_history.viz3d['node_numbers'], order=5)
-#    ftv.add(lot.sim_history.viz3d['cp'])
-#     lot.config.fu.set(anim_t_start=0, anim_t_end=50)
     lot.sim_history.viz3d['displ'].set(tube_radius=0.002,
                                        warp_scale_factor=5.0)
-    #    ftv.add(lt.formed_object.viz3d_dict['node_numbers'], order=5)
     ftv.add(lot.sim_history.viz3d['displ'])
-    #lt.config.gu['dofs'].viz3d['default'].scale_factor = 0.5
-    ftv.add(lot.config.gu['dofs'].viz3d['default'])
+    gu_dofs_viz3d = lot.config.gu['dofs'].viz3d['default']
+    gu_dofs_viz3d.scale_factor = 1
+    ftv.add(gu_dofs_viz3d)
     ftv.add(lot.config.fu.viz3d['default'])
     lot.config.fu.viz3d['default'].set(anim_t_start=00, anim_t_end=50)
-#     ftv.add(lot.config.fu.viz3d['node_load'])
-
-    # ftv.add(gu_dof_constraints.viz3d['default'])
 
     fta = FTA(ftv=ftv)
     fta.init_view(a=-45, e=65, d=60, f=(0, 0, 0), r=-50)

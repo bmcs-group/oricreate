@@ -36,7 +36,7 @@ class FuTargetFaceViz3D(Viz3D):
                               contours=[0.0])
         tf_pipe.visible = self.show_ff_pipe
         tf_pipe.module_manager.scalar_lut_manager.lut.table = self.lut
-        self.tf_pipe = tf_pipe
+        self.pipes['tf_pipe'] = tf_pipe
 
 #         x, y, z = self.x_t[0][self.nodes_id].T
 #         sf = self.scale_factor * 0.5
@@ -52,7 +52,7 @@ class FuTargetFaceViz3D(Viz3D):
             tf = self.vis3d.control_face
             x, y, z = self.ftv.xyz_grid
             Rf = tf.Rf(x, y, z, vot)
-            self.tf_pipe.mlab_source.set(scalars=Rf)
+            self.pipes['tf_pipe'].mlab_source.set(scalars=Rf)
 
         if self.show_ff_nodes:
             x, y, z = self.x_t[self.fold_step][self.nodes_id].T

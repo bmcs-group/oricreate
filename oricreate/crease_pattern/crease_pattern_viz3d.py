@@ -59,7 +59,8 @@ class CreasePatternViz3D(Viz3D):
         if len(F) > 0:
             cp_pipe = m.triangular_mesh(x, y, z, F,
                                         line_width=3,
-                                        color=(0.6, 0.625, 0.683))
+                                        color=(0.6, 0.625, 0.683),
+                                        name='Crease pattern')
 #                                        color=self.facet_color.toTuple()[:-1])
             if self.lines is True:
                 cp_pipe.mlab_source.dataset.lines = L
@@ -136,7 +137,8 @@ class CreasePatternDisplViz3D(CreasePatternViz3D):
             cp_pipe = m.triangular_mesh(x, y, z, F,
                                         line_width=3,
                                         scalars=w,
-                                        color=(0.6, 0.625, 0.683)
+                                        color=(0.6, 0.625, 0.683),
+                                        name='Crease pattern displacement'
                                         # color=self.facet_color.toTuple()[:-1]
                                         )
             if self.lines is True:
@@ -148,7 +150,9 @@ class CreasePatternDisplViz3D(CreasePatternViz3D):
         else:
             cp_pipe = m.points3d(x, y, z,
                                  color=(0.6, 0.625, 0.683),
-                                 scale_factor=0.2)
+                                 scale_factor=0.2,
+                                 name='Crease pattern displacement'
+                                 )
             cp_pipe.mlab_source.dataset.lines = L
         ds = cp_pipe.mlab_source.dataset
         ds.point_data.vectors = u_

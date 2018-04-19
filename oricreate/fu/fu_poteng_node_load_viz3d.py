@@ -42,6 +42,9 @@ class FuPotEngNodeLoadViz3D(Viz3D):
     def plot(self):
 
         m = self.ftv.mlab
+        fu_tot_poteng = self.vis3d
+        if len(fu_tot_poteng.F_ext_list) == 0:
+            return
         x, y, z, u, v, w = self.get_node_load_values(1.0)
 
         cl_arrow = m.quiver3d(x, y, z, u, v, w, mode='arrow',
@@ -52,6 +55,9 @@ class FuPotEngNodeLoadViz3D(Viz3D):
         self.pipes['surf'] = m.pipeline.surface(cl_arrow)
 
     def update(self, vot=0.0):
+        fu_tot_poteng = self.vis3d
+        if len(fu_tot_poteng.F_ext_list) == 0:
+            return
         x, y, z, u, v, w = self.get_node_load_values(1.0)
         cl_arrow = self.pipes['cl_arrow']
         cl_arrow.mlab_source.set(x=x, y=y, z=z, u=u, v=v, w=w)

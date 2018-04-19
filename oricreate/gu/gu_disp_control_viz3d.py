@@ -6,7 +6,7 @@ Created on Dec 3, 2015
 
 import copy
 from traits.api import \
-    Property, Float, Color, \
+    Property, Int, Float, Color, \
     cached_property
 
 import numpy as np
@@ -33,7 +33,7 @@ class GuDofConstraintsViz3D(Viz3D):
         - fixed constrains (constrain is full fixed in his direction)
         - connected constrains (constrains are in depending on each other
                            , e.g. constant or linear movement behavior)
-        - load constrains (constrains, which activates the numerical calculation)
+        - load constrains (time-dependent displacement)
 
         Different list for visualization:
         fixed constrains:
@@ -158,40 +158,54 @@ class GuDofConstraintsViz3D(Viz3D):
     facet_color = Color((0.4, 0.4, 0.7))
     facet_color = Color((0.0 / 255.0, 84.0 / 255.0, 159.0 / 255.0))
 
+    space_factor = Float(0.1, auto_set=False, enter_set=True)
+    '''
+    Space factor is giving space between constrains an real node
+    position
+    '''
+    line_width = Int(3, auto_set=False, enter_set=True)
+
     def plot(self):
 
         m = self.ftv.mlab
-        cp = self.vis3d.formed_object
+
+        gu_disp_control = self.vis3d
+        ft = gu_disp_control.forming_task
+        cp = ft.formed_object
+
+        sim_hist = ft.sim_history
+        sim_hist.vot = self.vis3d.vot
+        cp.x_0 = np.copy(sim_hist.x_t[0])
+        cp.u = np.copy(sim_hist.u)
+
         x_t = cp.x
 
         cn_f, cd_f, cn_c, cc_c, cd_c, cn_l, cd_l = self.cnstr
 
-        # spacefactor is giving space between constrains an real node
-        # position
-
-        spacefactor = 0.00 * self.scale_factor
-        scale = self.scale_factor * 1.0
-        line_width = self.scale_factor * 2
-        # fixed cnstr
         cp_f = x_t[cn_f]
         x, y, z = cp_f.T
         x, y, z = x[0], y[0], z[0]
-        U, V, W = cd_f.T * scale
-        sU, sV, sW = cd_f.T * spacefactor
-
+        vectors = cd_f.T * self.scale_factor
+        U, V, W = vectors
+        sU, sV, sW = vectors * self.space_factor
         x = x - U - sU
         y = y - V - sV
         z = z - W - sW
-
-        cf_arrow = m.quiver3d(x, y, z, U, V, W,
-                              mode='2darrow', color=(0.0, 0.0, 1.0),
-                              scale_mode='vector', scale_factor=self.scale_factor,
-                              line_width=line_width)
-        cf_cross = m.quiver3d(x, y, z, U, V, W, mode='2dcross',
-                              color=(0.0, 0.0, 1.0),
-                              scale_mode='vector',
-                              scale_factor=self.scale_factor,
-                              line_width=line_width)
+        cf_arrow = m.quiver3d(
+            x, y, z, U, V, W,
+            mode='2darrow', color=(0.0, 0.0, 1.0),
+            scale_mode='vector', scale_factor=1.0,
+            line_width=self.line_width,
+            name='Fixed dof arrows'
+        )
+        cf_cross = m.quiver3d(
+            x, y, z, U, V, W, mode='2dcross',
+            color=(0.0, 0.0, 1.0),
+            scale_mode='vector',
+            scale_factor=0.8,
+            line_width=self.line_width,
+            name='Fixed dof crosses'
+        )
 
         cf_cross_s = m.pipeline.surface(cf_cross)
         cf_arrow_s = m.pipeline.surface(cf_arrow)
@@ -206,18 +220,22 @@ class GuDofConstraintsViz3D(Viz3D):
 
         x, y, z = cp_l.T
         x, y, z = x[0], y[0], z[0]
-        U, V, W = cd_l.T * scale
-        sU, sV, sW = cd_l.T * spacefactor
+        vectors = cd_l.T * self.scale_factor
+        U, V, W = vectors
+        sU, sV, sW = vectors * self.space_factor
 
         x = x - U - sU
         y = y - V - sV
         z = z - W - sW
 
-        cl_arrow = m.quiver3d(x, y, z, U, V, W, mode='arrow',
-                              color=(1.0, 0.0, 0.0),
-                              scale_mode='vector',
-                              line_width=line_width,
-                              scale_factor=self.scale_factor)
+        cl_arrow = m.quiver3d(
+            x, y, z, U, V, W, mode='arrow',
+            color=(1.0, 0.0, 0.0),
+            scale_mode='vector',
+            line_width=self.line_width,
+            scale_factor=1.0,
+            name='Dofs with displacement control'
+        )
         cl_arrow_s = m.pipeline.surface(cl_arrow)
         self.pipes['cl_arrow'] = cl_arrow
         self.pipes['cl_arrow_s'] = cl_arrow_s
@@ -227,87 +245,93 @@ class GuDofConstraintsViz3D(Viz3D):
         cp_c = x_t[cn_c]
 
         x, y, z = cp_c.T
-
-        U, V, W = cd_c.T * scale
-        sU, sV, sW = cd_c.T * spacefactor
+        vectors = cd_c.T * self.scale_factor
+        U, V, W = vectors
+        sU, sV, sW = vectors * self.space_factor
 
         x = x - U - sU
         y = y - V - sV
         z = z - W - sW
 
-        cc_arrow = m.quiver3d(x, y, z, U, V, W,
-                              mode='2darrow',
-                              line_width=line_width,
-                              color=(0.0, 1.0, 0.0),
-                              scale_mode='vector',
-                              scale_factor=self.scale_factor)
+        cc_arrow = m.quiver3d(
+            x, y, z, U, V, W,
+            mode='2darrow',
+            line_width=self.line_width,
+            color=(0.0, 1.0, 0.0),
+            scale_mode='vector',
+            scale_factor=1.0,
+            name='Linked dofs'
+        )
 
         cc_arrow.mlab_source.dataset.lines = cc_c
 
-        cc_arrow_s = m.pipeline.surface(cc_arrow, color=(0.0, 0.7, 0.0),
-                                        line_width=line_width)
+        cc_arrow_s = m.pipeline.surface(
+            cc_arrow,
+            color=(0.0, 1.0, 0.0),
+            line_width=self.line_width
+        )
 
         self.pipes['cc_arrow'] = cc_arrow
         self.pipes['cc_arrow_s'] = cc_arrow_s
 
     def update(self, vot=0.0):
 
-        cp = self.vis3d.formed_object
+        gu_disp_control = self.vis3d
+        ft = gu_disp_control.forming_task
+        cp = ft.formed_object
+
+        sim_hist = ft.sim_history
+        sim_hist.vot = self.vis3d.vot
+        cp.x_0 = np.copy(sim_hist.x_t[0])
+        cp.u = np.copy(sim_hist.u)
         x_t = cp.x
 
         # update constrain symbols
 
         cn_f, cd_f, cn_c, cc_c, cd_c, cn_l, cd_l = self.cnstr
 
-        spacefactor = 0.00 * self.scale_factor
-        scale = self.scale_factor * 0.5
-
         # fixed cnstr
         cp_f = x_t[cn_f]
         x, y, z = cp_f.T
         x, y, z = x[0], y[0], z[0]
-        U, V, W = cd_f.T * scale
-        sU, sV, sW = cd_f.T * spacefactor
+        vectors = cd_f.T * self.scale_factor
+        u, v, w = vectors
+        sU, sV, sW = vectors * self.space_factor
 
-        x = x - U - sU
-        y = y - V - sV
-        z = z - W - sW
+        x = x - u - sU
+        y = y - v - sV
+        z = z - w - sW
 
-        cf_arrow = self.pipes['cf_arrow']
-        cf_arrow.mlab_source.reset(x=x, y=y, z=z)
-        cf_cross = self.pipes['cf_cross']
-        cf_cross.mlab_source.reset(x=x, y=y, z=z)
+        self.pipes['cf_arrow'].mlab_source.set(x=x, y=y, z=z)
+        self.pipes['cf_cross'].mlab_source.set(x=x, y=y, z=z)
 
         # load constrains
         cp_l = x_t[cn_l]
 
         x, y, z = cp_l.T
         x, y, z = x[0], y[0], z[0]
-        U, V, W = cd_l.T * scale
-        sU, sV, sW = cd_l.T * spacefactor
+        vectors = cd_l.T * self.scale_factor
+        U, V, W = vectors
+        sU, sV, sW = vectors * self.space_factor
 
         x = x - U - sU
         y = y - V - sV
         z = z - W - sW
 
-        cl_arrow = self.pipes['cl_arrow']
-        cl_arrow.mlab_source.reset(x=x, y=y, z=z)
+        self.pipes['cl_arrow'].mlab_source.set(x=x, y=y, z=z)
 
         # connected constrains
         cp_c = x_t[cn_c]
-
         x, y, z = cp_c.T
-
-        U, V, W = cd_c.T * scale
-        sU, sV, sW = cd_c.T * spacefactor
+        vectors = cd_c.T * self.scale_factor
+        U, V, W = vectors
+        sU, sV, sW = vectors * self.space_factor
 
         x = x - U - sU
         y = y - V - sV
         z = z - W - sW
 
-        cc_arrow = self.pipes['cc_arrow']
-        cc_arrow.mlab_source.reset(x=x, y=y, z=z)
-        cc_arrow.mlab_source.dataset.lines = cc_c
+        self.pipes['cc_arrow'].mlab_source.set(x=x, y=y, z=z)
 
     def _get_bounding_box(self):
         cp = self.vis3d.formed_object

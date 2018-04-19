@@ -54,6 +54,9 @@ class FuPotEngTotal(Fu, Visual3D):
     thickness = Float(0.01, label='thickness',
                       enter_set=True, auto_set=False)
 
+    m_u = Float(1.0, label='m_u',
+                enter_set=True, auto_set=False)
+
     _kappa_arr = Array(float, value=[])
     _kappa = Float(1.0)
 

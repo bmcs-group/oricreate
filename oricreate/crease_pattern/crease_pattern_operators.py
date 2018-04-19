@@ -12,16 +12,16 @@
 #
 # Created on Jan 29, 2015 by: rch
 
-from oricreate.util import \
-    get_theta, get_theta_du
-from oricreate.util.einsum_utils import \
-    DELTA, EPS
 from traits.api import \
     HasStrictTraits, Float, \
     Property, cached_property, \
     Array
 
 import numpy as np
+from oricreate.util import \
+    get_theta, get_theta_du
+from oricreate.util.einsum_utils import \
+    DELTA, EPS
 
 
 INPUT = '+cp_input'
@@ -289,15 +289,15 @@ class CreaseLineOperators(HasStrictTraits):
         l = self.norm_iL_vectors
         n = self.norm_iL_F_normals
         n0, n1 = np.einsum('ijk->jik', n)
-        lxn0 = np.einsum('...i,...j,...kij->...k', l, n0, EPS)
+        p0 = np.einsum('...i,...j,...kij->...k', l, n0, EPS)
         T = np.concatenate([l[:, np.newaxis, :],
                             n0[:, np.newaxis, :],
-                            lxn0[:, np.newaxis, :]], axis=1)
+                            p0[:, np.newaxis, :]], axis=1)
         n1_ = np.einsum('...ij,...j->...i', T, n1)
-        n1_cos, n1_sin = n1_[:, 1:].T
-        psi = np.arcsin(n1_sin)
-        oa_idx = np.where(n1_cos < 0.0)[0]
-        shifted_psi = np.sign(n1_sin[oa_idx]) * np.pi - 2.0 * psi[oa_idx]
+        n1_1, n1_2 = n1_[:, 1:].T
+        psi = np.arcsin(n1_2)
+        oa_idx = np.where(n1_1 < 0.0)[0]
+        shifted_psi = np.sign(n1_2[oa_idx]) * np.pi - 2.0 * psi[oa_idx]
         psi[oa_idx] += shifted_psi
         return psi
 
@@ -309,10 +309,10 @@ class CreaseLineOperators(HasStrictTraits):
         l = self.norm_iL_vectors_0
         n = self.norm_iL_F_normals_0
         n0, n1 = np.einsum('ijk->jik', n)
-        lxn0 = np.einsum('...i,...j,...kij->...k', l, n0, EPS)
+        p0 = np.einsum('...i,...j,...kij->...k', l, n0, EPS)
         T = np.concatenate([l[:, np.newaxis, :],
                             n0[:, np.newaxis, :],
-                            lxn0[:, np.newaxis, :]], axis=1)
+                            p0[:, np.newaxis, :]], axis=1)
         n1_ = np.einsum('...ij,...j->...i', T, n1)
         n1_cos, n1_sin = n1_[:, 1:].T
         oa_idx = np.where(n1_cos < 0.0)[0]
@@ -440,11 +440,14 @@ class CreaseLineOperators(HasStrictTraits):
             print 'rho', unit_nl01[:, 2]
 
         unit_nl01_dul = np.einsum(
-            '...,...j,...ijNd->...iNd', rho, unit_nl1, Tl0_dul)[:, 2, ...]
+            '...,...j,...ijNd->...iNd',
+            rho, unit_nl1, Tl0_dul)[:, 2, ...]
         unit_nl01_dul0 = np.einsum(
-            '...,...j,...ijNd->...iNd', rho, unit_nl1, Tl0_dul0)[:, 2, ...]
+            '...,...j,...ijNd->...iNd',
+            rho, unit_nl1, Tl0_dul0)[:, 2, ...]
         unit_nl01_dul1 = np.einsum(
-            '...,...jNd,...ij->...iNd', rho, unit_nl1_dul1, Tl0)[:, 2, ...]
+            '...,...jNd,...ij->...iNd',
+            rho, unit_nl1_dul1, Tl0)[:, 2, ...]
         if self.debug_level > 0:
             print 'unit_nl01_dul', unit_nl01_dul.shape
             print unit_nl01_dul
@@ -923,6 +926,7 @@ class CreaseViewRelatedOperators(HasStrictTraits):
     def _get_bounding_box(self):
         x_min, x_max = np.min(self.x, axis=0), np.max(self.x, axis=0)
         return np.array([x_min, x_max])
+
 
 if __name__ == '__main__':
     from crease_pattern_state import CreasePatternState
