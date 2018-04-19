@@ -430,16 +430,16 @@ if __name__ == '__main__':
                                           im_offsets=[[0, 0, 0.001]],
                                           vis3d=cp)
 
-    print 'x_refs', efttitle_viz3d.x_refs
-    print 'im_files', efttitle_viz3d.im_files
-    print 'im_shapes', efttitle_viz3d.im_shapes
-    print 'im_scales', efttitle_viz3d.im_scales
-    print 'im_centers', efttitle_viz3d.im_centers
-    print 'bases', efttitle_viz3d.bases
-    print 'rotated bases', efttitle_viz3d.rotated_bases
+    print('x_refs', efttitle_viz3d.x_refs)
+    print('im_files', efttitle_viz3d.im_files)
+    print('im_shapes', efttitle_viz3d.im_shapes)
+    print('im_scales', efttitle_viz3d.im_scales)
+    print('im_centers', efttitle_viz3d.im_centers)
+    print('bases', efttitle_viz3d.bases)
+    print('rotated bases', efttitle_viz3d.rotated_bases)
 
-    print 'glb_centers', efttitle_viz3d.glb_centers
-    print 'glb_angles', efttitle_viz3d.glb_euler_angles
+    print('glb_centers', efttitle_viz3d.glb_centers)
+    print('glb_angles', efttitle_viz3d.glb_euler_angles)
 
     ftv = FTV()
     ftv.add(cp.viz3d)
@@ -457,8 +457,8 @@ if __name__ == '__main__':
     cp.viz3d_notify_change()
     efttitle_viz3d.vis3d_changed = True
 
-    print 'glb_centers', efttitle_viz3d.glb_centers
-    print 'glb_angles', efttitle_viz3d.glb_euler_angles
+    print('glb_centers', efttitle_viz3d.glb_centers)
+    print('glb_angles', efttitle_viz3d.glb_euler_angles)
 
     ftv.update(force=True)
     m.show()

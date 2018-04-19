@@ -20,12 +20,12 @@ from traitsui.api import \
     Tabbed
 from traitsui.tabular_adapter import \
     TabularAdapter
-from crease_pattern_export import \
+from .crease_pattern_export import \
     CreasePatternExport
-from crease_pattern_operators import \
+from .crease_pattern_operators import \
     CreaseNodeOperators, CreaseLineOperators, CreaseFacetOperators, \
     CreaseCummulativeOperators, CreaseViewRelatedOperators
-from crease_pattern_plot_helper import \
+from .crease_pattern_plot_helper import \
     CreasePatternPlotHelper
 import numpy as np
 from oricreate.forming_tasks import \
@@ -517,7 +517,7 @@ if __name__ == '__main__':
                        F=[[0, 1, 2]]
                        )
 
-    from crease_pattern_viz3d import CreasePatternViz3D
+    from .crease_pattern_viz3d import CreasePatternViz3D
     # configure a viz object
     ftv = FTV()
     cp.viz3d_dict['smaller'] = CreasePatternViz3D(vis3d=cp, L_selection=[0, 1])

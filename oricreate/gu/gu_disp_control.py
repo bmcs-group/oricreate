@@ -8,8 +8,8 @@ from traits.api import \
     implements, \
     Array, DelegatesTo, cached_property, Property
 
-from gu import Gu
-from gu_disp_control_viz3d import \
+from .gu import Gu
+from .gu_disp_control_viz3d import \
     GuDofConstraintsViz3D
 import numpy as np
 from oricreate.opt import \

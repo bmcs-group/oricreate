@@ -40,7 +40,7 @@ wxPython: http://www.wxpython.org/
 PyQT: http://www.riverbankcomputing.co.uk/software/pyqt/intro
 '''
                           )
-    from main_window import MainWindow
+    from .main_window import MainWindow
     oricreate = MainWindow()
 
     oricreate.configure_traits()

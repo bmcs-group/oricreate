@@ -29,12 +29,12 @@ EQ3 = (V31.T * V31)[0, 0] - L31
 
 EQS = [EQ1, EQ2, EQ3]
 var = [v1, u2, w2]
-print EQ1
-print EQ2
-print EQ3
-print
+print(EQ1)
+print(EQ2)
+print(EQ3)
+print()
 
 sol = nonlinsolve(EQS, var)
 
 for s in sol:
-    print s
+    print(s)

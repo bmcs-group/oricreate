@@ -178,7 +178,7 @@ if __name__ == '__main__':
 
     cp = yf.formed_object
 
-    print 'free dofs =', cp.n_dofs - cp.n_L - 6
+    print('free dofs =', cp.n_dofs - cp.n_L - 6)
 
     import pylab as p
     cp.plot_mpl(p.axes(), nodes=False, lines=False, facets=True)

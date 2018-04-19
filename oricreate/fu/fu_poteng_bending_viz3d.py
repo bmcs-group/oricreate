@@ -82,10 +82,10 @@ class FuPotEngBendingViz3D(LineValueVi3D):
         iL_m = fu_tot_poteng.kappa * iL_phi
         max_m, min_m = np.max(iL_m), np.min(iL_m)
         delta_m = max_m - min_m
-        print 'delta_m', delta_m
+        print('delta_m', delta_m)
         if delta_m != 0:
-            print '-1.0', -1. / delta_m
-            print L_scale
+            print('-1.0', -1. / delta_m)
+            print(L_scale)
             scale_factor = -1. / delta_m * L_scale
         else:
             scale_factor = -1.

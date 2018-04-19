@@ -17,7 +17,7 @@ import os
 import tempfile
 from traits.api import Array
 
-from exporter import Exporter
+from .exporter import Exporter
 import numpy as np
 from oricreate.viz3d import Visual3D
 
@@ -96,7 +96,7 @@ class ScaffoldingExporter(Exporter, Visual3D):
         #centered_pos = pos + offset
 
         centered_pos = np.hstack([[L_mid, x_42], ref_midpoints[:, 0]])
-        print 'cp', centered_pos
+        print('cp', centered_pos)
 
         scaff_plates = []
         min_max = []
@@ -141,7 +141,7 @@ class ScaffoldingExporter(Exporter, Visual3D):
             ax.annotate('scaffold x - position %5.3f' % -s_pos, xy=(0, 0.04))
 
             fname_path = os.path.join(tdir, 'scaff%d.pdf' % idx)
-            print 'saving in %s', fname_path
+            print('saving in %s', fname_path)
             p.savefig(fname_path)
 
         p.show()

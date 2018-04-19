@@ -19,7 +19,7 @@ from traits.api import Instance, \
     Array, Dict, implements, Int, Bool, DelegatesTo
 from traitsui.api import \
     View, UItem, Item, Group
-from i_simulation_task import \
+from .i_simulation_task import \
     ISimulationTask
 import numpy as np
 from oricreate.crease_pattern import \
@@ -155,13 +155,13 @@ class SimulationTask(FormingTask):
         u_t_list = [self.cp.u]
         time_start = sysclock()
         for t in self.t_arr[1:]:
-            print 'time: %g' % t
+            print('time: %g' % t)
             self.sim_step.t = t
             #U = self.sim_step.U_t
             try:
                 U = self.sim_step.U_t
             except Exception as inst:
-                print inst
+                print(inst)
                 break
 
             if self.sim_step.record_iter:
@@ -171,7 +171,7 @@ class SimulationTask(FormingTask):
             u_t_list.append(U.reshape(-1, 3))
 
         time_end = sysclock()
-        print '==== solved in ', time_end - time_start, '====='
+        print('==== solved in ', time_end - time_start, '=====')
         return np.array(u_t_list)
 
     traits_view = View(
@@ -295,7 +295,7 @@ if __name__ == '__main__':
     init.U_0[5] = 0.05
 
     lift = Lift(source=init, n_steps=10)
-    print 'initial vector', lift.U_0
+    print('initial vector', lift.U_0)
 
 #    lift.TS = [[r_ , s_, 0.01 + t_ * (0.5)]]
     lift.CS = [[z_ - 4 * 0.4 * t_ * x_ * (1 - x_ / 3)]]
@@ -312,5 +312,5 @@ if __name__ == '__main__':
                       [(5, 0, 1.0)],
                       [(6, 0, 1.0)]]
     lift.cnstr_rhs[0] = 0.9
-    print lift.U_1
+    print(lift.U_1)
 #

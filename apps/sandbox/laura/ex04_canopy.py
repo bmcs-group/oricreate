@@ -381,12 +381,12 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
         x_42 = x_1[42][0]
 
         ref_lines = np.c_[self.scaff_ref_nodes[:-1], self.scaff_ref_nodes[1:]]
-        print 'ref', ref_lines
+        print('ref', ref_lines)
         ref_midpoints = (x_1[ref_lines[:, 1]] + x_1[ref_lines[:, 0]]) / 2.0
-        print 'mp', ref_midpoints[:, 0]
+        print('mp', ref_midpoints[:, 0])
 
         scaff_positions = ref_midpoints[:, 0] - L_mid
-        print 'sp', scaff_positions
+        print('sp', scaff_positions)
 
         #scaff_positions = self.scaff_positions
         scaff_positions = np.hstack([[0, x_42 - L_mid], scaff_positions])
@@ -394,7 +394,7 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
         #centered_pos = pos + offset
 
         centered_pos = np.hstack([[L_mid, x_42], ref_midpoints[:, 0]])
-        print 'cp', centered_pos
+        print('cp', centered_pos)
 
         scaff_plates = []
         min_max = []
@@ -439,7 +439,7 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
             ax.annotate('scaffold x - position %5.3f' % -s_pos, xy=(0, 0.04))
 
             fname_path = os.path.join(tdir, 'scaff%d.pdf' % idx)
-            print 'saving in %s', fname_path
+            print('saving in %s', fname_path)
             p.savefig(fname_path)
 
         p.show()
@@ -456,7 +456,7 @@ if __name__ == '__main__':
     from os.path import expanduser
     home = expanduser("~")
     fname = 'KOI.txt'
-    test_dir = 'C:\Users\laura\Desktop\Masterarbeit\Schale\AuswertungKO'
+    test_dir = 'C:\\Users\laura\Desktop\Masterarbeit\Schale\AuswertungKO'
     fname = path.join(test_dir, fname)
     measured = np.loadtxt(fname)
     node_idx_measured = np.array(measured[:, 0], dtype='int_')
@@ -524,7 +524,7 @@ if __name__ == '__main__':
         # Adapt back to your path
         laura = False
         if laura:
-            test_dir = 'C:\Users\laura\Desktop\Masterarbeit\Schale\AuswertungKO'
+            test_dir = 'C:\\Users\laura\Desktop\Masterarbeit\Schale\AuswertungKO'
         else:
             test_dir = path.join(home, 'simdb', 'exdata',
                                  'shell_tests', '2016-09-09-FSH04-Canopy')
@@ -544,8 +544,8 @@ if __name__ == '__main__':
         u = x_mes - cp.x
         cp.u = u
 
-        print'angle', cp.iL_psi2
-        print'angle size', cp.iL_psi2.size
+        print('angle', cp.iL_psi2)
+        print('angle size', cp.iL_psi2.size)
 
         dummy_fu = FuPotEngTotal(forming_task=mt,
                                  kappa=np.array([5.28]))
@@ -573,21 +573,21 @@ if __name__ == '__main__':
         n_max_uy = np.argmax(lt.u_1[:, 1])
         n_max_ux = np.argmax(lt.u_1[:, 0])
 
-        print 'node max_uz', n_max_uz
-        print 'uz_max', lt.u_1[n_max_uz, 2]
-        print 'node max_uy', n_max_uy
-        print 'uy_max', lt.u_1[n_max_uy, 2]
-        print 'node max_ux', n_max_ux
-        print 'ux_max', lt.u_1[n_max_ux, 2]
+        print('node max_uz', n_max_uz)
+        print('uz_max', lt.u_1[n_max_uz, 2])
+        print('node max_uy', n_max_uy)
+        print('uy_max', lt.u_1[n_max_uy, 2])
+        print('node max_ux', n_max_ux)
+        print('ux_max', lt.u_1[n_max_ux, 2])
 
-        print 'node 11_uz', lt.u_1[11, 2]
-        print 'node 5_uz', lt.u_1[5, 2]
+        print('node 11_uz', lt.u_1[11, 2])
+        print('node 5_uz', lt.u_1[5, 2])
 
         cp = lt.formed_object
         iL_phi = cp.iL_psi2 - cp.iL_psi_0
         iL_m = lt.config._fu.kappa * iL_phi
-        print 'moment', iL_m
-        print 'max moment', np.max(np.fabs(iL_m))
+        print('moment', iL_m)
+        print('max moment', np.max(np.fabs(iL_m)))
 
         ftv.plot()
         ftv.update(vot=1, force=True)

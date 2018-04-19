@@ -219,8 +219,8 @@ if __name__ == '__main__':
 
     if show_fold_gravity_angle_cntl:
         ft = bsf_process.fold_gravity_angle_cntl
-        print 'NDOFS', ft.formed_object.n_dofs
-        print ft.sim_step
+        print('NDOFS', ft.formed_object.n_dofs)
+        print(ft.sim_step)
         ft.sim_history.set(anim_t_start=0, anim_t_end=10)
         ft.config.gu['u'].set(anim_t_start=0, anim_t_end=5)
         ft.sim_history.viz3d['cp'].set(tube_radius=0.002)

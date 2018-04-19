@@ -17,8 +17,8 @@ def create_cp():
     cp_factory = MiuraOriCPFactory()
     cp = cp_factory.formed_object
 
-    print 'Nodes of facets enumerated counter clock-wise\n', cp.F_N
-    print 'Lines of facets enumerated counter clock-wise\n', cp.F_L
+    print('Nodes of facets enumerated counter clock-wise\n', cp.F_N)
+    print('Lines of facets enumerated counter clock-wise\n', cp.F_L)
     # end
     return cp
 

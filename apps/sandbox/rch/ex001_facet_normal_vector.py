@@ -36,14 +36,14 @@ if __name__ == '__main__':
 
     cp = cp_factory.formed_object
 
-    print 'F_normals', cp.norm_F_normals.shape
-    print cp.norm_F_normals
+    print('F_normals', cp.norm_F_normals.shape)
+    print(cp.norm_F_normals)
 
-    print 'F_N'
-    print cp.F_N
+    print('F_N')
+    print(cp.F_N)
 
-    print 'F_L_vectors', cp.F_L_vectors.shape
-    print cp.F_L_vectors
+    print('F_L_vectors', cp.F_L_vectors.shape)
+    print(cp.F_L_vectors)
 
-    print 'F-L_vectors_dul', cp.F_L_vectors_dul.shape
-    print cp.F_L_vectors_dul
+    print('F-L_vectors_dul', cp.F_L_vectors_dul.shape)
+    print(cp.F_L_vectors_dul)

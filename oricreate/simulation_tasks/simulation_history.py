@@ -80,7 +80,7 @@ class SimulationHistory(CreasePattern):
     '''
 
     def _get_u(self):
-        print 'TIME STEP', self.time_step
+        print('TIME STEP', self.time_step)
         return self.u_t[self.time_step]
 
 
@@ -100,10 +100,10 @@ if __name__ == '__main__':
                             F=[[0, 1, 2]]
                             )
 
-    print 'vectors\n', cp.L_vectors
-    print 'lengths\n', cp.L_lengths
+    print('vectors\n', cp.L_vectors)
+    print('lengths\n', cp.L_lengths)
 
     cp.u = np.zeros_like(cp.x_0)
     cp.u[:, 2] = 1.0
 
-    print 'x\n', cp.x
+    print('x\n', cp.x)

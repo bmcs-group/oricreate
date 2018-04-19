@@ -15,7 +15,7 @@
 from traits.api import \
     implements
 
-from fu import \
+from .fu import \
     Fu
 from oricreate.opt import \
     IFu

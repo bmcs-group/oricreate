@@ -15,7 +15,7 @@
 from traits.api import \
     DelegatesTo, cached_property, Property
 
-from gu import \
+from .gu import \
     Gu
 import numpy as np
 
@@ -117,8 +117,8 @@ class GuAngle(Gu):
 
             if np.any(gamma == 1):
                 ix = np.where(gamma == 1)[0]
-                print 'Warning', 'Penetration occurred along the lines (%d, %d) and (%d, %d)' % \
-                    (i, neighbors[ix], i, neighbors[ix + 1])
+                print('Warning', 'Penetration occurred along the lines (%d, %d) and (%d, %d)' % \
+                    (i, neighbors[ix], i, neighbors[ix + 1]))
                 # raise ValueError, 'Penetration occurred
                 # along the lines (%d, %d) and (%d, %d)' % \
                 #    (i, neighbors[ix], i, neighbors[ix + 1])

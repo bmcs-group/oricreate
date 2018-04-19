@@ -8,11 +8,11 @@ from traits.api import \
     Interface, Property, Instance, \
     Dict, Str
 
-from i_fu import \
+from .i_fu import \
     IFu
-from i_gu import \
+from .i_gu import \
     IGu
-from i_hu import \
+from .i_hu import \
     IHu
 
 

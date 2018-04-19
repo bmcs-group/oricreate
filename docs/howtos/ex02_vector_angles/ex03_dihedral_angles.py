@@ -27,9 +27,9 @@ if __name__ == '__main__':
     cp = cpf.formed_object
     cp.u[3, 2] = 0.0
     cp.u[3, 0] = 0.0
-    print 'F_normals', cp.norm_F_normals
-    print 'iL_psi', cp.iL_psi
-    print 'iL_psi_du', cp.iL_psi_du
+    print('F_normals', cp.norm_F_normals)
+    print('iL_psi', cp.iL_psi)
+    print('iL_psi_du', cp.iL_psi_du)
 
     psi_max = 3.999 * np.pi / 4.0
     psi_constr = [([(i, 1.0)], lambda t: psi_max * t)

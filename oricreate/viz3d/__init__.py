@@ -23,7 +23,7 @@ interface as an mlab attribute
 
 '''
 
-from forming_task_anim3d import FormingTaskAnim3D, FTA
+from .forming_task_anim3d import FormingTaskAnim3D, FTA
 from oricreate.view.window.forming_task_view3d import FormingTaskView3D, FTV
-from visual3d import Visual3D, Vis3D
-from viz3d import Viz3D
+from .visual3d import Visual3D, Vis3D
+from .viz3d import Viz3D

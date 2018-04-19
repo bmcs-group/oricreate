@@ -8,7 +8,7 @@ from traits.api import \
     HasStrictTraits, WeakRef, Str, Event, Property, Int, Bool, \
     Dict, PrototypedFrom
 import traitsui.api as tui
-from visual3d import \
+from .visual3d import \
     Visual3D
 
 
@@ -72,11 +72,11 @@ class Viz3D(HasStrictTraits):
             self.hidden = True
 
     def hide(self):
-        for pipe in self.pipes.values():
+        for pipe in list(self.pipes.values()):
             pipe.visible = False
 
     def show(self):
-        for pipe in self.pipes.values():
+        for pipe in list(self.pipes.values()):
             pipe.visible = True
 
     def update_t(self, anim_t=0.0, vot=0.0):

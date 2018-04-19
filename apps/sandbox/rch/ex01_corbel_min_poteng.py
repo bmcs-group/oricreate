@@ -52,7 +52,7 @@ def create_cp_factory(n=4, b=1):
         X[n + i, 0] = i
         i = i + 1
 
-    print 'X', X
+    print('X', X)
 
     # create lines
 
@@ -95,7 +95,7 @@ def create_cp_factory(n=4, b=1):
         L[3 * n + i, 1] = k
         i = i + 1
 
-    print 'L', L
+    print('L', L)
 
     # create facets
 
@@ -121,7 +121,7 @@ def create_cp_factory(n=4, b=1):
         F[n + i - 1, 2] = i + n
         i = i + 1
 
-    print 'F', F
+    print('F', F)
 
     cp = CreasePatternState(X=X,
                             L=L,
@@ -171,15 +171,15 @@ if __name__ == '__main__':
 
     cp.u[1:n + 1, 2] = np.linspace(0, -0.001, n)
     cp.u[n + 1:(2 * n) + 1, 2] = np.linspace(0, -0.0005, n)
-    print 'kinematic simulation: u', sim_task.u_1
+    print('kinematic simulation: u', sim_task.u_1)
 
     cp = sim_task.formed_object
     iL_phi = cp.iL_psi - cp.iL_psi_0
-    print 'phi',  iL_phi
+    print('phi',  iL_phi)
     iL_length = np.linalg.norm(cp.iL_vectors, axis=1)
     iL_m = sim_config._fu.kappa * iL_phi * iL_length
 
-    print 'moments', iL_m
+    print('moments', iL_m)
 
     ftv = FTV()
     ftv.add(sim_task.sim_history.viz3d['displ'])

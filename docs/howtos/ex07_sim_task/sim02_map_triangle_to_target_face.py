@@ -54,17 +54,17 @@ def create_sim_step():
     sim_step = SimulationStep(forming_task=do_something,
                               config=sim_config)
     sim_step.t = 0.4
-    print 'goal function for t = 0.4:', sim_step.get_f()
+    print('goal function for t = 0.4:', sim_step.get_f())
     sim_step.t = 0.8
-    print 'goal function for t = 0.8:', sim_step.get_f()
-    print 'goal function derivatives'
-    print sim_step.get_f_du()
-    print 'constraints'
-    print sim_step.get_G()
-    print 'constraint derivatives'
-    print sim_step.get_G_du()
+    print('goal function for t = 0.8:', sim_step.get_f())
+    print('goal function derivatives')
+    print(sim_step.get_f_du())
+    print('constraints')
+    print(sim_step.get_G())
+    print('constraint derivatives')
+    print(sim_step.get_G_du())
     sim_step._solve_fmin()
-    print 'target position:\n', sim_step.cp_state.x
+    print('target position:\n', sim_step.cp_state.x)
     # end
     return sim_step
 

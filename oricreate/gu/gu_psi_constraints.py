@@ -10,8 +10,8 @@ from traits.api import \
     implements, \
     Array, cached_property, Property
 
-from gu import Gu
-from gu_psi_constraints_viz3d2 import \
+from .gu import Gu
+from .gu_psi_constraints_viz3d2 import \
     GuPsiConstraintsViz3D
 import numpy as np
 from oricreate.opt import \
@@ -49,10 +49,9 @@ class GuPsiConstraints(Gu, Visual3D):
             lhs, rhs = psi_cnstr  # @UnusedVariable
             for l, c in lhs:  # @UnusedVariable
                 if cp.L_iL[l] < 0:
-                    raise IndexError, \
-                        'GuPsiConstraint: line index %d does ' \
+                    raise IndexError('GuPsiConstraint: line index %d does ' \
                         'not refer to an interior line: '\
-                        'must be one of %s' % (l, cp.iL)
+                        'must be one of %s' % (l, cp.iL))
 
     def __str__(self):
         s = 'Gu: %s - %d\n' % (self.label, len(self.psi_constraints))

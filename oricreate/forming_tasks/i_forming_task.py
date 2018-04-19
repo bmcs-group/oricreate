@@ -15,7 +15,7 @@
 from traits.api import \
     Interface, Property, Self, Instance, Array
 
-from i_formed_object import IFormedObject
+from .i_formed_object import IFormedObject
 
 
 class IFormingTask(Interface):

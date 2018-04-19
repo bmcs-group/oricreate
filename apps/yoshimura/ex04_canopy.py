@@ -443,10 +443,10 @@ if __name__ == '__main__':
         lt.config.fu.viz3d['default'].set(anim_t_start=00, anim_t_end=50)
         ftv.add(lt.config.fu.viz3d['node_load'])
 
-        print 'u_13', lt.u_1[13, 2]
+        print('u_13', lt.u_1[13, 2])
         n_max_u = np.argmax(lt.u_1[:, 2])
-        print 'node max_u', n_max_u
-        print 'u_max', lt.u_1[n_max_u, 2]
+        print('node max_u', n_max_u)
+        print('u_max', lt.u_1[n_max_u, 2])
 
         ftv.plot()
         ftv.configure_traits()
@@ -454,7 +454,7 @@ if __name__ == '__main__':
         cp = lt.formed_object
         iL_phi = cp.iL_psi - cp.iL_psi_0
         iL_m = lt.config._fu.kappa * iL_phi
-        print 'moments', np.max(np.fabs(iL_m))
+        print('moments', np.max(np.fabs(iL_m)))
 
         fta.add_cam_move(duration=10, n=20)
         fta.add_cam_move(duration=10, n=20, vot_start=1.0)
@@ -475,7 +475,7 @@ if __name__ == '__main__':
         for state in states:
             fname = 'KO%s.txt' % state
             fname = path.join(test_dir, fname)
-            print 'read', fname
+            print('read', fname)
             measured_state = np.loadtxt(fname)
             x = measured_state[:, 1:]
             measured_states.append(x)

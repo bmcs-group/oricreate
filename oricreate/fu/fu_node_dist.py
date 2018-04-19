@@ -15,7 +15,7 @@
 from traits.api import \
     implements, Array
 
-from fu import \
+from .fu import \
     Fu
 import numpy as np
 from oricreate.opt import \

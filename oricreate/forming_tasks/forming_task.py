@@ -20,9 +20,9 @@ from traits.api import \
 from traitsui.api import \
     View, Item
 
-from i_formed_object import \
+from .i_formed_object import \
     IFormedObject
-from i_forming_task import \
+from .i_forming_task import \
     IFormingTask
 
 

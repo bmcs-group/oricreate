@@ -86,6 +86,7 @@ The convention of rotation around ``z``, followed by rotation around
 import math
 
 import numpy as np
+from functools import reduce
 
 
 _FLOAT_EPS_4 = np.finfo(float).eps * 4.0
@@ -472,7 +473,7 @@ def rotation_to_vtk(R):
 
 if __name__ == '__main__':
 
-    from einsum_utils import EPS
+    from .einsum_utils import EPS
 
     def get_orthonormal_basis(m):
 
@@ -480,8 +481,8 @@ if __name__ == '__main__':
         v1 = M[..., 2, :] - M[..., 0, :]
         v2 = np.einsum('...ijk,...j,...k->...i', EPS, v0, v1)
         v1 = np.einsum('...ijk,...j,...k->...i', EPS, v2, v0)
-        print v0
-        print v1
+        print(v0)
+        print(v1)
         basis = np.c_[v0, v1, v2].T
         return basis / np.linalg.norm(basis, axis=1)[:, None]
 
@@ -498,9 +499,9 @@ if __name__ == '__main__':
                       [0.94280904, -0.23570226, -0.23570226],
                       [0.33333333,  0.66666667,  0.66666667]], dtype='float_')
 
-    print 'basis\n', basis
+    print('basis\n', basis)
     ae = mat2euler(basis)
-    print 'euler\n', ae
-    print 'basis\n', euler2mat(*ae)
+    print('euler\n', ae)
+    print('basis\n', euler2mat(*ae))
 
     # print 'newone', rotation_to_vtk(basis[0])

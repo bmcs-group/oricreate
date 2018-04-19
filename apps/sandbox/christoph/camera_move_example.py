@@ -40,7 +40,7 @@ class CameraMovementExample(HasStrictTraits):
                                                 distance=v[2],
                                                 focal_point=tuple(v[3]),
                                                 roll=r)
-        print 'from_station set.'
+        print('from_station set.')
 
     def _b2_fired(self):
         '''Set the to_station of the cam_move
@@ -52,7 +52,7 @@ class CameraMovementExample(HasStrictTraits):
                                               distance=v[2],
                                               focal_point=tuple(v[3]),
                                               roll=r)
-        print 'to_station set.'
+        print('to_station set.')
 
     def _cur_frame_changed(self):
         '''Change to the selected frame
@@ -70,7 +70,7 @@ class CameraMovementExample(HasStrictTraits):
     def _b_pv_fired(self):
         '''Print current view
         '''
-        print self.mlab.view(), self.mlab.roll()
+        print(self.mlab.view(), self.mlab.roll())
 
     traits_view = View(
         VGroup(

@@ -15,7 +15,7 @@ import os
 import sys
 
 
-print 'PATH', sys.path
+print('PATH', sys.path)
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -64,8 +64,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'oricreate'
-copyright = u'2014, Rostislav Chudoba'
+project = 'oricreate'
+copyright = '2014, Rostislav Chudoba'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -202,8 +202,8 @@ latex_font_size = '12pt'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ('index', 'oricreate.tex', u'oricreate Documentation',
-     u'Rostislav Chudoba', 'manual', True),
+    ('index', 'oricreate.tex', 'oricreate Documentation',
+     'Rostislav Chudoba', 'manual', True),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -256,8 +256,8 @@ latex_elements = {
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'oricreate', u'oricreate Documentation',
-     [u'Rostislav Chudoba'], 1)
+    ('index', 'oricreate', 'oricreate Documentation',
+     ['Rostislav Chudoba'], 1)
 ]
 
 

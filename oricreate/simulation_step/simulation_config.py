@@ -68,8 +68,8 @@ class SimulationConfig(HasStrictTraits):
 
     def _set_fu(self, value):
         if not value.__class__ is self.goal_function_type_:
-            raise TypeError, 'Goal function has type %s but should be %s' % \
-                (value.__class__, self.goal_function_type_)
+            raise TypeError('Goal function has type %s but should be %s' % \
+                (value.__class__, self.goal_function_type_))
         self._fu = value
 
     gu = Dict(Str, IGu)
@@ -84,9 +84,9 @@ class SimulationConfig(HasStrictTraits):
     '''
     @cached_property
     def _get_gu_lst(self):
-        for name, gu in self.gu.items():
+        for name, gu in list(self.gu.items()):
             gu.label = name
-        return self.gu.values()
+        return list(self.gu.values())
 
     selected_gu = Instance(IGu)
 
@@ -102,7 +102,7 @@ class SimulationConfig(HasStrictTraits):
     '''
     @cached_property
     def _get_hu_lst(self):
-        return self.hu.values()
+        return list(self.hu.values())
 
     selected_hu = Instance(IHu)
 

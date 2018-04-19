@@ -14,7 +14,7 @@
 
 from traits.api import HasTraits, Property, DelegatesTo, Str
 
-from gu import \
+from .gu import \
     Gu
 import numpy as np
 import sympy as sp
@@ -93,16 +93,16 @@ class GuPointsOnSurface(Gu):
 if __name__ == '__main__':
     control_face = CF(Rf=(x_ - t_) ** 2 - y_ ** 2 - 0)
 
-    print control_face.Rf(1, 2, 3, 0)
-    print control_face.Rf(1, 2, 3, 1)
+    print(control_face.Rf(1, 2, 3, 0))
+    print(control_face.Rf(1, 2, 3, 1))
 
-    print control_face.dRf(1, 2, 3, 1)
+    print(control_face.dRf(1, 2, 3, 1))
 
     xx = np.linspace(0, 10, 5)
     yy = np.linspace(-2, 4, 6)
 
-    print control_face.dRf(xx, yy, xx, 0)
-    print control_face.dRf(xx, yy, xx, 1)
+    print(control_face.dRf(xx, yy, xx, 0))
+    print(control_face.dRf(xx, yy, xx, 1))
 
     from oricreate.api import FormingTask, CreasePattern
 
@@ -118,5 +118,5 @@ if __name__ == '__main__':
     U = np.zeros_like(cp.X)
     U[2] += 1.0
 
-    print [sliding_face.get_G(U, 0)]
-    print [sliding_face.get_G_du(U, 0)]
+    print([sliding_face.get_G(U, 0)])
+    print([sliding_face.get_G_du(U, 0)])

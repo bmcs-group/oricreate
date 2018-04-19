@@ -14,7 +14,7 @@
 from traits.api import \
     implements
 
-from gu import \
+from .gu import \
     Gu, IGu
 import numpy as np
 
@@ -95,5 +95,5 @@ if __name__ == '__main__':
     U = np.zeros_like(cp.X)
     U[2] += 1.0
 
-    print [constant_length.get_G(U, 0)]
-    print [constant_length.get_G_du(U, 0)]
+    print([constant_length.get_G(U, 0)])
+    print([constant_length.get_G_du(U, 0)])

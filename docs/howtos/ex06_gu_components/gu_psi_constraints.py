@@ -27,10 +27,10 @@ def create_gu():
                          psi_constraints=[([(0, 1.0)], 0),
                                           ])
     cp = cp_factory.formed_object
-    print cp.iL
-    print cp.iL_psi
-    print 'gu:', gu_dof_constraints.get_G(1.0)
-    print 'g_du:\n', gu_dof_constraints.get_G_du(1.0)
+    print(cp.iL)
+    print(cp.iL_psi)
+    print('gu:', gu_dof_constraints.get_G(1.0))
+    print('g_du:\n', gu_dof_constraints.get_G_du(1.0))
     # end
     return gu_dof_constraints
 

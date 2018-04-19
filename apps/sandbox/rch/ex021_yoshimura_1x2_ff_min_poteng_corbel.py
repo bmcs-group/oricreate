@@ -100,7 +100,7 @@ class BarrellVaultGravityFormingProcess(HasTraits):
 
         F_ext_list = [(n, 2, FN(-1)) for n in [1, 3]]
 
-        print 'F_ext_list', F_ext_list
+        print('F_ext_list', F_ext_list)
         fu_tot_poteng = FuPotEngTotal(kappa=10, fu_factor=1,
                                       F_ext_list=F_ext_list)
         sim_config._fu = fu_tot_poteng
@@ -148,16 +148,16 @@ if __name__ == '__main__':
     # print 'ft_x1', ft.x_1
     lt.u_1
     cp = lt.formed_object
-    print 'lt_x0', cp.x_0
-    print 'lt_u', cp.u
+    print('lt_x0', cp.x_0)
+    print('lt_u', cp.u)
     cp.u[:, 1] = -0.001
-    print 'lt.u_1', lt.u_1
+    print('lt.u_1', lt.u_1)
 
     cp = lt.formed_object
     iL_phi = cp.iL_psi - cp.iL_psi_0
-    print 'iL_phi',  iL_phi
+    print('iL_phi',  iL_phi)
 
-    print 'lengths', cp.L_lengths
+    print('lengths', cp.L_lengths)
 
     ftv.plot()
     ftv.update(vot=1, force=True)

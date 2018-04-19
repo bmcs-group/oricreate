@@ -141,7 +141,7 @@ class WBShellFormingProcess(FormingProcess):
         n_F = len(cp.F)
         cp.F = np.vstack([cp.F, F_add_L, F_add_U])
 
-        print cp.F_L[n_F:]
+        print(cp.F_L[n_F:])
 
         return yf
 
@@ -203,7 +203,7 @@ class WBShellFormingProcess(FormingProcess):
             base_h_y = np.hstack([base_h_y, right2_h_y])
 
         for c_y in range(0, self.n_cell_y - 1):
-            print 'c_y', c_y
+            print('c_y', c_y)
             base_i_x = np.hstack([base_i_x, up2_i_x])
             base_i_y = np.hstack([base_i_y, c_y + up2_i_y])
             base_h_x = np.hstack([base_h_x, up2_h_x])
@@ -215,12 +215,12 @@ class WBShellFormingProcess(FormingProcess):
         n_nodes = f.N_h[base_h_x, base_h_y]
 
         psi_lines = cp.NN_L[[m_nodes], n_nodes].flatten()
-        print 'psi_lines', psi_lines
+        print('psi_lines', psi_lines)
 
         cm_node = f.N_i[0, 0]
         cn_node = f.N_h[1, 1]
         cpsi_line = cp.NN_L[cm_node, cn_node]
-        print 'cpsi_lines', cpsi_line
+        print('cpsi_lines', cpsi_line)
 
         N_h = f.N_h
         N_i = f.N_i
@@ -240,10 +240,10 @@ class WBShellFormingProcess(FormingProcess):
             lambda t: t * u_max
         )
 
-        print '--------------------------'
-        print N_i[0, 0].flatten()
-        print N_i[2, 0].flatten()
-        print '--------------------------'
+        print('--------------------------')
+        print(N_i[0, 0].flatten())
+        print(N_i[2, 0].flatten())
+        print('--------------------------')
 
         dof_constraints = fixed_nodes_x + fixed_nodes_z + fixed_nodes_y  # + \
         # link_mid
@@ -277,11 +277,11 @@ class WBShellFormingProcess(FormingProcess):
         N_down = np.hstack([N_h[::3, :].flatten(),
                             N_i[1::3, :].flatten()
                             ])
-        print 'N_down', N_down
+        print('N_down', N_down)
         N_up = np.hstack([N_i[::3, :].flatten(),
                           N_i[2::3, :].flatten(),
                           N_v[:, :].flatten()])
-        print 'N_up', N_up
+        print('N_up', N_up)
         cp.u[N_down, 2] -= self.d_down
         cp.u[N_up, 2] += self.d_up
         cp.u[:, 2] += self.d_down
@@ -305,16 +305,16 @@ class WBShellFormingProcess(FormingProcess):
         cp = f.formed_object
         m_n = f.N_h[(0, 0, -1, -1), (0, -1, 0, -1)]
         n_n = f.N_v[(0, 0, -1, -1), (0, -1, 0, -1)]
-        print m_n.flatten()
-        print n_n.flatten()
+        print(m_n.flatten())
+        print(n_n.flatten())
 
         fix_psi_lines = cp.NN_L[m_n, n_n].flatten()
-        print 'psi_lines', fix_psi_lines
+        print('psi_lines', fix_psi_lines)
 
         cm_nodes = [f.N_i[0, 0], f.N_i[-1, 1]]
         cn_nodes = [f.N_h[1, 1], f.N_h[2, 1]]
         cpsi_lines = cp.NN_L[cm_nodes, cn_nodes]
-        print 'cpsi_lines', cpsi_lines
+        print('cpsi_lines', cpsi_lines)
 
         N_h = f.N_h
         N_i = f.N_i
@@ -349,7 +349,7 @@ class WBShellFormingProcess(FormingProcess):
         fix_psi_constr = [([(i, 1.0)], 0.0)
                           for i in fix_psi_lines]
 
-        print 'fix_psi_lines', fix_psi_lines
+        print('fix_psi_lines', fix_psi_lines)
         gu_psi_constraints = \
             GuPsiConstraints(forming_task=self.init_displ_task,
                              psi_constraints=fix_psi_constr + cpsi_constr)
@@ -371,11 +371,11 @@ class WBShellFormingProcess(FormingProcess):
                             N_i[1::3, :].flatten(),
                             [23, 26]
                             ])
-        print 'N_down', N_down
+        print('N_down', N_down)
         N_up = np.hstack([N_i[::3, :].flatten(),
                           N_i[2::3, :].flatten(),
                           N_v[:, :].flatten()])
-        print 'N_up', N_up
+        print('N_up', N_up)
         cp.u[N_down, 2] -= self.d_down
         cp.u[N_up, 2] += self.d_up
         cp.u[:, 2] += self.d_down
@@ -457,11 +457,11 @@ class WBShellFormingProcess(FormingProcess):
         N_down = np.hstack([N_h[::3, :].flatten(),
                             N_i[1::3, :].flatten()
                             ])
-        print 'N_down', N_down
+        print('N_down', N_down)
         N_up = np.hstack([N_i[::3, :].flatten(),
                           N_i[2::3, :].flatten(),
                           N_v[:, :].flatten()])
-        print 'N_up', N_up
+        print('N_up', N_up)
         cp.u[N_down, 2] -= self.d_down
         cp.u[N_up, 2] += self.d_up
         cp.u[:, 2] += self.d_down
@@ -528,11 +528,11 @@ class WBShellFormingProcess(FormingProcess):
         E_mod = 21.0e+4
         I = 1.0 * thickness**3 / 12.0
         kappa = E_mod * I
-        print 'kappa', kappa
+        print('kappa', kappa)
 
         sig_tu = 3000.0
         m_u = sig_tu * 1.0 * thickness**2 / 6.0
-        print 'm_u', m_u
+        print('m_u', m_u)
 
         fu_tot_poteng = FuPotEngTotal(
             exclude_lines=exclude_lines,
@@ -595,7 +595,7 @@ class WBShellFormingProcess(FormingProcess):
         n_vv = np.sqrt(np.einsum('...i,...i', v, v))
         phi = np.arcsin(s_uxv * n_uxv / (n_uu * n_vv))
 
-        print n_uu
+        print(n_uu)
         return n_uu, n_vv, phi
 
     def generate_fe_mesh(self, t):
@@ -660,7 +660,7 @@ if __name__ == '__main__':
     ftv = mw.forming_task_scene
 
     fa = bsf_process.factory_task
-    print fa.formed_object.iL_psi
+    print(fa.formed_object.iL_psi)
 
     if False:
         import pylab as p
@@ -699,7 +699,7 @@ if __name__ == '__main__':
         from oricreate.view import FormingProcessView as FPV
         ftt = FPV(forming_process=bsf_process)
         ftt.configure_traits()
-        print ft.sim_step
+        print(ft.sim_step)
 
         ft.sim_history.set(anim_t_start=0, anim_t_end=10)
         ft.config.gu['dofs'].set(anim_t_start=0, anim_t_end=5)
@@ -746,16 +746,16 @@ if __name__ == '__main__':
         node_heights = [12, 18, 1, 4, 0, 3]
 
         for node in node_heights:
-            print 'node %d, %5.3f [%5.3f, %5.3f, %5.3f]' % \
+            print('node %d, %5.3f [%5.3f, %5.3f, %5.3f]' % \
                 (node, cp.x[node, 2], cp.u[node, 0],
-                 cp.u[node, 1], cp.u[node, 2])
+                 cp.u[node, 1], cp.u[node, 2]))
 
         iL_psi = cp.iL_psi / np.pi * 180.0
 
         recorded_creases = [4, 17, 36, 29, 24, 19, 38]
 
         for crease in recorded_creases:
-            print 'crease %d, %5.2f' % (crease, iL_psi[cp.L_iL[crease]])
+            print('crease %d, %5.2f' % (crease, iL_psi[cp.L_iL[crease]]))
 
         # bsf_process.generate_fe_mesh_kinem()
 
@@ -766,7 +766,7 @@ if __name__ == '__main__':
     if show_fold_self_weight_cntl:
         ft = bsf_process.fold_self_weight_cntl
 
-        print ft.sim_step
+        print(ft.sim_step)
 
         ft.sim_history.set(anim_t_start=0, anim_t_end=10)
         ft.config.gu['dofs'].set(anim_t_start=0, anim_t_end=5)
@@ -795,7 +795,7 @@ if __name__ == '__main__':
         ftv.add(lot.config.fu.viz3d['node_load'])
         lot.config.fu.viz3d['node_load'].set(anim_t_start=00, anim_t_end=50)
         u_max = np.max(np.fabs(lot.u_1))
-        print u_max
+        print(u_max)
 
         fta.add_cam_move(duration=10, n=20)
 

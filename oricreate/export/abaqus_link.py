@@ -16,7 +16,7 @@ from traits.api import HasTraits, Property, cached_property, \
     Array, Int, \
     Str, Float, Dict, WeakRef
 
-import abaqus_shell_manager as asm
+from . import abaqus_shell_manager as asm
 import numpy as np
 
 
@@ -250,10 +250,10 @@ class AbaqusLink(HasTraits):
                     cl_index[c] = self._origin_cl.tolist().index(
                         [cl[c][1], cl[c][0]])
 
-            step = range(self.n_split - 2)
+            step = list(range(self.n_split - 2))
 
             if cl_dir[0] is False:
-                step = range(self.n_split - 2, 0, -1)
+                step = list(range(self.n_split - 2, 0, -1))
 
             counter_f = 0
             for counter in step:
@@ -291,9 +291,9 @@ class AbaqusLink(HasTraits):
                                          node_index_cl]))
                 counter_f += 1
 
-            step = range(self.n_split - 2)
+            step = list(range(self.n_split - 2))
             if(cl_dir[1] is False):
-                step = range(self.n_split - 2, 0, -1)
+                step = list(range(self.n_split - 2, 0, -1))
             counter_f = 0
             f_pos = self.n_split - 3
             for counter in step:
@@ -330,9 +330,9 @@ class AbaqusLink(HasTraits):
                                          node_index_cl]))
                 counter_f += 1
 
-            step = range(1, self.n_split - 1)
+            step = list(range(1, self.n_split - 1))
             if(cl_dir[2]):
-                step = range(self.n_split - 2)
+                step = list(range(self.n_split - 2))
                 step.reverse()
 
             counter_f = 0
@@ -440,7 +440,7 @@ class AbaqusLink(HasTraits):
 *Elset, elset=_Surf-1_SNEG,  internal, instance=Part-A, generate\n 1,\t %i,\t 1\n' % (len(self.nodes), len(self.facets), len(self.facets))
         set_str += '*Nset, nset=boundery, instance=Part-A\n'
         for i in self.bounded_nodes:
-            print i
+            print(i)
             set_str += '%i, ' % (i)
         set_str += '\n'
         return set_str
@@ -611,7 +611,7 @@ S,\n\
         inp_file.write(output)
 
         inp_file.close()
-        print'inp file %s written' % fname
+        print('inp file %s written' % fname)
 
 #=======================================================================
 # Connection to server and solving of the problem
@@ -651,23 +651,23 @@ S,\n\
         # establish connection
         asm.connect_cluster(
             p, self.login, self.tail, cluster=self.cluster, options=self.options)
-        print asm.recv_some(p)
+        print(asm.recv_some(p))
         # delete old files with same name
         asm.delete_old(p, self.model_name, self.tail)
-        print asm.recv_some(p)
+        print(asm.recv_some(p))
         # upload the input file
         asm.upload_file(p, self.login, self.model_name + '.inp', self.tail)
-        print asm.recv_some(p)
+        print(asm.recv_some(p))
         # start abaqus solver on server
         asm.solve_abaqus(p, self.model_name, self.tail)
-        print asm.recv_some(p)
+        print(asm.recv_some(p))
         # close connection
         asm.close_connection(p, self.tail)
         # open new connection for downloading results
         p = asm.open_shell()
         asm.download_file(
             p, self.login, self.model_name + '.dat', self.tail, self.model_name + '.dat')
-        print asm.recv_some(p)
+        print(asm.recv_some(p))
         p.kill()
 
     def abaqus_cae(self):
@@ -676,9 +676,9 @@ S,\n\
         # establish connection
         asm.connect_cluster(
             p, self.login, self.tail, cluster=self.cluster, options=self.options)
-        print asm.recv_some(p)
+        print(asm.recv_some(p))
         asm.open_abaqus(p, self.tail)
-        print asm.recv_some(p)
+        print(asm.recv_some(p))
         asm.close_connection(p, self.tail)
 
 

@@ -30,8 +30,8 @@ def create_cp():
                             L=L,
                             F=F)
 
-    print 'Initial configuration'
-    print 'Orthonormal base vectors of a first edge\n', cp.F_L_bases[:, 0, :, :]
+    print('Initial configuration')
+    print('Orthonormal base vectors of a first edge\n', cp.F_L_bases[:, 0, :, :])
 
     return cp
 
@@ -39,8 +39,8 @@ def create_cp():
     cp.u[2, 2] = 1.0
     cp.u = cp.u
 
-    print 'Displaced configuration'
-    print 'Orthonormal base vectors of a first edge r\n', cp.F_L_bases[:, 0, :, :]
+    print('Displaced configuration')
+    print('Orthonormal base vectors of a first edge r\n', cp.F_L_bases[:, 0, :, :])
 
     # end
     return cp

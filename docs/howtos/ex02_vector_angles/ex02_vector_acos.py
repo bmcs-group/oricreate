@@ -16,9 +16,9 @@ if __name__ == '__main__':
     b = np.array([[0, 1], [1, 1], [1, -1]], dtype='f')
 
     print('gamma')
-    print(get_cos_theta(a, b))
+    print((get_cos_theta(a, b)))
     print('theta')
-    print(get_theta(a, b))
+    print((get_theta(a, b)))
 
     I = np.diag(np.ones((2,), dtype='f'))
     # dimensions of the derivatives are stored as:
@@ -35,6 +35,6 @@ if __name__ == '__main__':
                      [[[-1, 0]], [[0, -1]]]], dtype='f')
 
     print('gamma_du')
-    print(get_cos_theta_du(a, a_du, b, b_du))
-    print 'theta_du'
-    print(get_theta_du(a, a_du, b, b_du))
+    print((get_cos_theta_du(a, a_du, b, b_du)))
+    print('theta_du')
+    print((get_theta_du(a, a_du, b, b_du)))

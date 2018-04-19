@@ -118,9 +118,9 @@ def create_cp_factory():
     cp.u[(2, 3, 8, 9), 2] = 0.01
     cp.u[(6, 7, 12, 13), 2] = -0.005
     cp.u[(10, 11, 14, 15), 2] = 0.005
-    print 'n_N', cp.n_N
-    print 'n_L', cp.n_L
-    print 'n_free', cp.n_dofs - cp.n_L
+    print('n_N', cp.n_N)
+    print('n_L', cp.n_L)
+    print('n_free', cp.n_dofs - cp.n_L)
 
     cp_factory = CustomCPFactory(formed_object=cp)
     # end
@@ -160,6 +160,6 @@ class TwistFolding(SimulationTask):
 if __name__ == '__main__':
 
     twist_folding = TwistFolding(n_steps=40)
-    print twist_folding.u_t
-    print twist_folding.u_1
+    print(twist_folding.u_t)
+    print(twist_folding.u_1)
     # print twist_folding.sim_history.u_t[-1]
