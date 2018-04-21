@@ -33,7 +33,7 @@ class FormingTask(HasStrictTraits):
     """
     source_config_changed = Event
 
-    implements(IFormingTask)
+    # implements(IFormingTask)
 
     node = Str
     '''Name of the tree node
