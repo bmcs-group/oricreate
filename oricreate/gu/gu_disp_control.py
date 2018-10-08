@@ -4,6 +4,8 @@ Created on Feb 19, 2015
 @author: rch
 '''
 
+import numbers
+
 from traits.api import \
     implements, \
     Array, DelegatesTo, cached_property, Property
@@ -303,7 +305,13 @@ class GuDofConstraints(Gu, Visual3D):
             lhs, rhs = dof_cnstr
             for n, d, c in lhs:  # @UnusedVariable
                 G[i] += c * u[n, d]
-            G[i] -= rhs(t) if rhs else 0
+            if rhs:
+                if isinstance(rhs, numbers.Number):
+                    G[i] -= rhs
+                elif callable(rhs):
+                    G[i] -= rhs(t)
+            else:
+                G[i] -= 0
         return G
 
     def get_G_du(self, t=0.0):

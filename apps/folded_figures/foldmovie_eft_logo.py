@@ -20,17 +20,18 @@ import numpy as np
 from oricreate.api import FTV, FTA
 from oricreate.crease_pattern import \
     CreasePatternNormalsViz3D, CreasePatternBasesViz3D
-from oricreate.crease_pattern.crease_pattern_viz3d import CreasePatternThickViz3D
+from oricreate.crease_pattern.crease_pattern_viz3d import \
+    CreasePatternThickViz3D
 from oricreate.gu import GuConstantLength, GuDofConstraints, fix
 from oricreate.simulation_step import \
     SimulationStep, SimulationConfig
 from sim_task_twist_folding import \
-    TwistFolding, create_cp_factory, oricreate_mlab_label
+    TwistFolding, create_cp_factory, damped_range
 
 
 def run_sim():
 
-    cp_factory = create_cp_factory()
+    cp_factory, L_selection = create_cp_factory()
     cp = cp_factory.formed_object
 
     if False:
@@ -42,8 +43,11 @@ def run_sim():
 
     # Configure simulation
     gu_constant_length = GuConstantLength()
-    dof_constraints = fix(
-        [0], [0, 1, 2]) + fix([1], [1, 2]) + fix([5], [2]) + fix([3], [0], -1.9599)
+    dof_constraints = \
+        fix([0], [0, 1, 2]) +\
+        fix([1], [1, 2]) +\
+        fix([5], [2]) +\
+        fix([3], [0], lambda t: t * -1.9599)
     gu_dof_constraints = GuDofConstraints(dof_constraints=dof_constraints)
     sim_config = SimulationConfig(gu={'cl': gu_constant_length,
                                       'dofs': gu_dof_constraints},
@@ -159,11 +163,11 @@ def run_sim():
     eft_thick_viz3d = CreasePatternThickViz3D(
         label='EFT thick', vis3d=cp,
         plane_offsets=plane_offsets)
-    cp.viz3d.set(tube_radius=tube_radius)
+    cp.viz3d['cp'].set(tube_radius=tube_radius)
 
     # Configure scene
     ftv = FTV()
-    ftv.add(cp.viz3d)
+    ftv.add(cp.viz3d['cp'])
     ftv.add(eft_thick_viz3d)
     ftv.add(efttitle_front_viz3d)
     ftv.add(efttitle_back_viz3d)
@@ -176,7 +180,7 @@ def run_sim():
     fig = m.gcf()
 
     ftv.plot()
-    oricreate_mlab_label(m)
+#    oricreate_mlab_label(m)
 
     a, e, d, f = m.view()
     e = 135  # 10
@@ -299,7 +303,7 @@ def run_sim():
                                             roll_range[time_range],
                                             d_range[time_range])):
         gu_dof_constraints.dof_constraints[-1][-1] = u
-        sim_step._solve_nr(1.0)
+        sim_step._solve_nr()
         f = sim_step.forming_task.formed_object.center
         print 'perspective - before', ftv.mlab.view()
         print 'roll', ftv.mlab.roll()
@@ -329,6 +333,7 @@ def run_sim():
         print 'animation saved in', destination
 
     ftv.show()
+
 
 if __name__ == '__main__':
     run_sim()

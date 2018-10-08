@@ -31,6 +31,9 @@ class Viz3DDict(HasStrictTraits):
             self._viz3d_objects[key] = viz3d
         return viz3d
 
+    def values(self):
+        return self._viz3d_objects.values()
+
 
 class Visual3D(HasStrictTraits):
     '''Each state and operator object can be associated with 
@@ -64,5 +67,6 @@ class Visual3D(HasStrictTraits):
     def viz3d_notify_change(self):
         for viz3d in self.viz3d.values():
             viz3d.vis3d_changed = True
+
 
 Vis3D = Visual3D

@@ -59,7 +59,9 @@ class CreasePatternViz3D(Viz3D):
         if len(F) > 0:
             cp_pipe = m.triangular_mesh(x, y, z, F,
                                         line_width=3,
+                                        # color=self.facet_color.toTuple()[:-1],
                                         color=(0.6, 0.625, 0.683),
+                                        #                                        color=(0.0, 0.425, 0.683),
                                         name='Crease pattern')
 #                                        color=self.facet_color.toTuple()[:-1])
             if self.lines is True:
@@ -250,7 +252,7 @@ class CreasePatternBasesViz3D(Viz3D):
         self.pipes['quifer3d_pipe_blu'] = m.quiver3d(
             *args_blu, color=(0, 0, 1))
 
-    def update(self):
+    def update(self, vot=0.0):
         '''Update positions of the bases.
         '''
         Fa_r, F_L_bases = self.get_values()
@@ -294,7 +296,7 @@ class CreasePatternNodeNumbersViz3D(Viz3D):
             text = np.hstack([text, temp_text])
         self.text_entries = text
 
-    def update(self):
+    def update(self, vot=0.0):
         '''
         Update the labels of nodeindexes (node_index_pipeline)
         '''

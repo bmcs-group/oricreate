@@ -4,11 +4,13 @@ Created on Dec 3, 2015
 @author: rch
 '''
 
-from mayavi import mlab
 import os.path
+
+from mayavi import mlab
 from traits.api import \
     HasTraits, Array, Tuple, Property, List,\
     cached_property
+from tvtk.api import tvtk
 
 import matplotlib.pyplot as pl
 import numpy as np
@@ -259,7 +261,8 @@ class FacetsWithImageViz3D(CreasePatternDecoratorViz3D):
 
     im_centers = Property(Array, depends_on='+input')
     '''Get the local image centers.'''
-    @cached_property
+    #@cached_property
+
     def _get_im_centers(self):
         z0 = np.zeros_like(self.im_widths)
         c0 = np.c_[self.im_widths / 2.0,
@@ -268,14 +271,16 @@ class FacetsWithImageViz3D(CreasePatternDecoratorViz3D):
 
     glb_centers = Property(Array, depends_on='vis3d_changed, +input')
     '''Centers of images in global coordinates'''
-    @cached_property
+    #@cached_property
+
     def _get_glb_centers(self):
         return self.x_refs + np.einsum('...ij,...i->...j', self.bases, self.im_centers)
 
     rotated_bases = Property(Array, depends_on='vis3d_changed, +input')
     '''Rotate the base within the facet plane.
     '''
-    @cached_property
+    #@cached_property
+
     def _get_rotated_bases(self):
         at = self.atimes * np.pi / 180.0
         cat, sat = np.cos(at), np.sin(at)
@@ -289,8 +294,10 @@ class FacetsWithImageViz3D(CreasePatternDecoratorViz3D):
     glb_euler_angles = Property(Array, depends_on='vis3d_changed, +input')
     '''Get the euler angles.
     '''
-    @cached_property
+    #@cached_property
+
     def _get_glb_euler_angles(self):
+        print 'NEW ELUER ANGLES'
         ea = np.array([euler_from_matrix(base.T, 'syxz')
                        for base in self.rotated_bases], dtype='float_') / np.pi * 180.0
         return ea[:, (1, 0, 2)]
@@ -298,7 +305,8 @@ class FacetsWithImageViz3D(CreasePatternDecoratorViz3D):
     alpha_channels = Property(Array, depends_on='vis3d_changed, +input')
     '''Get the alpha chanel making the pixels outside the facet transparent.
     '''
-    @cached_property
+    #@cached_property
+
     def _get_alpha_channels(self):
         achannel = []
         for im_array, im_shape, c, s, rb, F_c in zip(self.im_arrays,
@@ -363,7 +371,7 @@ class FacetsWithImageViz3D(CreasePatternDecoratorViz3D):
             imshows.append(imshow)
         self.imshows = imshows
 
-    def update(self):
+    def update(self, vot=0.0):
         '''Update the orientation and position of the image
         '''
         for imshow, p, o in zip(self.imshows, self.glb_centers,
@@ -387,23 +395,36 @@ class FacetsWithImageViz3D(CreasePatternDecoratorViz3D):
         # The lut is a Nx4 array, with the columns representing RGBA
         # (red, green, blue, alpha) coded with integers going from 0 to 255,
         # we create it by stacking all the pixles (r,g,b,alpha) as rows.
-        lut = np.c_[im.reshape(-1, 3), alpha]
-        lut_lookup_array = np.arange(
-            im.shape[0] * im.shape[1]).reshape(im.shape[0], im.shape[1])
+#         lut = np.c_[im.reshape(-1, 3), alpha] / 255.0
+#         lut_lookup_array = np.arange(
+#             im.shape[0] * im.shape[1]).reshape(im.shape[0], im.shape[1])
 
         # We can display an color image by using mlab.imshow, a lut color list and
         # a lut lookup table.
         # temporary colormap
-        imshow = mlab.imshow(lut_lookup_array,
-                             colormap='binary',
-                             **kwargs)
+#         imshow = mlab.imshow(lut_lookup_array,
+#                              colormap='binary',
+#                              **kwargs)
 
-        imshow.actor.scale = (scale, scale, 1.0)
-        imshow.actor.position = position
-        imshow.actor.orientation = orientation
-        imshow.module_manager.scalar_lut_manager.lut.table = lut
+        colors = tvtk.UnsignedCharArray()
+        im_shape = im.shape
+        im_rgba = np.concatenate((im,
+                                  alpha.reshape(im_shape[0], im_shape[1], 1)),
+                                 axis=-1)
+        im_rgba_T = im_rgba.transpose((1, 0, 2))
+        colors.from_array(im_rgba_T.reshape(-1, 4))
+        image = mlab.imshow(np.ones(im_rgba_T.shape[:2]))
+        image.actor.input.point_data.scalars = colors
 
-        return imshow
+        image.actor.scale = (scale, scale, 1.0)
+        image.actor.position = position
+        image.actor.orientation = orientation
+        #imshow.module_manager.scalar_lut_manager.lut.table = lut
+        # print 'xxx'
+        # imshow.module_manager.scalar_lut_manager.load_lut_from_list(lut)
+        # print 'yyy'
+        return image
+
 
 if __name__ == '__main__':
 
@@ -442,7 +463,7 @@ if __name__ == '__main__':
     print 'glb_angles', efttitle_viz3d.glb_euler_angles
 
     ftv = FTV()
-    ftv.add(cp.viz3d)
+    ftv.add(cp.viz3d['cp'])
     ftv.add(efttitle_viz3d)
     ftv.add(eftlogo_bases)
 
@@ -461,4 +482,6 @@ if __name__ == '__main__':
     print 'glb_angles', efttitle_viz3d.glb_euler_angles
 
     ftv.update(force=True)
-    m.show()
+    print 'plot'
+    ftv.configure_traits()
+    print 'show'

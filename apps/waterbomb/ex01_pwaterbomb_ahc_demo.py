@@ -481,6 +481,9 @@ if __name__ == '__main__':
     if show_fold_angle_cntl:
         ft = bsf_process.fold_angle_cntl
 
+        cp = ft.formed_object
+        print 'NDOFS', cp.n_dofs
+
         print ft.sim_step
 
         ft.sim_history.set(anim_t_start=0, anim_t_end=10)

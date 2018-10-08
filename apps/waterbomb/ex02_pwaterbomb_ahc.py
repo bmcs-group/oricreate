@@ -302,7 +302,7 @@ if __name__ == '__main__':
 
     L_x = 0.6
     a_arr = np.array([0.36, 0.28, 0.20, 0.12, 0.04], dtype=np.float_)
-    a_arr = np.linspace(0.04, 0.36, 30)
+    a_arr = np.linspace(0.04, 0.36, 10)
     eta = a_arr / L_x
     c_arr = L_x * (1 - eta) / 2.0
     kw_arr = [dict(a=a,
@@ -343,11 +343,16 @@ if __name__ == '__main__':
         z_45.append(n_v[arg_t_45])
         ax3.plot(ft.t_arr, phi, 'r-', label='slope')
 
-    ax4.plot(a_arr, c_45, 'b-')
+    ax4.plot(a_arr, c_45, 'b-', label='c_45')
     ax5 = ax4.twinx()
-    ax5.plot(a_arr, z_45, 'g-')
-    ax_t_45.plot(a_arr, t_45, 'r-')
+    ax5.plot(a_arr, z_45, 'g-', label='z_45')
+    ax_t_45.plot(a_arr, t_45, 'r-', label='t_45')
+    p.legend()
     p.show()
+    ft.sim_history.viz3d['cp'].set(tube_radius=0.002)
+    ftv.add(ft.sim_history.viz3d['cp'])
+    ftv.plot()
+    ftv.configure_traits()
 
     fta = FTA(ftv=ftv)
     fta.init_view(a=33.4389721223,
