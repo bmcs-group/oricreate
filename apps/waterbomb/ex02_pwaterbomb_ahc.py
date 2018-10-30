@@ -96,14 +96,15 @@ class WBShellFormingProcess(HasStrictTraits):
         N_h = yf.N_h
         N_i = yf.N_i
 
-        e = (self.a + 2 * self.c) / 3.0
-        print 'e', e
-        d_x = e - self.c
-        print 'delta', d_x
-        cp.X[N_h[1::3, :].flatten(), 0] -= d_x
-        cp.X[N_h[2::3, :].flatten(), 0] += d_x
-        cp.X[N_i[0::3, :].flatten(), 0] += d_x
-        cp.X[N_i[2::3, :].flatten(), 0] -= d_x
+        if True:
+            e = (self.a + 2 * self.c) / 3.0
+            print 'e', e
+            d_x = e - self.c
+            print 'delta', d_x
+            cp.X[N_h[1::3, :].flatten(), 0] -= d_x
+            cp.X[N_h[2::3, :].flatten(), 0] += d_x
+            cp.X[N_i[0::3, :].flatten(), 0] += d_x
+            cp.X[N_i[2::3, :].flatten(), 0] -= d_x
         return yf
 
     init_displ_task = Property(Instance(FormingTask))
@@ -289,7 +290,6 @@ class WBShellFormingProcess(HasStrictTraits):
         n_vv = np.sqrt(np.einsum('...i,...i', v, v))
         phi = np.arcsin(s_uxv * n_uxv / (n_uu * n_vv))
 
-        print type(phi)
         return n_uu, n_vv, phi
 
 
@@ -300,14 +300,22 @@ class WBShellFormingProcessFTV(FTV):
 
 if __name__ == '__main__':
 
-    L_x = 0.6
-    a_arr = np.array([0.36, 0.28, 0.20, 0.12, 0.04], dtype=np.float_)
-    a_arr = np.linspace(0.04, 0.36, 10)
-    eta = a_arr / L_x
-    c_arr = L_x * (1 - eta) / 2.0
+    if False:
+        L_x = 0.6
+        a_arr = np.array([0.36, 0.28, 0.20, 0.12, 0.04], dtype=np.float_)
+        a_arr = np.linspace(0.04, 0.36, 3)
+        eta = a_arr / L_x
+        c_arr = L_x * (1 - eta) / 2.0
+        h = 0.55
+    else:
+        alpha = np.array([0.5], dtype=np.float_)
+        beta = np.array([1.0], dtype=np.float_)
+        h = 1
+        a_arr = alpha * h
+        c_arr = beta * h
     kw_arr = [dict(a=a,
                    c=c,
-                   h=0.55,
+                   h=h,
                    d_r=0.01, d_up=0.005, d_down=0.005,
                    t_max=0.25,
                    n_cell_x=1, n_cell_y=2,
@@ -332,6 +340,8 @@ if __name__ == '__main__':
 
         arg_phi, phi = bsf_process.max_slope
         n_u, n_v, c = bsf_process.curvature_t
+        print ft.t_arr
+        print c
         ax1.plot(ft.t_arr, c, 'b-',
                  label='curvature')
         ax2.plot(ft.t_arr, n_u, 'g-', label='height u')

@@ -431,8 +431,16 @@ if __name__ == '__main__':
                d_r=0.01 / factor, d_up=0.01 / factor, d_down=0.02 / factor,
                # d_r=0.0005, d_up=0.0005, d_down=0.01,
                t_max=1.0,
-               n_cell_x=4, n_cell_y=4,
+               n_cell_x=1, n_cell_y=1,
                n_fold_steps=5 * factor,
+               n_load_steps=1)
+    kw2 = dict(a=2,
+               h=7,
+               c=3,
+               d_r=0.01, d_up=0.01, d_down=0.02,
+               t_max=0.5,
+               n_cell_x=4, n_cell_y=4,
+               n_fold_steps=20,
                n_load_steps=1)
     kw3 = dict(a=2,
                h=3,
