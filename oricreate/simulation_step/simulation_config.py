@@ -67,28 +67,8 @@ class SimulationConfig(HasStrictTraits):
 
     def _set_fu(self, value):
         if not value.__class__ is self.goal_function_type_:
-<<<<<<< HEAD
-<<<<<<< master
-<<<<<<< master
-<<<<<<< HEAD
             raise TypeError('Goal function has type %s but should be %s' %
                             (value.__class__, self.goal_function_type_))
-=======
-            raise TypeError('Goal function has type %s but should be %s' % \
-                (value.__class__, self.goal_function_type_))
->>>>>>> 2to3
-=======
-            raise TypeError('Goal function has type %s but should be %s' % \
-                (value.__class__, self.goal_function_type_))
->>>>>>> interim stage 1
-=======
-            raise TypeError('Goal function has type %s but should be %s' %
-                            (value.__class__, self.goal_function_type_))
->>>>>>> Transformed to python 3
-=======
-            raise TypeError('Goal function has type %s but should be %s' %
-                            (value.__class__, self.goal_function_type_))
->>>>>>> bypass2
         self._fu = value
 
     gu = Dict(Str, IGu)

@@ -11,21 +11,6 @@ from traits.api import \
     provides, \
     Array, DelegatesTo, cached_property, Property
 
-<<<<<<< HEAD
-<<<<<<< master
-<<<<<<< master
-<<<<<<< HEAD
-=======
-=======
->>>>>>> interim stage 1
-from .gu import Gu
-from .gu_disp_control_viz3d import \
-    GuDofConstraintsViz3D
->>>>>>> 2to3
-=======
->>>>>>> Transformed to python 3
-=======
->>>>>>> bypass2
 import numpy as np
 from oricreate.opt import \
     IGu

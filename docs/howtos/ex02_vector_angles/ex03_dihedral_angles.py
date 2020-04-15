@@ -22,6 +22,7 @@ def create_cp_factory():
     # end
     return cp_factory
 
+
 if __name__ == '__main__':
     cpf = create_cp_factory()
     cp = cpf.formed_object

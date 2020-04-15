@@ -18,30 +18,9 @@ from traits.api import \
     provides,  List, Tuple, Float, \
     Property, Array, Int
 
-<<<<<<< HEAD
-<<<<<<< master
-<<<<<<< master
-<<<<<<< HEAD
-=======
-=======
->>>>>>> interim stage 1
-from .fu import \
-    Fu
-from .fu_poteng_bending_viz3d import \
-    FuPotEngBendingViz3D
-from .fu_poteng_node_load_viz3d import \
-    FuPotEngNodeLoadViz3D
->>>>>>> 2to3
-=======
->>>>>>> Transformed to python 3
-=======
->>>>>>> bypass2
 import numpy as np
-from oricreate.crease_pattern.crease_pattern_operators import CreaseCummulativeOperators
 from oricreate.opt import \
     IFu
-from oricreate.util.einsum_utils import \
-    EPS
 from oricreate.viz3d import \
     Visual3D
 
@@ -51,13 +30,8 @@ from .fu_poteng_bending_viz3d import \
     FuPotEngBendingViz3D
 from .fu_poteng_node_load_viz3d import \
     FuPotEngNodeLoadViz3D
-<<<<<<< HEAD
 
 
-=======
-
-
->>>>>>> bypass2
 @provides(IFu)
 class FuPotEngTotal(Fu, Visual3D):
 
@@ -93,26 +67,8 @@ class FuPotEngTotal(Fu, Visual3D):
         elif isinstance(value, float) or isinstance(value, int):
             self._kappa = value
         else:
-<<<<<<< HEAD
-<<<<<<< master
-<<<<<<< master
-<<<<<<< HEAD
             raise ValueError(
                 'wrong type of kappa value - must be float or array')
-=======
-            raise ValueError('wrong type of kappa value - must be float or array')
->>>>>>> 2to3
-=======
-            raise ValueError('wrong type of kappa value - must be float or array')
->>>>>>> interim stage 1
-=======
-            raise ValueError(
-                'wrong type of kappa value - must be float or array')
->>>>>>> Transformed to python 3
-=======
-            raise ValueError(
-                'wrong type of kappa value - must be float or array')
->>>>>>> bypass2
 
     def _get_kappa(self):
         if len(self._kappa_arr):

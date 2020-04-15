@@ -19,20 +19,6 @@ from traits.api import \
     DelegatesTo, Float, Str, Array, \
     Instance
 
-<<<<<<< HEAD
-<<<<<<< master
-<<<<<<< master
-<<<<<<< HEAD
-=======
-=======
->>>>>>> interim stage 1
-from .fu import \
-    Fu
->>>>>>> 2to3
-=======
->>>>>>> Transformed to python 3
-=======
->>>>>>> bypass2
 import numpy as np
 from oricreate.fu.fu_target_face_viz3d import \
     FuTargetFaceViz3D

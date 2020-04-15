@@ -20,31 +20,17 @@ from traitsui.api import \
     Tabbed
 from traitsui.tabular_adapter import \
     TabularAdapter
-<<<<<<< HEAD
-<<<<<<< master
-<<<<<<< HEAD
-=======
->>>>>>> interim stage 1
-=======
->>>>>>> bypass2
 
 import numpy as np
 from oricreate.forming_tasks import \
     IFormedObject
 
-<<<<<<< HEAD
-<<<<<<< master
-=======
->>>>>>> 2to3
-=======
->>>>>>> interim stage 1
-=======
->>>>>>> bypass2
 from .crease_pattern_export import \
     CreasePatternExport
 from .crease_pattern_operators import \
     CreaseNodeOperators, CreaseLineOperators, CreaseFacetOperators, \
     CreaseCummulativeOperators, CreaseViewRelatedOperators
+
 from .crease_pattern_plot_helper import \
     CreasePatternPlotHelper
 

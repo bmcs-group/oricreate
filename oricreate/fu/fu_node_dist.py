@@ -10,25 +10,11 @@
 #
 # Thanks for using Simvisage open source!
 #
-# Created on Nov 18, 2011 by: matthias
+# Created on Nov 18, 2011 by: rch
 
 from traits.api import \
     provides, Array
 
-<<<<<<< HEAD
-<<<<<<< master
-<<<<<<< master
-<<<<<<< HEAD
-=======
-=======
->>>>>>> interim stage 1
-from .fu import \
-    Fu
->>>>>>> 2to3
-=======
->>>>>>> Transformed to python 3
-=======
->>>>>>> bypass2
 import numpy as np
 from oricreate.opt import \
     IFu
@@ -37,18 +23,8 @@ from oricreate.viz3d import \
 
 from .fu import \
     Fu
-<<<<<<< HEAD
-<<<<<<< master
 
 
-=======
-
-
->>>>>>> Transformed to python 3
-=======
-
-
->>>>>>> bypass2
 @provides(IFu)
 class FuNodeDist(Fu, Visual3D):
 

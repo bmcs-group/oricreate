@@ -13,24 +13,15 @@
 # Created on Sep 7, 2011 by: rch
 
 from traits.api import \
-    Float, Property, cached_property
+    Float, Property
 
-<<<<<<< HEAD
-<<<<<<< master
-<<<<<<< HEAD
-=======
-=======
->>>>>>> interim stage 1
-=======
->>>>>>> bypass2
-from .crease_pattern_viz3d import \
-    CreasePatternViz3D, CreasePatternNodeNumbersViz3D, \
-    CreasePatternDisplViz3D
->>>>>>> 2to3
 import numpy as np
 from oricreate.viz3d import \
     Visual3D
 
+from .crease_pattern_viz3d import \
+    CreasePatternViz3D, CreasePatternNodeNumbersViz3D, \
+    CreasePatternDisplViz3D
 from .crease_pattern_viz3d import \
     CreasePatternViz3D, CreasePatternNodeNumbersViz3D, \
     CreasePatternDisplViz3D, CreasePatternThickViz3D
