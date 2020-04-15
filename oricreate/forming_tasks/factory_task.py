@@ -5,16 +5,17 @@ Created on Nov 6, 2014
 '''
 
 from traits.api import \
-    implements, on_trait_change, Property, Instance, cached_property
+    provides, on_trait_change, Property, Instance, cached_property
 
-from forming_task import \
+from .forming_task import \
     FormingTask
-from i_formed_object import \
+from .i_formed_object import \
     IFormedObject
-from i_forming_task import \
+from .i_forming_task import \
     IFormingTask
 
 
+@provides(IFormingTask)
 class FactoryTask(FormingTask):
 
     r'''Factory task that generates a a formed_object as a pre-form.
@@ -23,7 +24,6 @@ class FactoryTask(FormingTask):
     It constructs the ``formed_object`` using the method ``deliver``.
     that must be implemented by subclasses.
     '''
-    implements(IFormingTask)
 
     @on_trait_change('+geometry')
     def notify_geometry_change(self):
@@ -41,10 +41,19 @@ class FactoryTask(FormingTask):
         raise NotImplementedError('no factory function implemented for %s',
                                   self)
 
+    x_1 = Property
+    '''Final state of the FormingTask process that can be used
+    by further FormingTask controller.
+    '''
+
+    def _get_x_1(self):
+        return self.x_0
+
     previous_task = None
+
 
 if __name__ == '__main__':
     ft = FactoryTask()
-    print ft.source_task
+    print(ft.source_task)
     # print ft.formed_object
     ft.configure_traits()

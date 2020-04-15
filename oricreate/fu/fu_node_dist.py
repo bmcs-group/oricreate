@@ -13,23 +13,23 @@
 # Created on Nov 18, 2011 by: matthias
 
 from traits.api import \
-    implements, Array
+    provides, Array
 
-from fu import \
-    Fu
 import numpy as np
 from oricreate.opt import \
     IFu
 from oricreate.viz3d import \
     Visual3D
 
+from .fu import \
+    Fu
 
+
+@provides(IFu)
 class FuNodeDist(Fu, Visual3D):
 
     '''Optimization criteria based on the distance between specified nodes.
     '''
-
-    implements(IFu)
 
     L = Array(int)
 

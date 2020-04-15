@@ -12,18 +12,18 @@
 #
 
 from traits.api import \
-    implements
+    provides
 
-from gu import \
-    Gu, IGu
 import numpy as np
 
+from .gu import \
+    Gu, IGu
 
+
+@provides(IGu)
 class GuConstantLength(Gu):
-
     '''Constant length constraint.
     '''
-    implements(IGu)
 
     def __str__(self):
         cp = self.formed_object
@@ -95,5 +95,5 @@ if __name__ == '__main__':
     U = np.zeros_like(cp.X)
     U[2] += 1.0
 
-    print [constant_length.get_G(U, 0)]
-    print [constant_length.get_G_du(U, 0)]
+    print([constant_length.get_G(U, 0)])
+    print([constant_length.get_G_du(U, 0)])

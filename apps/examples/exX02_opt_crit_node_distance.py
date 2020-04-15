@@ -19,5 +19,5 @@ if __name__ == '__main__':
     u = np.array([[0, 0, 0],
                   [0, 0, 0],
                   [0, 0, 0]], dtype='f')
-    print 'f', oc.get_f(u)
-    print 'f_du', oc.get_f_du(u)
+    print('f', oc.get_f(u))
+    print('f_du', oc.get_f_du(u))

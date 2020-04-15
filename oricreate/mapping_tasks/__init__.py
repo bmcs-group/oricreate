@@ -1,9 +1,11 @@
 
-from map_to_surface import \
+from .map_to_surface import \
     MapToSurface
-from mapping_task import \
+from .mapping_task import \
     MappingTask
-from mask_task import \
+from .mask_task import \
     MaskTask
-from rotate_copy import \
+from .move_task import \
+    MoveTask
+from .rotate_copy import \
     RotateCopy

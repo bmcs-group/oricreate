@@ -198,9 +198,15 @@ class YoshimuraCPFactory(FactoryTask):
         # (3)
 
         n_h = np.arange(
-            (n_x + 1) * (n_y / 2 + 1)).reshape((n_x + 1), (n_y / 2 + 1))
-        n_v = np.arange((2 * n_y / 2)).reshape(2, n_y / 2) + n_h[-1, -1] + 1
-        n_i = np.arange(n_x * n_y / 2).reshape(n_x, n_y / 2) + n_v[-1, -1] + 1
+            (n_x + 1) * (n_y / 2 + 1),
+            dtype=np.int_
+        ).reshape((n_x + 1), int(n_y / 2 + 1))
+        n_v = np.arange((2 * n_y / 2), dtype=np.int_).reshape(
+            2, int(n_y / 2)
+        ) + n_h[-1, -1] + 1
+        n_i = np.arange(n_x * n_y / 2, dtype=np.int_).reshape(
+            n_x, int(n_y / 2)
+        ) + n_v[-1, -1] + 1
         n_viv = np.vstack([n_v[0, :], n_i, n_v[-1, :]])
 
         # connectivity of nodes defining the crease pattern
@@ -216,7 +222,7 @@ class YoshimuraCPFactory(FactoryTask):
         e_i00 = np.c_[n_i[:-1, :].flatten(), n_i[1:, :].flatten()]
 
         nodes = np.vstack([X_h, X_v, X_i])
-        zero_z = np.zeros((nodes.shape[0], 1), dtype=float)
+        zero_z = np.zeros((nodes.shape[0], 1), dtype=np.float_)
 
         nodes = np.hstack([nodes, zero_z])
         crease_lines = np.vstack(
@@ -278,6 +284,7 @@ class YoshimuraCPFactory(FactoryTask):
                 n_h, n_v, n_i, X_h, X_v, X_i,
                 interior_vertices, cycled_neighbors)
 
+
 if __name__ == '__main__':
 
     yf = YoshimuraCPFactory(L_x=3,
@@ -289,6 +296,9 @@ if __name__ == '__main__':
 
     cp = yf.formed_object
 
+    print(yf.N_h)
+    print(yf.N_i)
+    print(yf.N_v)
     import pylab as p
     cp.plot_mpl(p.axes())
     p.show()

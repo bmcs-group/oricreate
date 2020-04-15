@@ -15,12 +15,13 @@
 from traits.api import \
     Float, Property, cached_property
 
-from crease_pattern_viz3d import \
-    CreasePatternViz3D, CreasePatternNodeNumbersViz3D, \
-    CreasePatternDisplViz3D
 import numpy as np
 from oricreate.viz3d import \
     Visual3D
+
+from .crease_pattern_viz3d import \
+    CreasePatternViz3D, CreasePatternNodeNumbersViz3D, \
+    CreasePatternDisplViz3D, CreasePatternThickViz3D
 
 
 class CreasePatternPlotHelper(Visual3D):
@@ -121,6 +122,7 @@ class CreasePatternPlotHelper(Visual3D):
         return cp_pipe.mlab_source
 
     viz3d_classes = dict(cp=CreasePatternViz3D,
+                         cp_thick=CreasePatternThickViz3D,
                          node_numbers=CreasePatternNodeNumbersViz3D,
                          displ=CreasePatternDisplViz3D)
 
@@ -130,7 +132,7 @@ class CreasePatternPlotHelper(Visual3D):
 
         @todo this should be moved to GuDofConstraints
         '''
-        print 'get position'
+        print('get position')
         u_t = self.fold_steps[iteration_step]
         pts_p, faces_p = self.cnstr[0].get_cnstr_view(u_t, 1.0)
         pts_l = None
@@ -150,7 +152,7 @@ class CreasePatternPlotHelper(Visual3D):
         '''
 
         if(len(self.line_pts) == 0):
-            print ' NO LINE POINTS'
+            print(' NO LINE POINTS')
             return
 
         for p in range(len(self.fold_steps)):
@@ -178,7 +180,7 @@ class CreasePatternPlotHelper(Visual3D):
                 r = ry
             else:
                 r = rz
-            print 'Step ', p, ': r = ', r
+            print('Step ', p, ': r = ', r)
 
     def create_rcp_tex(self, name='rcp_output.tex', x=15., y=15.):
         r'''

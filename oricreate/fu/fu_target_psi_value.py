@@ -4,25 +4,27 @@ Created on Feb 19, 2015
 @author: rch
 '''
 
-from traits.api import \
-    implements, Tuple, \
-    cached_property, Property
 import types
 
-from fu import Fu
-from fu_target_psi_value_viz3d2 import \
-    FuTargetPsiValueViz3D
+from traits.api import \
+    provides, Tuple, \
+    cached_property, Property
+
 from oricreate.opt import \
     IFu
 from oricreate.viz3d import \
     Visual3D
 
+from .fu import Fu
+from .fu_target_psi_value_viz3d2 import \
+    FuTargetPsiValueViz3D
 
+
+@provides(IFu)
 class FuTargetPsiValue(Fu, Visual3D):
 
     '''Explicit constraints for selected of freedom.
     '''
-    implements(IFu)
 
     psi_value = Tuple
     '''Specification of explicit constraint for particular dihedral psis.
@@ -43,10 +45,9 @@ class FuTargetPsiValue(Fu, Visual3D):
         cp = self.formed_object
         l, value = self.psi_value  # @UnusedVariable
         if cp.L_iL[l] < 0:
-            raise IndexError, \
-                'GuPsiConstraint: line index %d does ' \
-                'not refer to an interior line: '\
-                'must be one of %s' % (l, cp.iL)
+            raise IndexError('GuPsiConstraint: line index %d does '
+                             'not refer to an interior line: '
+                             'must be one of %s' % (l, cp.iL))
 
     def get_f(self, t=0):
         ''' Calculate the residue for given constraint equations

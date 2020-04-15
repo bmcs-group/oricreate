@@ -24,16 +24,15 @@ def _broadcast_nd(n, d):
     '''Construct the combination of supplied node and dimension indexes.
     '''
     nodes, dirs = n, d
-    if isinstance(nodes, int):
-        nodes = np.array([n], dtype='int')
+    if isinstance(nodes, np.int_):
+        nodes = np.array([n], dtype=np.int_)
     elif isinstance(nodes, collections.Container):
-        nodes = np.array(list(nodes), dtype='int')
+        nodes = np.array(list(nodes), np.int_)
 
     if isinstance(dirs, int):
-        dirs = np.array([d], dtype='int')
+        dirs = np.array([d], dtype=np.int_)
     elif isinstance(dirs, collections.Container):
-        dirs = np.array(list(dirs), dtype='int')
-
+        dirs = np.array(list(dirs), dtype=np.int_)
     return np.broadcast(nodes[None, :], dirs[:, None])
 
 

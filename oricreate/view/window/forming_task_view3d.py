@@ -9,7 +9,7 @@ from mayavi.tools.mlab_scene_model import MlabSceneModel
 from traits.api import \
     HasStrictTraits, Dict, \
     Property, Str, Float, \
-    on_trait_change, Int, Tuple, Instance
+    on_trait_change, Int, Tuple, Instance, Bool
 from traitsui.api import \
     View, HSplit, VSplit, VGroup, Item, UItem, TableEditor, ObjectColumn, \
     RangeEditor, Tabbed
@@ -52,7 +52,8 @@ class FormingTaskView3D(HasStrictTraits):
     selected_viz3d = Instance(Viz3D)
 
     def _get_vis3d_list(self):
-        return np.unique(np.array([viz3d.vis3d for viz3d in self.viz3d_list]))
+        return np.array([viz3d.vis3d for viz3d in self.viz3d_list])
+#        return np.unique(np.array([viz3d.vis3d for viz3d in self.viz3d_list]))
 
     vot_min = Float(0.0)
     vot_max = Float(1.0)
@@ -89,8 +90,8 @@ class FormingTaskView3D(HasStrictTraits):
         '''
         mm = []
         if len(self.viz3d_list) == 0:
-            raise IndexError, 'No vizualization module inserted' \
-                'into fold television'
+            raise IndexError('No vizualization module inserted'
+                             'into fold television')
         for viz3d in self.viz3d_list:
             x_min, x_max = viz3d.min_max
             if x_min != None and x_max != None:
@@ -135,17 +136,19 @@ class FormingTaskView3D(HasStrictTraits):
     def _get_mlab(self):
         return self.scene.mlab
 
-    def add(self, viz3d, order=1):
+    def add(self, viz3d, order=1, name=None):
         '''Add a new visualization objectk.'''
         viz3d.ftv = self
         vis3d = viz3d.vis3d
-        label = '%s[%s:%s]-%s' % (viz3d.label,
+        if name == None:
+            name = viz3d.label
+        label = '%s[%s:%s]-%s' % (name,
                                   str(vis3d.__class__),
                                   str(viz3d.__class__),
                                   vis3d
                                   )
-        if self.viz3d_dict.has_key(label):
-            raise KeyError, 'viz3d object named %s already registered' % label
+        if label in self.viz3d_dict:
+            raise KeyError('viz3d object named %s already registered' % label)
         viz3d.order = order
         self.viz3d_dict[label] = viz3d
 
@@ -165,6 +168,8 @@ class FormingTaskView3D(HasStrictTraits):
     def _scene_default(self):
         return MlabSceneModel()
 
+    label_on = Bool(False)
+
     def plot(self):
         '''Plot the current visualization objects.
         '''
@@ -174,7 +179,8 @@ class FormingTaskView3D(HasStrictTraits):
         self.mlab.figure(fig, bgcolor=bgcolor, fgcolor=fgcolor)
         for viz3d in self.viz3d_list:
             viz3d.plot()
-        oricreate_mlab_label(self.mlab)
+        if self.label_on:
+            oricreate_mlab_label(self.mlab)
 
     def update(self, vot=0.0, anim_t=0.0, force=False):
         '''Update current visualization.
@@ -237,7 +243,7 @@ class FormingTaskView3D(HasStrictTraits):
 FTV = FormingTaskView3D
 
 if __name__ == '__main__':
-    from point_cloud_viz3d import PointCloud
+    from .point_cloud_viz3d import PointCloud
     ftv = FTV()
     pc = PointCloud()
     ftv.add(pc.viz3d['default'])

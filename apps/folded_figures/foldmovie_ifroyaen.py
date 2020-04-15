@@ -22,7 +22,7 @@ from traits.api import \
     Instance, Property, cached_property, \
     File, Array, List, Float
 
-from folded_figures_viz3d import \
+from .folded_figures_viz3d import \
     FacetsWithImageViz3D
 import numpy as np
 from oricreate.api import \
@@ -32,7 +32,7 @@ from oricreate.crease_pattern import \
 from oricreate.crease_pattern.crease_pattern_viz3d import \
     CreasePatternThickViz3D
 from oricreate.viz3d.viz3d import Viz3D
-from sim_task_twist_folding import \
+from .sim_task_twist_folding import \
     TwistFolding
 
 

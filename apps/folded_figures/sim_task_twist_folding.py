@@ -2,7 +2,7 @@ import math
 from traits.api import \
     HasStrictTraits, Instance, Property, cached_property, \
     Array, Int, Color
-from folded_figures_viz3d import \
+from .folded_figures_viz3d import \
     FacetsWithTextViz3D, FacetsWithImageViz3D
 
 import matplotlib.pyplot as \
@@ -116,15 +116,15 @@ def create_cp_factory():
                             F=F_derived
                             )
 
-    print cp.viz3d
+    print(cp.viz3d)
     cp.viz3d['cp'].L_selection = L_range
 
     cp.u[(2, 3, 8, 9), 2] = 0.01
     cp.u[(6, 7, 12, 13), 2] = -0.005
     cp.u[(10, 11, 14, 15), 2] = 0.005
-    print 'n_N', cp.n_N
-    print 'n_L', cp.n_L
-    print 'n_free', cp.n_dofs - cp.n_L
+    print('n_N', cp.n_N)
+    print('n_L', cp.n_L)
+    print('n_free', cp.n_dofs - cp.n_L)
 
     cp_factory = CustomCPFactory(formed_object=cp)
     # end
@@ -210,7 +210,7 @@ if __name__ == '__main__':
 
     shift_x = x_offset + edge_len / c45 - edge_len
     shift_l = shift_x * c45
-    print 'shift_l', shift_l
+    print('shift_l', shift_l)
     F_ref = [0, 2, 4, 6, 8, 16, 1, 12, 14, ]
     N_ref = [0, 3, 15, 12, 7, 4, 1, 11, 13]
     F_covered = [[0, 9], [2, 11], [4, 13], [6, 15],

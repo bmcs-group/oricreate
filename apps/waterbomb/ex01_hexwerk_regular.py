@@ -121,21 +121,21 @@ class HexYoshiFormingProcess(HasStrictTraits):
         base_h_y = corner2_h_y
 
         for c_x in range(0, self.n_cell_x):
-            print 'c_x', c_x
+            print('c_x', c_x)
             base_i_x = np.hstack([base_i_x, 3 * c_x + tb2_i_x])
             base_i_y = np.hstack([base_i_y, tb2_i_y])
             base_h_x = np.hstack([base_h_x, 3 * c_x + tb2_h_x])
             base_h_y = np.hstack([base_h_y, tb2_h_y])
 
         for c_x in range(0, self.n_cell_x - 1):
-            print 'c_x', c_x
+            print('c_x', c_x)
             base_i_x = np.hstack([base_i_x, 3 * c_x + right2_i_x])
             base_i_y = np.hstack([base_i_y, right2_i_y])
             base_h_x = np.hstack([base_h_x, 3 * c_x + right2_h_x])
             base_h_y = np.hstack([base_h_y, right2_h_y])
 
         for c_y in range(0, self.n_cell_y - 1):
-            print 'c_y', c_y
+            print('c_y', c_y)
             base_i_x = np.hstack([base_i_x, up2_i_x])
             base_i_y = np.hstack([base_i_y, c_y + up2_i_y])
             base_h_x = np.hstack([base_h_x, up2_h_x])
@@ -148,7 +148,7 @@ class HexYoshiFormingProcess(HasStrictTraits):
 
         psi_lines = cp.NN_L[[m_nodes], n_nodes].flatten()
 
-        print 'psi_lines', psi_lines
+        print('psi_lines', psi_lines)
 
         N_h = f.N_h
         N_i = f.N_i
@@ -187,11 +187,11 @@ class HexYoshiFormingProcess(HasStrictTraits):
         N_down = np.hstack([N_h[::3, :].flatten(),
                             N_i[1::3, :].flatten()
                             ])
-        print 'N_down', N_down
+        print('N_down', N_down)
         N_up = np.hstack([N_i[::3, :].flatten(),
                           N_i[2::3, :].flatten(),
                           N_v[:, :].flatten()])
-        print 'N_up', N_up
+        print('N_up', N_up)
         cp.u[N_down, 2] -= .1
         cp.u[N_up, 2] += .1
 
@@ -243,8 +243,8 @@ if __name__ == '__main__':
 
     if show_fold_angle_cntl:
         ft = bsf_process.fold_angle_cntl
-        print 'NDOFS', ft.formed_object.n_dofs
-        print ft.sim_step
+        print('NDOFS', ft.formed_object.n_dofs)
+        print(ft.sim_step)
         ft.sim_history.set(anim_t_start=0, anim_t_end=10)
         ft.config.gu['dofs'].set(anim_t_start=0, anim_t_end=5)
         ft.sim_history.viz3d['cp'].set(tube_radius=0.002)

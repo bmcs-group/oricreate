@@ -4,28 +4,30 @@ Created on Feb 19, 2015
 @author: rch
 '''
 
+import collections
 import numbers
 
 from traits.api import \
-    implements, \
+    provides, \
     Array, DelegatesTo, cached_property, Property
 
-from gu import Gu
-from gu_disp_control_viz3d import \
-    GuDofConstraintsViz3D
 import numpy as np
 from oricreate.opt import \
     IGu
 from oricreate.viz3d import \
     Visual3D
 
+from .gu import Gu
+from .gu_disp_control_viz3d import \
+    GuDofConstraintsViz3D
 
+
+@provides(IGu)
 class GuGrabPoints(Gu):
 
     '''Grab points are included in the nodes attribute of the crease pattern.
     Their position is constrained within a facet using triangle coordinates.
     '''
-    implements(IGu)
 
     n_dofs = DelegatesTo('forming_task')
     N = DelegatesTo('forming_task')
@@ -94,6 +96,7 @@ class GuGrabPoints(Gu):
         return grab_lines
 
 
+@provides(IGu)
 class GuPointsOnLine(Gu):
 
     '''PointsOnLine are included in the nodes attribute
@@ -102,7 +105,6 @@ class GuPointsOnLine(Gu):
     line-element and at least one other
     constraining Element.
     '''
-    implements(IGu)
 
     LP = DelegatesTo('forming_task')
     n_LP = DelegatesTo('forming_task')
@@ -262,11 +264,11 @@ class GuPointsOnLine(Gu):
         return dR
 
 
+@provides(IGu)
 class GuDofConstraints(Gu, Visual3D):
 
     '''Explicit constraints for selected of freedom.
     '''
-    implements(IGu)
 
     dof_constraints = Array
     '''Specification of explicit constraint for particular degrees of freedom.
@@ -308,7 +310,7 @@ class GuDofConstraints(Gu, Visual3D):
             if rhs:
                 if isinstance(rhs, numbers.Number):
                     G[i] -= rhs
-                elif callable(rhs):
+                elif isinstance(rhs, collections.Callable):
                     G[i] -= rhs(t)
             else:
                 G[i] -= 0

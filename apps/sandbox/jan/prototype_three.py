@@ -252,12 +252,12 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
 
 
         ref_lines = np.c_[self.scaff_ref_nodes[:-1], self.scaff_ref_nodes[1:]]
-        print 'ref', ref_lines
+        print('ref', ref_lines)
         ref_midpoints = (x_1[ref_lines[:, 1]] + x_1[ref_lines[:, 0]]) / 2.0
-        print 'mp', ref_midpoints[:, 0]
+        print('mp', ref_midpoints[:, 0])
 
         scaff_positions = ref_midpoints[:, 0] - L_mid
-        print 'sp', scaff_positions
+        print('sp', scaff_positions)
 
         #scaff_positions = self.scaff_positions
 
@@ -266,7 +266,7 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
         #centered_pos = pos + offset
 
         centered_pos = np.hstack([[L_mid, x_42], ref_midpoints[:, 0]])
-        print 'cp', centered_pos
+        print('cp', centered_pos)
 
         scaff_plates = []
         min_max = []
@@ -311,7 +311,7 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
             ax.annotate('scaffold x - position %5.3f' % -s_pos, xy=(0, 0.04))
 
             fname_path = os.path.join(tdir, 'scaff%d.pdf' % idx)
-            print 'saving in %s', fname_path
+            print('saving in %s', fname_path)
             p.savefig(fname_path)
 
         p.show()

@@ -1,6 +1,6 @@
 
-from mesh_exporter import \
+from .mesh_exporter import \
     InfoCadMeshExporter
 
-from scaffolding_exporter import \
+from .scaffolding_exporter import \
     ScaffoldingExporter

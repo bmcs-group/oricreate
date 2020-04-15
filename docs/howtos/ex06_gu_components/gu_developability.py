@@ -10,7 +10,7 @@ by checking if a  node displacement in a respective direction
 increases or decreases the angle around the interior node
 of the example crease pattern.
 '''
-from custom_factory_mpl import create_cp_factory
+from .custom_factory_mpl import create_cp_factory
 
 
 def create_fu():
@@ -19,8 +19,8 @@ def create_fu():
     from oricreate.gu import GuDevelopability
     # Link the pattern factory with the constraint client.
     gu_devel = GuDevelopability(forming_task=cp_factory)
-    print 'gu:', gu_devel.get_G()
-    print 'g_du:\n', gu_devel.get_G_du()
+    print('gu:', gu_devel.get_G())
+    print('g_du:\n', gu_devel.get_G_du())
     # end
     return gu_devel
 

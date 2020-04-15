@@ -51,8 +51,8 @@ if __name__ == '__main__':
     diag_psi_mask[1:-1, 1:-1] = False
     diag_psi_constraints = [([(i, 1.0)], 0)
                             for i in cpf.L_d_grid[diag_psi_mask].flatten()]
-    print 'psi constraints', diag_psi_constraints
-    print 'controlled line', cpf.L_h_grid[nx2, ny2]
+    print('psi constraints', diag_psi_constraints)
+    print('controlled line', cpf.L_h_grid[nx2, ny2])
     gu_psi_constraints = \
         GuPsiConstraints(forming_task=cpf,
                          psi_constraints=diag_psi_constraints +

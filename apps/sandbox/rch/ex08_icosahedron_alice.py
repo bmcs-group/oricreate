@@ -1,3 +1,8 @@
+from traits.api import \
+    HasTraits, Float, Property, cached_property, Instance, \
+    Int
+
+import numpy as np
 from oricreate.api import \
     CustomCPFactory,  CreasePatternState,  fix, link,\
     FuNodeDist, \
@@ -5,14 +10,9 @@ from oricreate.api import \
     SimulationConfig, SimulationTask, \
     FTV, FTA
 from oricreate.forming_tasks.forming_task import FormingTask
-from oricreate.view import FormingTaskTree
-from traits.api import \
-    HasTraits, Float, Property, cached_property, Instance, \
-    Int
-
-import numpy as np
 
 
+#from oricreate.view import FormingTaskTree
 class OctaHedronFormingProcess(HasTraits):
     '''
     Define the simulation task prescribing the boundary conditions, 
@@ -179,10 +179,10 @@ class OctaHedronFormingProcess(HasTraits):
             else:
                 return (t - start_t) / (end_t - start_t)
 
-        FN = lambda psi, start_t, end_t: lambda t: psi * \
+        def FN(psi, start_t, end_t): return lambda t: psi * \
             fold_step(t, start_t, end_t)
 
-        print 'iL', iL
+        print('iL', iL)
 
         trange = np.zeros((len(iL), 2), dtype=np.float_)
         trange[:, 0] = 0.0
@@ -273,6 +273,7 @@ class OctaHedronFormingProcess(HasTraits):
         cp = st.formed_object
         return st
 
+
 if __name__ == '__main__':
     bsf_process = OctaHedronFormingProcess(n_steps=1,
                                            phi_max=np.pi / 2.556)
@@ -352,7 +353,7 @@ if __name__ == '__main__':
     single_step_fold_task.u_1
 
     sscp = single_step_fold_task.formed_object
-    print 'phi', sscp.iL_psi
+    print('phi', sscp.iL_psi)
 
     fts = fts4
     fts = single_step_fold_task
@@ -362,11 +363,11 @@ if __name__ == '__main__':
 
     ftv = FTV()
 
-#     ft.sim_history.set(anim_t_start=0, anim_t_end=10)
-#     ft.sim_history.viz3d['cp'].set(tube_radius=0.005)
+#     ft.sim_history.trait_set(anim_t_start=0, anim_t_end=10)
+#     ft.sim_history.viz3d['cp'].trait_set(tube_radius=0.005)
 #     ftv.add(ft.sim_history.viz3d['cp'])
-    fts.sim_history.set(anim_t_start=0, anim_t_end=100)
-    fts.sim_history.viz3d['cp'].set(tube_radius=0.01)
+    fts.sim_history.trait_set(anim_t_start=0, anim_t_end=100)
+    fts.sim_history.viz3d['cp'].trait_set(tube_radius=0.01)
     ftv.add(fts.sim_history.viz3d['cp'])
 
     ftv.plot()

@@ -12,15 +12,17 @@
 #
 # Created on Nov 18, 2011 by: matthias
 
+from traits.api import \
+    provides, Float
+
 from oricreate.opt import \
     IFu
-from traits.api import \
-    implements, Float
 
-from fu import \
+from .fu import \
     Fu
 
 
+@provides(IFu)
 class FuPotEngGravity(Fu):
 
     '''Optimization criteria based on minimum potential energy of gravity.
@@ -28,8 +30,6 @@ class FuPotEngGravity(Fu):
     This plug-in class lets the crease pattern operators evaluate the
     integral over the spatial domain in an instantaneous configuration
     '''
-
-    implements(IFu)
 
     rho = Float(0.234, auto_set=False, enter_set=True)
 

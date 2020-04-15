@@ -3,8 +3,8 @@ Created on Feb 21, 2017
 
 @author: rch
 '''
-from forming_task_anim3d import FTA
-from ex04_canopy import DoublyCurvedYoshiFormingProcess, \
+from .forming_task_anim3d import FTA
+from .ex04_canopy import DoublyCurvedYoshiFormingProcess, \
     DoublyCurvedYoshiFormingProcessFTV
 import numpy as np
 from oricreate.api import SimulationHistory
@@ -117,7 +117,7 @@ if __name__ == '__main__':
         for state in states:
             fname = 'KO%s.txt' % state
             fname = path.join(test_dir, fname)
-            print 'read', fname
+            print('read', fname)
             measured_state = np.loadtxt(fname)
             x = measured_state[:, 1:]
             measured_states.append(x)

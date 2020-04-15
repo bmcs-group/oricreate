@@ -32,5 +32,5 @@ if __name__ == '__main__':
     cp = CreasePattern(X=[[1, 2, 3]])
     it = CustomCPFactory(formed_object=cp)
     ft = MappingTask(previous_task=it)
-    print cp
-    print ft.formed_object
+    print(cp)
+    print(ft.formed_object)

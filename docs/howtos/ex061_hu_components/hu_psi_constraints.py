@@ -27,10 +27,10 @@ def create_hu():
                          psi_constraints=[(1, False), ]
                          )
     cp = cp_factory.formed_object
-    print cp.iL
-    print cp.iL_psi
-    print 'gu:', hu_psi_constraints.get_H(1.0)
-    print 'g_du:\n', hu_psi_constraints.get_H_du(1.0)
+    print(cp.iL)
+    print(cp.iL_psi)
+    print('gu:', hu_psi_constraints.get_H(1.0))
+    print('g_du:\n', hu_psi_constraints.get_H_du(1.0))
     # end
     return hu_psi_constraints
 

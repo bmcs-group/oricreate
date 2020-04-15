@@ -14,13 +14,11 @@
 
 from scipy.optimize import fsolve
 from traits.api import \
-    implements, HasTraits, List, \
+    provides, HasTraits, List, \
     Property, cached_property, Any,\
     DelegatesTo, Float, Str, Array, \
     Instance
 
-from fu import \
-    Fu
 import numpy as np
 from oricreate.fu.fu_target_face_viz3d import \
     FuTargetFaceViz3D
@@ -31,6 +29,9 @@ from oricreate.util import \
 from oricreate.viz3d import \
     Visual3D
 import sympy as sm
+
+from .fu import \
+    Fu
 
 
 class ParamFaceOperator(HasTraits):
@@ -80,14 +81,14 @@ class ParamFaceOperator(HasTraits):
 
     @cached_property
     def _get_dF_rs(self):
-        return np.vstack([map(lambda x: sm.diff(x, var_), self.F)
+        return np.vstack([[sm.diff(x, var_) for x in self.F]
                           for var_ in [r_, s_]])
 
     dF_rs_fn = Property(depends_on='F')
 
     @cached_property
     def _get_dF_rs_fn(self):
-        dF_rs = [map(lambda x: sm.diff(x, var_), self.F) for var_ in [r_, s_]]
+        dF_rs = [[sm.diff(x, var_) for x in self.F] for var_ in [r_, s_]]
         return sm.lambdify([r_, s_, t_], dF_rs)
 
     def get_dF_rs(self, r_pnt, t):
@@ -159,7 +160,7 @@ class ParamFaceOperator(HasTraits):
 
     @cached_property
     def _get_d_norm_cond(self):
-        return [map(lambda x: sm.diff(x, var_), self.norm_cond) for
+        return [[sm.diff(x, var_) for x in self.norm_cond] for
                 var_ in [r_, s_]]
 
     d_norm_cond_fn = Property(depends_on='+input')
@@ -308,12 +309,11 @@ def FuTF(expr, nodes):
                         nodes=nodes)
 
 
+@provides(IFu)
 class FuTargetFaces(Fu, Visual3D):
 
     '''Container of target faces
     '''
-
-    implements(IFu)
 
     tf_lst = List([])
 
@@ -380,39 +380,39 @@ if __name__ == '__main__':
     x_pnt = np.array([0, 0.2, 1], dtype='f')
     r0_pnt = np.array([0, 0], dtype='f')
 
-    print 'r0_pnt:\t\t\t\t', r0_pnt
-    print 'value of F at r0_pnt:\t\t', cp.get_F(r0_pnt, 0)
-    print 'value of dF_rs at r0_pnt:\t', cp.get_dF_rs(r0_pnt, 0)
-    print 'x_pnt:\t\t\t\t', x_pnt
-    print 'normality r0_pnt - x_pnt:\t', cp.get_norm_cond(r0_pnt, x_pnt, 0)
-    print 'd(normality r0_pnt - x_pnt):\t', cp.get_d_norm_cond(r0_pnt,
-                                                               x_pnt, 0)
+    print('r0_pnt:\t\t\t\t', r0_pnt)
+    print('value of F at r0_pnt:\t\t', cp.get_F(r0_pnt, 0))
+    print('value of dF_rs at r0_pnt:\t', cp.get_dF_rs(r0_pnt, 0))
+    print('x_pnt:\t\t\t\t', x_pnt)
+    print('normality r0_pnt - x_pnt:\t', cp.get_norm_cond(r0_pnt, x_pnt, 0))
+    print('d(normality r0_pnt - x_pnt):\t', cp.get_d_norm_cond(r0_pnt,
+                                                               x_pnt, 0))
     r_pnt = cp.get_r_pnt(r0_pnt, x_pnt, 0)
-    print 'r_pnt:\t\t\t\t', r_pnt
-    print 'distance x_pnt - r_pnt:\t\t', cp.get_dist(r_pnt, x_pnt, 0)
+    print('r_pnt:\t\t\t\t', r_pnt)
+    print('distance x_pnt - r_pnt:\t\t', cp.get_dist(r_pnt, x_pnt, 0))
 
     target_face = FuFaceNodeDistance(F=[r_, s_, -r_ ** 2 - s_ ** 2],
                                      X_arr=[[0, 0.2, 1],
                                             [1, 4, -2],
                                             [7, 8, 9]])
-    print 'x_arr:\n', target_face.X_arr
-    print 'r_arr:\n', target_face.r_arr
-    print 'd_arr:\n', target_face.d_arr
-    print 'ls_arr:\n', target_face.ls_arr
-    print 'd_xyz_arr:\n', target_face.d_xyz_arr
+    print('x_arr:\n', target_face.X_arr)
+    print('r_arr:\n', target_face.r_arr)
+    print('d_arr:\n', target_face.d_arr)
+    print('ls_arr:\n', target_face.ls_arr)
+    print('d_xyz_arr:\n', target_face.d_xyz_arr)
 
     target_face.X_arr = target_face.X_arr + 1.0
 
-    print 'x_arr:\n', target_face.X_arr
-    print 'r_arr:\n', target_face.r_arr
-    print 'd_arr:\n', target_face.d_arr
-    print 'ls_arr:\n', target_face.ls_arr
-    print 'd_xyz_arr:\n', target_face.d_xyz_arr
+    print('x_arr:\n', target_face.X_arr)
+    print('r_arr:\n', target_face.r_arr)
+    print('d_arr:\n', target_face.d_arr)
+    print('ls_arr:\n', target_face.ls_arr)
+    print('d_xyz_arr:\n', target_face.d_xyz_arr)
 
     target_face.F = [r_, s_, t_]
 
-    print 'x_arr:\n', target_face.X_arr
-    print 'r_arr:\n', target_face.r_arr
-    print 'd_arr:\n', target_face.d_arr
-    print 'ls_arr:\n', target_face.ls_arr
-    print 'd_xyz_arr:\n', target_face.d_xyz_arr
+    print('x_arr:\n', target_face.X_arr)
+    print('r_arr:\n', target_face.r_arr)
+    print('d_arr:\n', target_face.d_arr)
+    print('ls_arr:\n', target_face.ls_arr)
+    print('d_xyz_arr:\n', target_face.d_xyz_arr)

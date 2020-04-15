@@ -121,7 +121,7 @@ class OctaHedronFormingProcess(HasTraits):
     def _get_fold_task(self):
 
         psi_max = np.pi - 138.19 / 180.0 * np.pi
-        print psi_max
+        print(psi_max)
         inner_lines = [1, 7, 10, 11, 12, 13, 14, 16, 17, 18, 19,
                        22, 24, 25, 26, 32, 34, 35, 37]
 
@@ -132,7 +132,7 @@ class OctaHedronFormingProcess(HasTraits):
             start_t = fold_index * dt
             end_t = (fold_index + 1) * dt
 
-            print 't', t, start_t, end_t
+            print('t', t, start_t, end_t)
             if t < start_t:
                 return 0.0
             elif t > end_t:

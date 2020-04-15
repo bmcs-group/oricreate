@@ -5,25 +5,25 @@ Created on Feb 19, 2015
 '''
 
 from traits.api import \
-    implements, \
+    provides, \
     Array, cached_property, Property, Dict, Float
 
-
-from hu import Hu
-from hu_psi_constraints_viz3d2 import \
-    HuPsiConstraintsViz3D
 import numpy as np
 from oricreate.opt import \
     IHu
 from oricreate.viz3d import \
     Visual3D
 
+from .hu import Hu
+from .hu_psi_constraints_viz3d2 import \
+    HuPsiConstraintsViz3D
 
+
+@provides(IHu)
 class HuPsiConstraints(Hu, Visual3D):
 
     '''Explicit constraints for selected of freedom.
     '''
-    implements(IHu)
 
     psi_constraints = Array
     '''Specification of explicit constraint for particular dihedral psis.
@@ -51,10 +51,9 @@ class HuPsiConstraints(Hu, Visual3D):
         for i, psi_cnstr in enumerate(self.psi_constraints):  # @UnusedVariable
             l, sign = psi_cnstr  # @UnusedVariable
             if cp.L_iL[l] < 0:
-                raise IndexError, \
-                    'GuPsiConstraint: line index %d does ' \
-                    'not refer to an interior line: '\
-                    'must be one of %s' % (l, cp.iL)
+                raise IndexError('GuPsiConstraint: line index %d does '
+                                 'not refer to an interior line: '
+                                 'must be one of %s' % (l, cp.iL))
 
     def get_H(self, t=0):
         ''' Calculate the residue for given constraint equations

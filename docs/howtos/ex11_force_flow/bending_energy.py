@@ -33,15 +33,15 @@ if __name__ == '__main__':
                               n_steps=1)
 
     cp.u[4, 2] = 0.001
-    print 'kinematic simulation: u', sim_task.u_1
+    print('kinematic simulation: u', sim_task.u_1)
 
     cp = sim_task.formed_object
     iL_phi = cp.iL_psi2 - cp.iL_psi_0
-    print 'phi',  iL_phi
+    print('phi',  iL_phi)
     iL_length = np.linalg.norm(cp.iL_vectors, axis=1)
     iL_m = sim_config._fu.kappa * iL_phi * iL_length
 
-    print 'moments', iL_m
+    print('moments', iL_m)
 
     ftv = FTV()
     ftv.add(sim_task.formed_object.viz3d)

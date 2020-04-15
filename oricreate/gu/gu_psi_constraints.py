@@ -7,24 +7,25 @@ Created on Feb 19, 2015
 import types
 
 from traits.api import \
-    implements, \
+    provides, \
     Array, cached_property, Property
 
-from gu import Gu
-from gu_psi_constraints_viz3d2 import \
-    GuPsiConstraintsViz3D
 import numpy as np
 from oricreate.opt import \
     IGu
 from oricreate.viz3d import \
     Visual3D
 
+from .gu import Gu
+from .gu_psi_constraints_viz3d2 import \
+    GuPsiConstraintsViz3D
 
+
+@provides(IGu)
 class GuPsiConstraints(Gu, Visual3D):
 
     '''Explicit constraints for selected of freedom.
     '''
-    implements(IGu)
 
     psi_constraints = Array
     '''Specification of explicit constraint for particular dihedral psis.
@@ -49,10 +50,9 @@ class GuPsiConstraints(Gu, Visual3D):
             lhs, rhs = psi_cnstr  # @UnusedVariable
             for l, c in lhs:  # @UnusedVariable
                 if cp.L_iL[l] < 0:
-                    raise IndexError, \
-                        'GuPsiConstraint: line index %d does ' \
-                        'not refer to an interior line: '\
-                        'must be one of %s' % (l, cp.iL)
+                    raise IndexError('GuPsiConstraint: line index %d does '
+                                     'not refer to an interior line: '
+                                     'must be one of %s' % (l, cp.iL))
 
     def __str__(self):
         s = 'Gu: %s - %d\n' % (self.label, len(self.psi_constraints))

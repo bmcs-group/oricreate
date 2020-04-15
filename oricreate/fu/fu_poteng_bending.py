@@ -13,14 +13,16 @@
 # Created on Nov 18, 2011 by: matthias
 
 from traits.api import \
-    implements
+    provides
 
-from fu import \
-    Fu
 from oricreate.opt import \
     IFu
 
+from .fu import \
+    Fu
 
+
+@provides(IFu)
 class FuPotEngBending(Fu):
 
     '''Optimization criteria based on minimum Bending energy of gravity.
@@ -28,8 +30,6 @@ class FuPotEngBending(Fu):
     This plug-in class lets the crease pattern operators evaluate the
     integral over the spatial domain in an instantaneous configuration
     '''
-
-    implements(IFu)
 
     def get_f(self, t=0):
         '''Get the bending energy of gravity.

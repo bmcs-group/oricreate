@@ -67,7 +67,7 @@ from traitsui.api import \
 import numpy as np
 from oricreate.view.window.forming_task_view3d import \
     FTV
-from viz3d import \
+from .viz3d import \
     Viz3D
 
 
@@ -143,7 +143,8 @@ class CamStation(HasStrictTraits):
     azimuth = Float(0.0)
     elevation = Float(0.0)
     distance = Float(10.0)
-    focal_point = Tuple(Float, Float, Float)
+    roll = Float(0)
+    focal_point = Array(np.float_)
 
     time_stemp = Property
 
@@ -154,8 +155,6 @@ class CamStation(HasStrictTraits):
             return 0.0
 
     fpoint = Property
-
-    roll = Float(0)
 
     def _get_fpoint(self):
         return np.array(list(self.focal_point), dtype='float_')
@@ -271,9 +270,11 @@ class CamMove(HasStrictTraits):
     '''
     @cached_property
     def _get_transition_arr(self):
-        trans_arr = [getattr(self, attr + '_move_')(getattr(self.from_station, attr),
-                                                    getattr(self.to_station, attr), self.n_t)
-                     for attr in self.cam_attributes]
+        trans_arr = [getattr(self, attr + '_move_')(
+            getattr(self.from_station, attr),
+            getattr(self.to_station, attr), self.n_t)
+            for attr in self.cam_attributes
+        ]
         trans_arr.append(self.vot)
         trans_arr.append(self.viz_t_move)
         return trans_arr
@@ -288,7 +289,7 @@ class CamMove(HasStrictTraits):
             self.reset_cam(ftv.mlab, a, float(e), d, f, r)
             sleep(self.fta.anim_delay)
 
-    def render_take(self, ftv, fname_base, format_, idx_offset):
+    def render_take(self, ftv, fname_base, format_, idx_offset, figsize_factor):
         im_files = []
         for idx, (a, e, d, f, r, vot, viz_t) \
                 in enumerate(zip(*self.transition_arr)):
@@ -296,7 +297,8 @@ class CamMove(HasStrictTraits):
             # @todo: temporary focal point determination - make it optional
             self.reset_cam(ftv.mlab, a, e, d, f, r)
             fname = '%s%03d.%s' % (fname_base, idx + idx_offset, format_)
-            ftv.mlab.savefig(fname, size=(800, 500))  #
+            ftv.mlab.savefig(fname, size=(
+                figsize_factor * 800, figsize_factor * 500))  #
             im_files.append(fname)
         return im_files
 
@@ -447,6 +449,8 @@ class FormingTaskAnim3D(HasStrictTraits):
         for cam_move in self.cam_moves:
             cam_move.take(self.ftv)
 
+    figsize_factor = Float(1.0)
+
     def render(self):
         self.ftv.mlab.options.offscreen = True
         self.ftv.mlab.clf()
@@ -460,7 +464,7 @@ class FormingTaskAnim3D(HasStrictTraits):
         idx_offset = 0
         for cam_move in self.cam_moves:
             take_im_files = cam_move.render_take(
-                self.ftv, fname_path, 'jpg', idx_offset)
+                self.ftv, fname_path, 'png', idx_offset, self.figsize_factor)
             idx_offset += len(take_im_files)
             im_files.append(take_im_files)
 
@@ -508,7 +512,7 @@ FTA = FormingTaskAnim3D
 
 if __name__ == '__main__':
 
-    from visual3d import Visual3D
+    from .visual3d import Visual3D
 
     class PointCloudViz3D(Viz3D):
         '''Visualization object
@@ -551,7 +555,7 @@ if __name__ == '__main__':
             x, y, z, s = self.p
             s = np.array(s, float)
             s[-1] *= (1.0 - 0.9 * self.vot)
-            print x, y, z, s
+            print(x, y, z, s)
             return x, y, z, s
 
         viz3d_classes = dict(default=PointCloudViz3D,

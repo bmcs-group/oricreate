@@ -48,9 +48,9 @@ def get_sin_theta(a, b):
     '''
     c = np.einsum('...i,...j,...kij->...k', a, b, EPS)
     mag_c = np.einsum('...i,...i->...', c, c)
-    print 'c', c, 'mag_c', mag_c
+    print('c', c, 'mag_c', mag_c)
     mag_aa_bb = np.einsum('...i,...i,...j,...j->...', a, a, b, b)
-    print 'mag_ab_bb', mag_aa_bb
+    print('mag_ab_bb', mag_aa_bb)
     sin_theta = np.sqrt(mag_c / mag_aa_bb)
 
     return sin_theta
@@ -63,4 +63,4 @@ if __name__ == '__main__':
     a = np.array([[1, 0, 0], [1, 0, 0], [1, 0, 0]], dtype='f')
     b = np.array([[0, 1, 0], [1, 1, 0], [1, -1, 0]], dtype='f')
 
-    print 'gamma', get_sin_theta(a, b)
+    print('gamma', get_sin_theta(a, b))

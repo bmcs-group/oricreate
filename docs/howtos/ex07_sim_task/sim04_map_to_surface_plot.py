@@ -4,7 +4,7 @@ used in the examples below demonstrating the evaluation of goal functions
 and constraints.
 '''
 
-from sim04_map_to_surface import create_sim_step
+from .sim04_map_to_surface import create_sim_step
 
 if __name__ == '__main__':
     import mayavi.mlab as m

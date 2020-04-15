@@ -189,7 +189,7 @@ class HexagonalCPFactory(FactoryTask):
         Nupv1 = N_enum[Nf1[j_arr * 2, i_arr]]
         Nupv2 = N_enum[Nf1[-j_arr * 2 - 1, -i_arr - 1]]
 
-        print 'N_uph1', Nuph1
+        print('N_uph1', Nuph1)
 
         Nf_up = np.unique(np.hstack([Nuph1, Nuph2, Nupv1, Nupv2]))
 
@@ -234,10 +234,10 @@ if __name__ == '__main__':
                             )
 
     cp = yf.formed_object
-    print yf.L_rigid
-    print 'N_x_sym', yf.N_x_sym
-    print yf.N_up
-    print yf.N_down
+    print(yf.L_rigid)
+    print('N_x_sym', yf.N_x_sym)
+    print(yf.N_up)
+    print(yf.N_down)
 
     import pylab as p
     cp.plot_mpl(p.axes(), nodes=True, lines=True, facets=False)

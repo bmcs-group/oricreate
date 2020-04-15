@@ -6,7 +6,7 @@ In order to show a non-zero value of the constraint residue,
 node displacement in vertical direction is assigned
 to the interior node of the sample crease pattern.
 '''
-from custom_factory_mpl import create_cp_factory
+from .custom_factory_mpl import create_cp_factory
 
 
 def create_gu():
@@ -19,8 +19,8 @@ def create_gu():
     # Set a vertical of the mid node
     cp.u[4, 2] = -1.0
     cp.u = cp.u
-    print 'gu:', gu_constant_length.get_G(cp.u)
-    print 'g_du:\n', gu_constant_length.get_G_du(cp.u)
+    print('gu:', gu_constant_length.get_G(cp.u))
+    print('g_du:\n', gu_constant_length.get_G_du(cp.u))
     # end
     return gu_constant_length
 

@@ -14,22 +14,24 @@
 
 from traits.api import \
     Property, cached_property, \
-    Array, Constant, implements, Int
+    Array, Constant, provides, Int
 from traitsui.api import \
     View, Item, TabularEditor, \
     Tabbed
 from traitsui.tabular_adapter import \
     TabularAdapter
-from crease_pattern_export import \
-    CreasePatternExport
-from crease_pattern_operators import \
-    CreaseNodeOperators, CreaseLineOperators, CreaseFacetOperators, \
-    CreaseCummulativeOperators, CreaseViewRelatedOperators
-from crease_pattern_plot_helper import \
-    CreasePatternPlotHelper
+
 import numpy as np
 from oricreate.forming_tasks import \
     IFormedObject
+
+from .crease_pattern_export import \
+    CreasePatternExport
+from .crease_pattern_operators import \
+    CreaseNodeOperators, CreaseLineOperators, CreaseFacetOperators, \
+    CreaseCummulativeOperators, CreaseViewRelatedOperators
+from .crease_pattern_plot_helper import \
+    CreasePatternPlotHelper
 
 
 INPUT = '+cp_input'
@@ -74,6 +76,7 @@ class FArrayAdapter(TabularAdapter):
         return str(self.row)
 
 
+@provides(IFormedObject)
 class CreasePattern(CreaseNodeOperators,
                     CreaseLineOperators,
                     CreaseFacetOperators,
@@ -107,8 +110,6 @@ class CreasePattern(CreaseNodeOperators,
     the parameter ``u`` representing the interim configuration
     of the crease pattern.
     '''
-
-    implements(IFormedObject)
 
     # ==========================================================================
     # Node coordinates
@@ -501,6 +502,7 @@ class CreasePattern(CreaseNodeOperators,
         buttons=['OK', 'Cancel'],
         resizable=True)
 
+
 if __name__ == '__main__':
 
     from oricreate.viz3d import FTV
@@ -517,7 +519,7 @@ if __name__ == '__main__':
                        F=[[0, 1, 2]]
                        )
 
-    from crease_pattern_viz3d import CreasePatternViz3D
+    from .crease_pattern_viz3d import CreasePatternViz3D
     # configure a viz object
     ftv = FTV()
     cp.viz3d_dict['smaller'] = CreasePatternViz3D(vis3d=cp, L_selection=[0, 1])

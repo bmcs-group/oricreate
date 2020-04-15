@@ -282,9 +282,9 @@ if __name__ == '__main__':
                              n_y=3)
 
     cp = wbf.formed_object
-    print cp.X
+    print(cp.X)
 
-    print 'n_crease_lines', cp.n_L
+    print('n_crease_lines', cp.n_L)
 
     import pylab as p
     cp.plot_mpl(p.axes())
