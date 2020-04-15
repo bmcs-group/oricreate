@@ -14,8 +14,11 @@
 from traits.api import \
     provides
 
+<<<<<<< master
 <<<<<<< HEAD
 =======
+=======
+>>>>>>> interim stage 1
 from .gu import \
     Gu, IGu
 >>>>>>> 2to3

@@ -23,7 +23,10 @@ from traitsui.api import \
 import numpy as np
 =======
 
+<<<<<<< master
 >>>>>>> 2to3
+=======
+>>>>>>> interim stage 1
 from .i_formed_object import \
     IFormedObject
 from .i_forming_task import \

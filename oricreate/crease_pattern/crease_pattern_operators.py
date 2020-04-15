@@ -106,7 +106,7 @@ class CreaseLineOperators(HasStrictTraits):
     '''
     @cached_property
     def _get_L_vectors_0(self):
-        return self.x_0[self.L[:, 1]] - self.x_0[self.L[:, 0]]
+        return self.x_0[self.L[:, 1], :] - self.x_0[self.L[:, 0], :]
 
     L_vectors = Property(Array, depends_on=INPUT)
     r'''Vectors of the crease lines.

@@ -15,8 +15,11 @@
 from traits.api import \
     Float, Property, cached_property
 
+<<<<<<< master
 <<<<<<< HEAD
 =======
+=======
+>>>>>>> interim stage 1
 from .crease_pattern_viz3d import \
     CreasePatternViz3D, CreasePatternNodeNumbersViz3D, \
     CreasePatternDisplViz3D

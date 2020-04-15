@@ -15,8 +15,11 @@
 from traits.api import \
     provides, Array
 
+<<<<<<< master
 <<<<<<< HEAD
 =======
+=======
+>>>>>>> interim stage 1
 from .fu import \
     Fu
 >>>>>>> 2to3

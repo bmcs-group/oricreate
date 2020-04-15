@@ -18,8 +18,11 @@ from traits.api import \
     provides,  List, Tuple, Float, \
     Property, Array, Int
 
+<<<<<<< master
 <<<<<<< HEAD
 =======
+=======
+>>>>>>> interim stage 1
 from .fu import \
     Fu
 from .fu_poteng_bending_viz3d import \
@@ -79,12 +82,16 @@ class FuPotEngTotal(Fu, Visual3D):
         elif isinstance(value, float) or isinstance(value, int):
             self._kappa = value
         else:
+<<<<<<< master
 <<<<<<< HEAD
             raise ValueError(
                 'wrong type of kappa value - must be float or array')
 =======
             raise ValueError('wrong type of kappa value - must be float or array')
 >>>>>>> 2to3
+=======
+            raise ValueError('wrong type of kappa value - must be float or array')
+>>>>>>> interim stage 1
 
     def _get_kappa(self):
         if len(self._kappa_arr):

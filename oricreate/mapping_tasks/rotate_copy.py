@@ -7,8 +7,11 @@ import math
 
 from traits.api import Property, Str, Int, Float, Array, cached_property
 
+<<<<<<< master
 <<<<<<< HEAD
 =======
+=======
+>>>>>>> interim stage 1
 from .mapping_task import \
     MappingTask
 >>>>>>> 2to3

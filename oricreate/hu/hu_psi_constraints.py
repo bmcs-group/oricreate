@@ -58,6 +58,7 @@ class HuPsiConstraints(Hu, Visual3D):
         for i, psi_cnstr in enumerate(self.psi_constraints):  # @UnusedVariable
             l, sign = psi_cnstr  # @UnusedVariable
             if cp.L_iL[l] < 0:
+<<<<<<< master
 <<<<<<< HEAD
                 raise IndexError('GuPsiConstraint: line index %d does '
                                  'not refer to an interior line: '
@@ -67,6 +68,11 @@ class HuPsiConstraints(Hu, Visual3D):
                     'not refer to an interior line: '\
                     'must be one of %s' % (l, cp.iL))
 >>>>>>> 2to3
+=======
+                raise IndexError('GuPsiConstraint: line index %d does ' \
+                    'not refer to an interior line: '\
+                    'must be one of %s' % (l, cp.iL))
+>>>>>>> interim stage 1
 
     def get_H(self, t=0):
         ''' Calculate the residue for given constraint equations

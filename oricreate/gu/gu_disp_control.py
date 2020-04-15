@@ -11,8 +11,11 @@ from traits.api import \
     provides, \
     Array, DelegatesTo, cached_property, Property
 
+<<<<<<< master
 <<<<<<< HEAD
 =======
+=======
+>>>>>>> interim stage 1
 from .gu import Gu
 from .gu_disp_control_viz3d import \
     GuDofConstraintsViz3D

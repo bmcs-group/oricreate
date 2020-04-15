@@ -19,8 +19,11 @@ from traits.api import \
     DelegatesTo, Float, Str, Array, \
     Instance
 
+<<<<<<< master
 <<<<<<< HEAD
 =======
+=======
+>>>>>>> interim stage 1
 from .fu import \
     Fu
 >>>>>>> 2to3
