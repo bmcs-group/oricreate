@@ -13,6 +13,11 @@
 
 from traits.api import \
     provides
+<<<<<<< master
+=======
+
+import numpy as np
+>>>>>>> Transformed to python 3
 
 <<<<<<< master
 <<<<<<< HEAD
@@ -21,12 +26,20 @@ from traits.api import \
 >>>>>>> interim stage 1
 from .gu import \
     Gu, IGu
+<<<<<<< master
 >>>>>>> 2to3
 import numpy as np
+=======
+>>>>>>> Transformed to python 3
 
 from .gu import \
     Gu, IGu
 
+<<<<<<< master
+=======
+@provides(IGu)
+class GuConstantLength(Gu):
+>>>>>>> Transformed to python 3
 
 @provides(IGu)
 class GuConstantLength(Gu):

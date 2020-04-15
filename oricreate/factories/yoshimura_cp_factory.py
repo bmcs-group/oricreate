@@ -197,7 +197,9 @@ class YoshimuraCPFactory(FactoryTask):
         # (2)
         # (3)
 
+        n_y_2 = int(n_y / 2)
         n_h = np.arange(
+<<<<<<< master
             (n_x + 1) * (n_y / 2 + 1),
             dtype=np.int_
         ).reshape((n_x + 1), int(n_y / 2 + 1))
@@ -207,6 +209,11 @@ class YoshimuraCPFactory(FactoryTask):
         n_i = np.arange(n_x * n_y / 2, dtype=np.int_).reshape(
             n_x, int(n_y / 2)
         ) + n_v[-1, -1] + 1
+=======
+            (n_x + 1) * (n_y_2 + 1)).reshape((n_x + 1), (n_y_2 + 1))
+        n_v = np.arange((2 * n_y_2)).reshape(2, n_y_2) + n_h[-1, -1] + 1
+        n_i = np.arange(n_x * n_y_2).reshape(n_x, n_y_2) + n_v[-1, -1] + 1
+>>>>>>> Transformed to python 3
         n_viv = np.vstack([n_v[0, :], n_i, n_v[-1, :]])
 
         # connectivity of nodes defining the crease pattern

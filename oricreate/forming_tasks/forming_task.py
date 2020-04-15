@@ -41,11 +41,14 @@ class FormingTask(HasStrictTraits):
     """
     source_config_changed = Event
 
+<<<<<<< master
 <<<<<<< HEAD
 =======
     # implements(IFormingTask)
 
 >>>>>>> 2to3
+=======
+>>>>>>> Transformed to python 3
     node = Str
     '''Name of the tree node
     '''

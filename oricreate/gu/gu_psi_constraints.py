@@ -11,6 +11,7 @@ from traits.api import \
     Array, cached_property, Property
 
 <<<<<<< master
+<<<<<<< master
 <<<<<<< HEAD
 =======
 =======
@@ -19,6 +20,8 @@ from .gu import Gu
 from .gu_psi_constraints_viz3d2 import \
     GuPsiConstraintsViz3D
 >>>>>>> 2to3
+=======
+>>>>>>> Transformed to python 3
 import numpy as np
 from oricreate.opt import \
     IGu
@@ -60,6 +63,7 @@ class GuPsiConstraints(Gu, Visual3D):
             for l, c in lhs:  # @UnusedVariable
                 if cp.L_iL[l] < 0:
 <<<<<<< master
+<<<<<<< master
 <<<<<<< HEAD
                     raise IndexError('GuPsiConstraint: line index %d does '
                                      'not refer to an interior line: '
@@ -74,6 +78,11 @@ class GuPsiConstraints(Gu, Visual3D):
                         'not refer to an interior line: '\
                         'must be one of %s' % (l, cp.iL))
 >>>>>>> interim stage 1
+=======
+                    raise IndexError('GuPsiConstraint: line index %d does '
+                                     'not refer to an interior line: '
+                                     'must be one of %s' % (l, cp.iL))
+>>>>>>> Transformed to python 3
 
     def __str__(self):
         s = 'Gu: %s - %d\n' % (self.label, len(self.psi_constraints))

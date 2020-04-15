@@ -20,6 +20,7 @@ from traits.api import \
     Instance
 
 <<<<<<< master
+<<<<<<< master
 <<<<<<< HEAD
 =======
 =======
@@ -27,6 +28,8 @@ from traits.api import \
 from .fu import \
     Fu
 >>>>>>> 2to3
+=======
+>>>>>>> Transformed to python 3
 import numpy as np
 from oricreate.fu.fu_target_face_viz3d import \
     FuTargetFaceViz3D

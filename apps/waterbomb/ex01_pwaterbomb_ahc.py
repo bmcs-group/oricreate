@@ -4,14 +4,11 @@ Created on Jan 20, 2016
 @author: rch
 '''
 
-from math import sqrt
-
 from traits.api import \
-    Float, HasStrictTraits, Property, cached_property, Int, \
+    Float, Property, cached_property, Int, \
     Instance, Array, Bool, List
 
 import numpy as np
-from oricreate.api import MappingTask
 from oricreate.api import YoshimuraCPFactory, \
     fix, link, r_, s_, t_, MapToSurface,\
     GuConstantLength, GuDofConstraints, \
@@ -747,6 +744,7 @@ if __name__ == '__main__':
 
         for node in node_heights:
 <<<<<<< master
+<<<<<<< master
             print('node %d, %5.3f [%5.3f, %5.3f, %5.3f]' %
                   (node, cp.x[node, 2], cp.u[node, 0],
                    cp.u[node, 1], cp.u[node, 2]))
@@ -758,6 +756,11 @@ if __name__ == '__main__':
                 (node, cp.x[node, 2], cp.u[node, 0],
                  cp.u[node, 1], cp.u[node, 2]))
 >>>>>>> interim stage 1
+=======
+            print('node %d, %5.3f [%5.3f, %5.3f, %5.3f]' %
+                  (node, cp.x[node, 2], cp.u[node, 0],
+                   cp.u[node, 1], cp.u[node, 2]))
+>>>>>>> Transformed to python 3
 
         iL_psi = cp.iL_psi / np.pi * 180.0
 
@@ -808,9 +811,9 @@ if __name__ == '__main__':
         gu_dofs_viz3d.scale_factor = 0.1
         ftv.add(gu_dofs_viz3d)
         ftv.add(lot.config.fu.viz3d['default'])
-        lot.config.fu.viz3d['default'].set(anim_t_start=00, anim_t_end=50)
+        lot.config.fu.viz3d['default'].set(anim_t_start=0, anim_t_end=50)
         ftv.add(lot.config.fu.viz3d['node_load'])
-        lot.config.fu.viz3d['node_load'].set(anim_t_start=00, anim_t_end=50)
+        lot.config.fu.viz3d['node_load'].set(anim_t_start=0, anim_t_end=50)
         u_max = np.max(np.fabs(lot.u_1))
         print(u_max)
 

@@ -406,13 +406,13 @@ if __name__ == '__main__':
 
 import platform
 import time
+
 from traits.api import Instance, \
     Property, cached_property, Str, \
-    Array, Dict, implements, Int, Bool, DelegatesTo
+    Array, Dict, provides, Int, Bool, DelegatesTo
 from traitsui.api import \
     View, UItem, Item, Group
-from .i_simulation_task import \
-    ISimulationTask
+
 import numpy as np
 from oricreate.crease_pattern import \
     CreasePattern
@@ -433,12 +433,17 @@ from oricreate.simulation_step import \
     SimulationStep, SimulationConfig
 from oricreate.simulation_tasks.simulation_history import SimulationHistory
 
+from .i_simulation_task import \
+    ISimulationTask
+
+
 if platform.system() == 'Linux':
     sysclock = time.time
 elif platform.system() == 'Windows':
     sysclock = time.clock
 
 
+@provides(ISimulationTask)
 class SimulationTask(FormingTask):
 
     '''SimulationTask tasks use the crease pattern state
@@ -449,8 +454,6 @@ class SimulationTask(FormingTask):
     of the FormingStep with the goal to
     represent the.
     '''
-    implements(ISimulationTask)
-
     config = Instance(SimulationConfig)
     '''Configuration of the simulation
     '''
