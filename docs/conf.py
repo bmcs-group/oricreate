@@ -31,19 +31,21 @@ sys.path.insert(0, root_path_simvisage)
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc',
-              'sphinx.ext.doctest',
-              'matplotlib.sphinxext.mathmpl',
-              'matplotlib.sphinxext.only_directives',
-              'matplotlib.sphinxext.plot_directive',
-              'sphinx.ext.inheritance_diagram',
-              'sphinx.ext.graphviz',
-              'sphinx.ext.todo',
-              'sphinx.ext.coverage',
-              'sphinx.ext.pngmath',
-              'sphinx.ext.ifconfig',
-              'sphinx.ext.viewcode',
-              'sphinxcontrib.programoutput']
+extensions = [
+    #             'sphinx.ext.autodoc',
+    #               'sphinx.ext.doctest',
+    #               'matplotlib.sphinxext.mathmpl',
+    #               'matplotlib.sphinxext.only_directives',
+    #               'matplotlib.sphinxext.plot_directive',
+    #               'sphinx.ext.inheritance_diagram',
+    #               'sphinx.ext.graphviz',
+    #               'sphinx.ext.todo',
+    #               'sphinx.ext.coverage',
+    #               'sphinx.ext.pngmath',
+    #               'sphinx.ext.ifconfig',
+    #               'sphinx.ext.viewcode',
+    #               'sphinxcontrib.programoutput'
+]
 
 [extensions]
 
@@ -65,7 +67,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'oricreate'
-copyright = '2014, Rostislav Chudoba'
+copyright = '2020, IMB'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
