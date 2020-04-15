@@ -6,7 +6,7 @@ Created on Jan 20, 2016
 
 from traits.api import \
     Float, HasTraits, Property, cached_property, Int, \
-    Instance, Array, Bool
+    Instance, Bool
 
 import numpy as np
 from oricreate.api import MappingTask
@@ -204,8 +204,13 @@ if __name__ == '__main__':
     ft = bsf_process.fold_task
 
     cp = ft.formed_object
+<<<<<<< HEAD
     print('n_dofs', cp.n_dofs)
     print(ft.sim_step)
+=======
+    print(('n_dofs', cp.n_dofs))
+    print((ft.sim_step))
+>>>>>>> 2to3
 
     animate = False
     show_init_task = False

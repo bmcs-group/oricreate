@@ -19,7 +19,11 @@ from traits.api import \
     cached_property, Enum, Array
 from traitsui.api import \
     View, Item
+<<<<<<< HEAD
 import numpy as np
+=======
+
+>>>>>>> 2to3
 from .i_formed_object import \
     IFormedObject
 from .i_forming_task import \
@@ -34,6 +38,11 @@ class FormingTask(HasStrictTraits):
     """
     source_config_changed = Event
 
+<<<<<<< HEAD
+=======
+    # implements(IFormingTask)
+
+>>>>>>> 2to3
     node = Str
     '''Name of the tree node
     '''

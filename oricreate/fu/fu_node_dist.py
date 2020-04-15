@@ -15,6 +15,11 @@
 from traits.api import \
     provides, Array
 
+<<<<<<< HEAD
+=======
+from .fu import \
+    Fu
+>>>>>>> 2to3
 import numpy as np
 from oricreate.opt import \
     IFu

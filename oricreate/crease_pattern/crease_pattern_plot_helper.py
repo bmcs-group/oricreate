@@ -15,6 +15,12 @@
 from traits.api import \
     Float, Property, cached_property
 
+<<<<<<< HEAD
+=======
+from .crease_pattern_viz3d import \
+    CreasePatternViz3D, CreasePatternNodeNumbersViz3D, \
+    CreasePatternDisplViz3D
+>>>>>>> 2to3
 import numpy as np
 from oricreate.viz3d import \
     Visual3D

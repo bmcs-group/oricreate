@@ -14,6 +14,7 @@
 
 import platform
 import time
+<<<<<<< HEAD
 
 from traits.api import Instance, \
     Property, cached_property, Str, \
@@ -21,6 +22,15 @@ from traits.api import Instance, \
 from traitsui.api import \
     View, UItem, Item, Group
 
+=======
+from traits.api import Instance, \
+    Property, cached_property, Str, \
+    Array, Dict, implements, Int, Bool, DelegatesTo
+from traitsui.api import \
+    View, UItem, Item, Group
+from .i_simulation_task import \
+    ISimulationTask
+>>>>>>> 2to3
 import numpy as np
 from oricreate.crease_pattern import \
     CreasePattern
@@ -41,18 +51,56 @@ from oricreate.simulation_step import \
     SimulationStep, SimulationConfig
 from oricreate.simulation_tasks.simulation_history import SimulationHistory
 
+<<<<<<< HEAD
 from .i_simulation_task import \
     ISimulationTask
 
 
+=======
+>>>>>>> 2to3
 if platform.system() == 'Linux':
     sysclock = time.time
 elif platform.system() == 'Windows':
     sysclock = time.clock
 
 
+<<<<<<< HEAD
 @provides(ISimulationTask)
 class SimulationTaskBase(FormingTask):
+=======
+class SimulationTask(FormingTask):
+
+    '''SimulationTask tasks use the crease pattern state
+    attained within the previous FormingTask task
+    and bring it to the next stage.
+
+    It is realized as a specialized configurations
+    of the FormingStep with the goal to
+    represent the.
+    '''
+    implements(ISimulationTask)
+
+    config = Instance(SimulationConfig)
+    '''Configuration of the simulation
+    '''
+
+    def _config_default(self):
+        return SimulationConfig()
+
+    n_steps = Int(1, auto_set=False, enter_set=True)
+    '''Number of simulation steps.
+    '''
+
+    sim_step = Property(depends_on='config')
+    '''Simulation step resim_step =alizing the transition
+    from initial to final state for the increment
+    of the time-dependent constraints.
+    '''
+    @cached_property
+    def _get_sim_step(self):
+        return SimulationStep(forming_task=self,
+                              config=self.config)
+>>>>>>> 2to3
 
     # =========================================================================
     # Geometric data
@@ -75,6 +123,13 @@ class SimulationTaskBase(FormingTask):
     def _get_u_1(self):
         return self.u_t[-1]
 
+<<<<<<< HEAD
+=======
+    # ==========================================================================
+    # Solver parameters
+    # ==========================================================================
+
+>>>>>>> 2to3
     n_steps = Int(1, auto_set=False, enter_set=True)
     '''Number of time steps.
     '''
@@ -83,6 +138,16 @@ class SimulationTaskBase(FormingTask):
     '''User specified time array overriding the default one.
     '''
 
+<<<<<<< HEAD
+=======
+    unfold = Bool(False)
+    '''Reverse the time array. So it's possible to unfold
+    a structure. If you optimize a pattern with FindFormForGeometry
+    you can unfold it at least with FoldRigidly to it's flatten
+    shape.
+    '''
+
+>>>>>>> 2to3
     t_arr = Property(Array(float), depends_on='unfold, n_steps, time_array')
     '''Generated time array.
     '''
@@ -103,6 +168,7 @@ class SimulationTaskBase(FormingTask):
     def _get_sim_history(self):
         cp = self.cp
         return SimulationHistory(
+<<<<<<< HEAD
             x_0=cp.x_0, L=cp.L, F=cp.F, u_t=self.u_t,
             t_record=self.t_arr
         )
@@ -146,6 +212,11 @@ class SimulationTask(SimulationTaskBase):
     you can unfold it at least with FoldRigidly to it's flatten
     shape.
     '''
+=======
+            x_0=cp.x_0, L=cp.L, F=cp.F, u_t=self.u_t, t_record=self.t_arr
+        )
+
+>>>>>>> 2to3
     record_iter = DelegatesTo('sim_step')
 
     u_t = Property(depends_on='source_config_changed, unfold')

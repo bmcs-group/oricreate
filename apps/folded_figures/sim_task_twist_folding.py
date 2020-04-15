@@ -289,5 +289,12 @@ if __name__ == '__main__':
     # ftv.configure_traits()
     fta = FTA(ftv=ftv)
 
+<<<<<<< HEAD
     fta.add_cam_move(duration=10, n=20)
     fta.configure_traits()
+=======
+    twist_folding = TwistFolding(n_steps=40)
+    print(twist_folding.u_t)
+    print(twist_folding.u_1)
+    # print twist_folding.sim_history.u_t[-1]
+>>>>>>> 2to3

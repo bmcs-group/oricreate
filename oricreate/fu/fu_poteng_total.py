@@ -18,6 +18,15 @@ from traits.api import \
     provides,  List, Tuple, Float, \
     Property, Array, Int
 
+<<<<<<< HEAD
+=======
+from .fu import \
+    Fu
+from .fu_poteng_bending_viz3d import \
+    FuPotEngBendingViz3D
+from .fu_poteng_node_load_viz3d import \
+    FuPotEngNodeLoadViz3D
+>>>>>>> 2to3
 import numpy as np
 from oricreate.crease_pattern.crease_pattern_operators import CreaseCummulativeOperators
 from oricreate.opt import \
@@ -70,8 +79,12 @@ class FuPotEngTotal(Fu, Visual3D):
         elif isinstance(value, float) or isinstance(value, int):
             self._kappa = value
         else:
+<<<<<<< HEAD
             raise ValueError(
                 'wrong type of kappa value - must be float or array')
+=======
+            raise ValueError('wrong type of kappa value - must be float or array')
+>>>>>>> 2to3
 
     def _get_kappa(self):
         if len(self._kappa_arr):

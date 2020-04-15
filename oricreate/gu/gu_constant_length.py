@@ -14,6 +14,11 @@
 from traits.api import \
     provides
 
+<<<<<<< HEAD
+=======
+from .gu import \
+    Gu, IGu
+>>>>>>> 2to3
 import numpy as np
 
 from .gu import \

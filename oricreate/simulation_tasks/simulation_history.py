@@ -89,6 +89,7 @@ if __name__ == '__main__':
     # trivial example with a single triangle positioned
 
     from oricreate.api import CreasePatternState
+<<<<<<< HEAD
     cp = CreasePatternState(
         x_0=[[0, 0, 0],
              [1, 0, 0],
@@ -100,6 +101,18 @@ if __name__ == '__main__':
            [2, 0]],
         F=[[0, 1, 2]]
     )
+=======
+    cp = CreasePatternState(x_0=[[0, 0, 0],
+                                 [1, 0, 0],
+                                 [1, 1, 0],
+                                 [0.667, 0.333, 0],
+                                 [0.1, 0.05, 0]],
+                            L=[[0, 1],
+                               [1, 2],
+                               [2, 0]],
+                            F=[[0, 1, 2]]
+                            )
+>>>>>>> 2to3
 
     print('vectors\n', cp.L_vectors)
     print('lengths\n', cp.L_lengths)

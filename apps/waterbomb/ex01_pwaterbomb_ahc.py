@@ -749,6 +749,9 @@ if __name__ == '__main__':
             print('node %d, %5.3f [%5.3f, %5.3f, %5.3f]' %
                   (node, cp.x[node, 2], cp.u[node, 0],
                    cp.u[node, 1], cp.u[node, 2]))
+            print('node %d, %5.3f [%5.3f, %5.3f, %5.3f]' %
+                  (node, cp.x[node, 2], cp.u[node, 0],
+                   cp.u[node, 1], cp.u[node, 2]))
 
         iL_psi = cp.iL_psi / np.pi * 180.0
 

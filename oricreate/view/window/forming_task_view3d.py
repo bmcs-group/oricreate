@@ -90,8 +90,13 @@ class FormingTaskView3D(HasStrictTraits):
         '''
         mm = []
         if len(self.viz3d_list) == 0:
+<<<<<<< HEAD
             raise IndexError('No vizualization module inserted'
                              'into fold television')
+=======
+            raise IndexError('No vizualization module inserted' \
+                'into fold television')
+>>>>>>> 2to3
         for viz3d in self.viz3d_list:
             x_min, x_max = viz3d.min_max
             if x_min != None and x_max != None:

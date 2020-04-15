@@ -20,11 +20,14 @@ from traitsui.api import \
     Tabbed
 from traitsui.tabular_adapter import \
     TabularAdapter
+<<<<<<< HEAD
 
 import numpy as np
 from oricreate.forming_tasks import \
     IFormedObject
 
+=======
+>>>>>>> 2to3
 from .crease_pattern_export import \
     CreasePatternExport
 from .crease_pattern_operators import \

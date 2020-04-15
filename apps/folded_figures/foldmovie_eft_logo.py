@@ -26,7 +26,11 @@ from oricreate.gu import GuConstantLength, GuDofConstraints, fix
 from oricreate.simulation_step import \
     SimulationStep, SimulationConfig
 from .sim_task_twist_folding import \
+<<<<<<< HEAD
     TwistFolding, create_cp_factory, damped_range
+=======
+    TwistFolding, create_cp_factory, oricreate_mlab_label
+>>>>>>> 2to3
 
 
 def run_sim():
