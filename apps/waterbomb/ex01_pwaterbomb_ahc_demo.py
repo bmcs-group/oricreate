@@ -597,7 +597,10 @@ def run_examples():
         cp = ft.formed_object
         print('NDOFS', cp.n_dofs)
 
+<<<<<<< HEAD
 >>>>>>> interim stage 1
+=======
+>>>>>>> bypass2
         print(ft.sim_step)
 
         ft.sim_history.set(anim_t_start=0, anim_t_end=10)

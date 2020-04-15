@@ -743,6 +743,7 @@ if __name__ == '__main__':
         node_heights = [12, 18, 1, 4, 0, 3]
 
         for node in node_heights:
+<<<<<<< HEAD
 <<<<<<< master
 <<<<<<< master
             print('node %d, %5.3f [%5.3f, %5.3f, %5.3f]' %
@@ -761,6 +762,11 @@ if __name__ == '__main__':
                   (node, cp.x[node, 2], cp.u[node, 0],
                    cp.u[node, 1], cp.u[node, 2]))
 >>>>>>> Transformed to python 3
+=======
+            print('node %d, %5.3f [%5.3f, %5.3f, %5.3f]' %
+                  (node, cp.x[node, 2], cp.u[node, 0],
+                   cp.u[node, 1], cp.u[node, 2]))
+>>>>>>> bypass2
 
         iL_psi = cp.iL_psi / np.pi * 180.0
 

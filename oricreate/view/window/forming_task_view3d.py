@@ -51,14 +51,20 @@ class FormingTaskView3D(HasStrictTraits):
 
     def _get_vis3d_list(self):
         return np.array([viz3d.vis3d for viz3d in self.viz3d_list])
+<<<<<<< HEAD
 <<<<<<< master
 #        return np.unique(np.array([viz3d.vis3d for viz3d in self.viz3d_list]))
 =======
+=======
+>>>>>>> bypass2
         # return np.unique(np.array([viz3d.vis3d for viz3d in
         # self.viz3d_list]))
 
     selected_viz3d = Instance(Viz3D)
+<<<<<<< HEAD
 >>>>>>> Transformed to python 3
+=======
+>>>>>>> bypass2
 
     vot_min = Float(0.0)
     vot_max = Float(1.0)
@@ -95,6 +101,7 @@ class FormingTaskView3D(HasStrictTraits):
         '''
         mm = []
         if len(self.viz3d_list) == 0:
+<<<<<<< HEAD
 <<<<<<< master
 <<<<<<< master
 <<<<<<< HEAD
@@ -112,6 +119,10 @@ class FormingTaskView3D(HasStrictTraits):
             raise IndexError('No vizualization module inserted'
                              'into fold television')
 >>>>>>> Transformed to python 3
+=======
+            raise IndexError('No vizualization module inserted'
+                             'into fold television')
+>>>>>>> bypass2
         for viz3d in self.viz3d_list:
             x_min, x_max = viz3d.min_max
             if x_min != None and x_max != None:

@@ -15,11 +15,15 @@ from .gu import \
 from .hu import \
     HuPsiConstraints
 from .mapping_tasks import \
+<<<<<<< HEAD
 <<<<<<< master
     MappingTask, MapToSurface, RotateCopy, MoveTask
 =======
     MappingTask, MapToSurface, RotateCopy
 >>>>>>> interim stage 1
+=======
+    MappingTask, MapToSurface, RotateCopy
+>>>>>>> bypass2
 from .simulation_step import \
     SimulationStep, SimulationConfig
 from .simulation_tasks import \

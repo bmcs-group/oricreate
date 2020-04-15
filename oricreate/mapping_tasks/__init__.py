@@ -5,6 +5,7 @@ from .mapping_task import \
     MappingTask
 from .mask_task import \
     MaskTask
+<<<<<<< HEAD
 <<<<<<< master
 <<<<<<< HEAD
 from .move_task import \
@@ -13,5 +14,7 @@ from .move_task import \
 >>>>>>> 2to3
 =======
 >>>>>>> interim stage 1
+=======
+>>>>>>> bypass2
 from .rotate_copy import \
     RotateCopy

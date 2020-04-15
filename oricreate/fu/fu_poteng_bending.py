@@ -15,6 +15,7 @@
 from traits.api import \
     provides
 
+<<<<<<< HEAD
 <<<<<<< master
 <<<<<<< master
 <<<<<<< HEAD
@@ -26,11 +27,14 @@ from .fu import \
 >>>>>>> 2to3
 =======
 >>>>>>> Transformed to python 3
+=======
+>>>>>>> bypass2
 from oricreate.opt import \
     IFu
 
 from .fu import \
     Fu
+<<<<<<< HEAD
 <<<<<<< master
 
 
@@ -38,6 +42,10 @@ from .fu import \
 
 
 >>>>>>> Transformed to python 3
+=======
+
+
+>>>>>>> bypass2
 @provides(IFu)
 class FuPotEngBending(Fu):
 

@@ -35,6 +35,7 @@ class CreasePatternExport(HasStrictTraits):
 
         @todo this should be moved to FormingTask
         '''
+<<<<<<< HEAD
 <<<<<<< master
 <<<<<<< HEAD
         print('get position')
@@ -43,6 +44,9 @@ class CreasePatternExport(HasStrictTraits):
 =======
         print('get position')
 >>>>>>> interim stage 1
+=======
+        print('get position')
+>>>>>>> bypass2
         u_t = self.fold_steps[iteration_step]
         pts_p, faces_p = self.cnstr[0].get_cnstr_view(u_t, 1.0)
         pts_l = None
@@ -87,6 +91,7 @@ class CreasePatternExport(HasStrictTraits):
                 r = ry
             else:
                 r = rz
+<<<<<<< HEAD
 <<<<<<< master
 <<<<<<< HEAD
             print('Step ', p, ': r = ', r)
@@ -96,6 +101,9 @@ class CreasePatternExport(HasStrictTraits):
 =======
             print('Step ', p, ': r = ', r)
 >>>>>>> interim stage 1
+=======
+            print('Step ', p, ': r = ', r)
+>>>>>>> bypass2
 
     def create_rcp_tex(self, name='rcp_output.tex', x=15., y=15.):
         '''
@@ -192,6 +200,7 @@ class CreasePatternExport(HasStrictTraits):
                 a_f.append(i)
 
         a_f = np.array(a_f)
+<<<<<<< HEAD
 <<<<<<< master
 <<<<<<< HEAD
         print(a_f + 1)
@@ -201,4 +210,7 @@ class CreasePatternExport(HasStrictTraits):
 =======
         print(a_f + 1)
 >>>>>>> interim stage 1
+=======
+        print(a_f + 1)
+>>>>>>> bypass2
         return a_f

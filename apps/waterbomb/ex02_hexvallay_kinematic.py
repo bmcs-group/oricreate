@@ -204,6 +204,7 @@ if __name__ == '__main__':
     ft = bsf_process.fold_task
 
     cp = ft.formed_object
+<<<<<<< HEAD
 <<<<<<< master
 <<<<<<< HEAD
     print('n_dofs', cp.n_dofs)
@@ -216,6 +217,10 @@ if __name__ == '__main__':
     print('n_dofs', cp.n_dofs)
     print(ft.sim_step)
 >>>>>>> interim stage 1
+=======
+    print('n_dofs', cp.n_dofs)
+    print(ft.sim_step)
+>>>>>>> bypass2
 
     animate = False
     show_init_task = False

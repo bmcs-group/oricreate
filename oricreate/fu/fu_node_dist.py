@@ -15,6 +15,7 @@
 from traits.api import \
     provides, Array
 
+<<<<<<< HEAD
 <<<<<<< master
 <<<<<<< master
 <<<<<<< HEAD
@@ -26,6 +27,8 @@ from .fu import \
 >>>>>>> 2to3
 =======
 >>>>>>> Transformed to python 3
+=======
+>>>>>>> bypass2
 import numpy as np
 from oricreate.opt import \
     IFu
@@ -34,6 +37,7 @@ from oricreate.viz3d import \
 
 from .fu import \
     Fu
+<<<<<<< HEAD
 <<<<<<< master
 
 
@@ -41,6 +45,10 @@ from .fu import \
 
 
 >>>>>>> Transformed to python 3
+=======
+
+
+>>>>>>> bypass2
 @provides(IFu)
 class FuNodeDist(Fu, Visual3D):
 

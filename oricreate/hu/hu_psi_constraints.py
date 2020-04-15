@@ -8,6 +8,7 @@ from traits.api import \
     provides, \
     Array, cached_property, Property, Dict, Float
 
+<<<<<<< HEAD
 <<<<<<< master
 <<<<<<< HEAD
 =======
@@ -18,6 +19,8 @@ from .hu_psi_constraints_viz3d2 import \
 >>>>>>> 2to3
 =======
 >>>>>>> Transformed to python 3
+=======
+>>>>>>> bypass2
 import numpy as np
 from oricreate.opt import \
     IHu
@@ -61,6 +64,7 @@ class HuPsiConstraints(Hu, Visual3D):
         for i, psi_cnstr in enumerate(self.psi_constraints):  # @UnusedVariable
             l, sign = psi_cnstr  # @UnusedVariable
             if cp.L_iL[l] < 0:
+<<<<<<< HEAD
 <<<<<<< master
 <<<<<<< master
 <<<<<<< HEAD
@@ -82,6 +86,11 @@ class HuPsiConstraints(Hu, Visual3D):
                                  'not refer to an interior line: '
                                  'must be one of %s' % (l, cp.iL))
 >>>>>>> Transformed to python 3
+=======
+                raise IndexError('GuPsiConstraint: line index %d does '
+                                 'not refer to an interior line: '
+                                 'must be one of %s' % (l, cp.iL))
+>>>>>>> bypass2
 
     def get_H(self, t=0):
         ''' Calculate the residue for given constraint equations

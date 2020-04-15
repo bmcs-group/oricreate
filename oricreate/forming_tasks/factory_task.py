@@ -24,7 +24,6 @@ class FactoryTask(FormingTask):
     It constructs the ``formed_object`` using the method ``deliver``.
     that must be implemented by subclasses.
     '''
-    implements(IFormingTask)
 
     @on_trait_change('+geometry')
     def notify_geometry_change(self):

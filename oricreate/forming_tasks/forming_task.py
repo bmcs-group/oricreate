@@ -20,6 +20,7 @@ from traits.api import \
 from traitsui.api import \
     View, Item
 <<<<<<< HEAD
+<<<<<<< HEAD
 import numpy as np
 =======
 
@@ -27,6 +28,9 @@ import numpy as np
 >>>>>>> 2to3
 =======
 >>>>>>> interim stage 1
+=======
+
+>>>>>>> bypass2
 from .i_formed_object import \
     IFormedObject
 from .i_forming_task import \
@@ -41,6 +45,7 @@ class FormingTask(HasStrictTraits):
     """
     source_config_changed = Event
 
+<<<<<<< HEAD
 <<<<<<< master
 <<<<<<< HEAD
 =======
@@ -49,6 +54,8 @@ class FormingTask(HasStrictTraits):
 >>>>>>> 2to3
 =======
 >>>>>>> Transformed to python 3
+=======
+>>>>>>> bypass2
     node = Str
     '''Name of the tree node
     '''
