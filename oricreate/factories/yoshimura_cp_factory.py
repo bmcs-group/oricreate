@@ -197,10 +197,11 @@ class YoshimuraCPFactory(FactoryTask):
         # (2)
         # (3)
 
+        n_y_2 = int(n_y / 2)
         n_h = np.arange(
-            (n_x + 1) * (n_y / 2 + 1)).reshape((n_x + 1), (n_y / 2 + 1))
-        n_v = np.arange((2 * n_y / 2)).reshape(2, n_y / 2) + n_h[-1, -1] + 1
-        n_i = np.arange(n_x * n_y / 2).reshape(n_x, n_y / 2) + n_v[-1, -1] + 1
+            (n_x + 1) * (n_y_2 + 1)).reshape((n_x + 1), (n_y_2 + 1))
+        n_v = np.arange((2 * n_y_2)).reshape(2, n_y_2) + n_h[-1, -1] + 1
+        n_i = np.arange(n_x * n_y_2).reshape(n_x, n_y_2) + n_v[-1, -1] + 1
         n_viv = np.vstack([n_v[0, :], n_i, n_v[-1, :]])
 
         # connectivity of nodes defining the crease pattern
@@ -277,6 +278,7 @@ class YoshimuraCPFactory(FactoryTask):
         return (self.geo_transform(nodes), crease_lines, facets,
                 n_h, n_v, n_i, X_h, X_v, X_i,
                 interior_vertices, cycled_neighbors)
+
 
 if __name__ == '__main__':
 

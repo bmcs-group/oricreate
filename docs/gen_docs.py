@@ -166,7 +166,10 @@ class GenDoc(HasTraits):
             ged.generate_latex()
 
         os.chdir(DOCS_DIR)
-        sphings_cmd = 'sphinx-build -b latex -E . %s' % self.build_dir
+        hdir = os.path.expanduser('~')
+        sphings_exe = os.path.join(hdir, 'anaconda3', 'bin', 'sphinx-build')
+        sphings_cmd = '%s -b latex -E . %s' % (
+            sphings_exe, self.build_dir)
         os.system(sphings_cmd)
         make_cmd = 'make all-pdf'
         os.chdir(self.build_dir)
@@ -178,7 +181,9 @@ class GenDoc(HasTraits):
             ged.generate_html()
 
         os.chdir(DOCS_DIR)
-        sphings_cmd = 'sphinx-build -b html -E . %s' % self.build_dir
+        hdir = os.path.expanduser('~')
+        sphings_exe = os.path.join(hdir, 'anaconda3', 'bin', 'sphinx-build')
+        sphings_cmd = '%s -b html -E . %s' % (sphings_exe, self.build_dir)
         os.system(sphings_cmd)
 
     def push_html(self):
@@ -188,6 +193,7 @@ class GenDoc(HasTraits):
         rsync_cmd = 'rsync -av --delete %s/ %s' % (
             self.build_dir, self.html_server)
         os.system(rsync_cmd)
+
 
 if __name__ == '__main__':
 

@@ -15,15 +15,9 @@
 import types
 
 from traits.api import \
-    implements,  List, Tuple, Float, \
+    provides,  List, Tuple, Float, \
     Property, Array, Int
 
-from .fu import \
-    Fu
-from .fu_poteng_bending_viz3d import \
-    FuPotEngBendingViz3D
-from .fu_poteng_node_load_viz3d import \
-    FuPotEngNodeLoadViz3D
 import numpy as np
 from oricreate.crease_pattern.crease_pattern_operators import CreaseCummulativeOperators
 from oricreate.opt import \
@@ -33,7 +27,15 @@ from oricreate.util.einsum_utils import \
 from oricreate.viz3d import \
     Visual3D
 
+from .fu import \
+    Fu
+from .fu_poteng_bending_viz3d import \
+    FuPotEngBendingViz3D
+from .fu_poteng_node_load_viz3d import \
+    FuPotEngNodeLoadViz3D
 
+
+@provides(IFu)
 class FuPotEngTotal(Fu, Visual3D):
 
     '''Optimization criteria based on minimum Bending energy of gravity.
@@ -41,8 +43,6 @@ class FuPotEngTotal(Fu, Visual3D):
     This plug-in class lets the crease pattern operators evaluate the
     integral over the spatial domain in an instantaneous configuration
     '''
-
-    implements(IFu)
 
     F_ext_list = List(Tuple, [])
 
@@ -70,7 +70,8 @@ class FuPotEngTotal(Fu, Visual3D):
         elif isinstance(value, float) or isinstance(value, int):
             self._kappa = value
         else:
-            raise ValueError('wrong type of kappa value - must be float or array')
+            raise ValueError(
+                'wrong type of kappa value - must be float or array')
 
     def _get_kappa(self):
         if len(self._kappa_arr):

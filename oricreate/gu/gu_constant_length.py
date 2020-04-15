@@ -12,18 +12,19 @@
 #
 
 from traits.api import \
-    implements
+    provides
+
+import numpy as np
 
 from .gu import \
     Gu, IGu
-import numpy as np
 
 
+@provides(IGu)
 class GuConstantLength(Gu):
 
     '''Constant length constraint.
     '''
-    implements(IGu)
 
     def __str__(self):
         cp = self.formed_object

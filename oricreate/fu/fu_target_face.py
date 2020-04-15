@@ -14,13 +14,11 @@
 
 from scipy.optimize import fsolve
 from traits.api import \
-    implements, HasTraits, List, \
+    provides, HasTraits, List, \
     Property, cached_property, Any,\
     DelegatesTo, Float, Str, Array, \
     Instance
 
-from .fu import \
-    Fu
 import numpy as np
 from oricreate.fu.fu_target_face_viz3d import \
     FuTargetFaceViz3D
@@ -31,6 +29,9 @@ from oricreate.util import \
 from oricreate.viz3d import \
     Visual3D
 import sympy as sm
+
+from .fu import \
+    Fu
 
 
 class ParamFaceOperator(HasTraits):
@@ -308,12 +309,11 @@ def FuTF(expr, nodes):
                         nodes=nodes)
 
 
+@provides(IFu)
 class FuTargetFaces(Fu, Visual3D):
 
     '''Container of target faces
     '''
-
-    implements(IFu)
 
     tf_lst = List([])
 

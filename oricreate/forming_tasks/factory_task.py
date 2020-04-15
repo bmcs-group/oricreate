@@ -5,7 +5,7 @@ Created on Nov 6, 2014
 '''
 
 from traits.api import \
-    implements, on_trait_change, Property, Instance, cached_property
+    provides, on_trait_change, Property, Instance, cached_property
 
 from .forming_task import \
     FormingTask
@@ -15,6 +15,7 @@ from .i_forming_task import \
     IFormingTask
 
 
+@provides(IFormingTask)
 class FactoryTask(FormingTask):
 
     r'''Factory task that generates a a formed_object as a pre-form.
@@ -23,7 +24,6 @@ class FactoryTask(FormingTask):
     It constructs the ``formed_object`` using the method ``deliver``.
     that must be implemented by subclasses.
     '''
-    implements(IFormingTask)
 
     @on_trait_change('+geometry')
     def notify_geometry_change(self):
@@ -42,6 +42,7 @@ class FactoryTask(FormingTask):
                                   self)
 
     previous_task = None
+
 
 if __name__ == '__main__':
     ft = FactoryTask()

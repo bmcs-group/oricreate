@@ -5,7 +5,7 @@ Created on Oct 29, 2014
 '''
 
 from traits.api import \
-    HasStrictTraits, Property, cached_property, implements, \
+    HasStrictTraits, Property, cached_property, provides, \
     Int, Trait, Instance, Bool, Dict, Str,  Float
 from traitsui.api import \
     View, UItem,  TableEditor, ObjectColumn, \
@@ -30,13 +30,12 @@ hu_list_editor = TableEditor(
 )
 
 
+@provides(IOpt)
 class SimulationConfig(HasStrictTraits):
 
     '''Configuration of the optimization problem
     including the goal functions, and constraints.
     '''
-
-    implements(IOpt)
 
     debug_level = Int(0, label='Debug level', auto_set=False, enter_set=True)
     r'''Debug level for simulation scheme.
@@ -68,8 +67,8 @@ class SimulationConfig(HasStrictTraits):
 
     def _set_fu(self, value):
         if not value.__class__ is self.goal_function_type_:
-            raise TypeError('Goal function has type %s but should be %s' % \
-                (value.__class__, self.goal_function_type_))
+            raise TypeError('Goal function has type %s but should be %s' %
+                            (value.__class__, self.goal_function_type_))
         self._fu = value
 
     gu = Dict(Str, IGu)

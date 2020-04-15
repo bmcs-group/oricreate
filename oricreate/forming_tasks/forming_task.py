@@ -15,7 +15,7 @@
 import copy
 from traits.api import \
     HasStrictTraits, Event, Property, Str, \
-    List, Instance, implements, \
+    List, Instance, provides, \
     cached_property, Enum, Array
 from traitsui.api import \
     View, Item
@@ -26,14 +26,13 @@ from .i_forming_task import \
     IFormingTask
 
 
+@provides(IFormingTask)
 class FormingTask(HasStrictTraits):
 
     r"""Control node in the design process of
     a crease pattern element.
     """
     source_config_changed = Event
-
-    implements(IFormingTask)
 
     node = Str
     '''Name of the tree node

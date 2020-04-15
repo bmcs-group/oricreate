@@ -49,10 +49,12 @@ class FormingTaskView3D(HasStrictTraits):
     '''Gather all the visualization objects
     '''
 
-    selected_viz3d = Instance(Viz3D)
-
     def _get_vis3d_list(self):
-        return np.unique(np.array([viz3d.vis3d for viz3d in self.viz3d_list]))
+        return np.array([viz3d.vis3d for viz3d in self.viz3d_list])
+        # return np.unique(np.array([viz3d.vis3d for viz3d in
+        # self.viz3d_list]))
+
+    selected_viz3d = Instance(Viz3D)
 
     vot_min = Float(0.0)
     vot_max = Float(1.0)
@@ -89,8 +91,8 @@ class FormingTaskView3D(HasStrictTraits):
         '''
         mm = []
         if len(self.viz3d_list) == 0:
-            raise IndexError('No vizualization module inserted' \
-                'into fold television')
+            raise IndexError('No vizualization module inserted'
+                             'into fold television')
         for viz3d in self.viz3d_list:
             x_min, x_max = viz3d.min_max
             if x_min != None and x_max != None:
