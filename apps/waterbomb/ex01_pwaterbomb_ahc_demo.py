@@ -89,9 +89,9 @@ class WBShellFormingProcess(HasStrictTraits):
         N_i = yf.N_i
 
         e = (self.a + 2 * self.c) / 3.0
-        print 'e', e
+        print('e', e)
         d_x = e - self.c
-        print 'delta', d_x
+        print('delta', d_x)
         cp.X[N_h[1::3, :].flatten(), 0] -= d_x
         cp.X[N_h[2::3, :].flatten(), 0] += d_x
         cp.X[N_i[0::3, :].flatten(), 0] += d_x
@@ -155,7 +155,7 @@ class WBShellFormingProcess(HasStrictTraits):
             base_h_y = np.hstack([base_h_y, right2_h_y])
 
         for c_y in range(0, self.n_cell_y - 1):
-            print 'c_y', c_y
+            print('c_y', c_y)
             base_i_x = np.hstack([base_i_x, up2_i_x])
             base_i_y = np.hstack([base_i_y, c_y + up2_i_y])
             base_h_x = np.hstack([base_h_x, up2_h_x])
@@ -167,12 +167,12 @@ class WBShellFormingProcess(HasStrictTraits):
         n_nodes = f.N_h[base_h_x, base_h_y]
 
         psi_lines = cp.NN_L[[m_nodes], n_nodes].flatten()
-        print 'psi_lines', psi_lines
+        print('psi_lines', psi_lines)
 
         cm_node = f.N_i[0, 0]
         cn_node = f.N_h[1, 1]
         cpsi_line = cp.NN_L[cm_node, cn_node]
-        print 'cpsi_lines', cpsi_line
+        print('cpsi_lines', cpsi_line)
 
         N_h = f.N_h
         N_i = f.N_i
@@ -184,10 +184,10 @@ class WBShellFormingProcess(HasStrictTraits):
         fixed_nodes_z = fix(
             [N_h[0, 0], N_h[-1, 0], N_h[0, -1]], (2))
 
-        print '--------------------------'
-        print N_i[0, 0].flatten()
-        print N_i[2, 0].flatten()
-        print '--------------------------'
+        print('--------------------------')
+        print(N_i[0, 0].flatten())
+        print(N_i[2, 0].flatten())
+        print('--------------------------')
 
         dof_constraints = fixed_nodes_x + fixed_nodes_z + fixed_nodes_y  # + \
         # link_mid
@@ -220,11 +220,11 @@ class WBShellFormingProcess(HasStrictTraits):
         N_down = np.hstack([N_h[::3, :].flatten(),
                             N_i[1::3, :].flatten()
                             ])
-        print 'N_down', N_down
+        print('N_down', N_down)
         N_up = np.hstack([N_i[::3, :].flatten(),
                           N_i[2::3, :].flatten(),
                           N_v[:, :].flatten()])
-        print 'N_up', N_up
+        print('N_up', N_up)
         cp.u[N_down, 2] -= self.d_down
         cp.u[N_up, 2] += self.d_up
         cp.u[:, 2] += self.d_down
@@ -277,7 +277,7 @@ class WBShellFormingProcess(HasStrictTraits):
             base_h_y = np.hstack([base_h_y, right2_h_y])
 
         for c_y in range(0, self.n_cell_y - 1):
-            print 'c_y', c_y
+            print('c_y', c_y)
             base_i_x = np.hstack([base_i_x, up2_i_x])
             base_i_y = np.hstack([base_i_y, c_y + up2_i_y])
             base_h_x = np.hstack([base_h_x, up2_h_x])
@@ -289,12 +289,12 @@ class WBShellFormingProcess(HasStrictTraits):
         n_nodes = f.N_h[base_h_x, base_h_y]
 
         psi_lines = cp.NN_L[m_nodes, n_nodes].flatten()
-        print 'psi_lines', psi_lines
+        print('psi_lines', psi_lines)
 
         cm_nodes = [f.N_i[0, 0], f.N_i[-1, 1]]
         cn_nodes = [f.N_h[1, 1], f.N_h[2, 1]]
         cpsi_lines = cp.NN_L[cm_nodes, cn_nodes]
-        print 'cpsi_lines', cpsi_lines
+        print('cpsi_lines', cpsi_lines)
 
         N_h = f.N_h
         N_i = f.N_i
@@ -346,11 +346,11 @@ class WBShellFormingProcess(HasStrictTraits):
         N_down = np.hstack([N_h[::3, :].flatten(),
                             N_i[1::3, :].flatten()
                             ])
-        print 'N_down', N_down
+        print('N_down', N_down)
         N_up = np.hstack([N_i[::3, :].flatten(),
                           N_i[2::3, :].flatten(),
                           N_v[:, :].flatten()])
-        print 'N_up', N_up
+        print('N_up', N_up)
         cp.u[N_down, 2] -= self.d_down
         cp.u[N_up, 2] += self.d_up
         cp.u[:, 2] += self.d_down
@@ -399,7 +399,7 @@ class WBShellFormingProcess(HasStrictTraits):
         n_vv = np.sqrt(np.einsum('...i,...i', v, v))
         phi = np.arcsin(s_uxv * n_uxv / (n_uu * n_vv))
 
-        print n_uu
+        print(n_uu)
         return n_uu, n_vv, phi
 
     def generate_fe_mesh(self, t):
@@ -490,9 +490,9 @@ if __name__ == '__main__':
         ft = bsf_process.fold_angle_cntl
 
         cp = ft.formed_object
-        print 'NDOFS', cp.n_dofs
+        print('NDOFS', cp.n_dofs)
 
-        print ft.sim_step
+        print(ft.sim_step)
 
         ft.sim_history.set(anim_t_start=0, anim_t_end=10)
 #        ft.config.gu['dofs'].set(anim_t_start=0, anim_t_end=5)
@@ -523,7 +523,7 @@ if __name__ == '__main__':
     if show_fold_kinem_cntl:
         ft = bsf_process.fold_kinem_cntl
 
-        print ft.sim_step
+        print(ft.sim_step)
 
         ft.sim_history.set(anim_t_start=0, anim_t_end=10)
         ft.config.gu['dofs'].set(anim_t_start=0, anim_t_end=5)

@@ -450,7 +450,7 @@ class FormingTaskAnim3D(HasStrictTraits):
         # self.ftv.mlab.options.offscreen = True
         im_files = []
         fname_base = 'anim'
-        tdir = 'C:\Users\cthoennessen\Pictures\Oricreate' # tempfile.mkdtemp()
+        tdir = 'C:\\Users\cthoennessen\Pictures\Oricreate' # tempfile.mkdtemp()
         fname_path = os.path.join(tdir, fname_base)
 
         idx_offset = 0

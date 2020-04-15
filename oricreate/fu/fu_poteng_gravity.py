@@ -17,7 +17,7 @@ from oricreate.opt import \
 from traits.api import \
     implements, Float
 
-from fu import \
+from .fu import \
     Fu
 
 

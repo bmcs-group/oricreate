@@ -165,7 +165,7 @@ if __name__ == '__main__':
     ft = bsf_process.fold_task
 
     cp = ft.formed_object
-    print 'n_dofs', cp.n_dofs
+    print('n_dofs', cp.n_dofs)
     # print ft.sim_step
 
     if True:

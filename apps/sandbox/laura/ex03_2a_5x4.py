@@ -153,10 +153,10 @@ if __name__ == '__main__':
     lt.u_1
 
     cp = lt.formed_object
-    print'iL_psi_o', cp.iL_psi_0
+    print('iL_psi_o', cp.iL_psi_0)
     iL_phi = cp.iL_psi2 - cp.iL_psi_0
     iL_m = lt.config._fu.kappa * iL_phi
-    print 'moments', np.max(np.fabs(iL_m))
+    print('moments', np.max(np.fabs(iL_m)))
 
     ftv.plot()
     ftv.update(vot=1, force=True)

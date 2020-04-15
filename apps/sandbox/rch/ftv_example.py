@@ -52,7 +52,7 @@ class PointCloud(Vis3D):
 
     def _p_default(self):
         x, y, z, s = np.random.random((4, 100))
-        print 's_default', s
+        print('s_default', s)
         return x, y, z, s
 
     points_t = Property(Tuple)

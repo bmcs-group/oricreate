@@ -19,7 +19,7 @@ from traits.api import Property, cached_property, \
     Array, Int, \
     Str, Float, Dict, WeakRef
 
-from exporter import Exporter
+from .exporter import Exporter
 import numpy as np
 from oricreate.viz3d import Visual3D
 
@@ -165,7 +165,7 @@ class InfoCadMeshExporter(MeshExporter):
         inp_file = open(fname, 'w')
         inp_file.write(part)
         inp_file.close()
-        print'inp file %s written' % fname
+        print('inp file %s written' % fname)
 
 if __name__ == '__main__':
     from oricreate.api import YoshimuraCPFactory, \

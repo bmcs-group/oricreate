@@ -4,7 +4,7 @@ with a client - i.e. a goal function using
 the factory product (crease pattern) for evaluation
 of the potential energy.
 '''
-from custom_factory_mpl import create_cp_factory
+from .custom_factory_mpl import create_cp_factory
 
 
 def create_fu():
@@ -24,9 +24,9 @@ def create_fu():
     # the fu_poteng instance that something has changed
     # an assignment to an array as a whole is necessary:
     cp.u = cp.u
-    print 'F_V_du', cp.F_V_du
-    print 'fu:', fu_poteng.get_f(cp.u)
-    print 'f_du:\n', fu_poteng.get_f_du(cp.u)
+    print('F_V_du', cp.F_V_du)
+    print('fu:', fu_poteng.get_f(cp.u))
+    print('f_du:\n', fu_poteng.get_f_du(cp.u))
     # end
     return fu_poteng
 

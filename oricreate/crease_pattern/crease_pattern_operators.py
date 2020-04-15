@@ -106,7 +106,7 @@ class CreaseLineOperators(HasStrictTraits):
     '''
     @cached_property
     def _get_L_vectors_0(self):
-        return self.x_0[self.L[:, 1]] - self.x_0[self.L[:, 0]]
+        return self.x_0[self.L[:, 1], :] - self.x_0[self.L[:, 0], :]
 
     L_vectors = Property(Array, depends_on=INPUT)
     r'''Vectors of the crease lines.
@@ -332,12 +332,12 @@ class CreaseLineOperators(HasStrictTraits):
         vl = self.iL_vectors
         nl0, nl1 = np.einsum('fi...->if...', self.iL_F_normals)
         if self.debug_level > 0:
-            print 'vl', vl.shape
-            print vl
-            print 'nl0', nl0.shape
-            print nl0
-            print 'nl1', nl1.shape
-            print nl1
+            print('vl', vl.shape)
+            print(vl)
+            print('nl0', nl0.shape)
+            print(nl0)
+            print('nl1', nl1.shape)
+            print(nl1)
 
         # construct the unit orthonormal basis
         norm_vl = np.sqrt(np.einsum('...i,...i->...', vl, vl))
@@ -347,12 +347,12 @@ class CreaseLineOperators(HasStrictTraits):
         unit_nl0 = nl0 / norm_nl0[:, np.newaxis]
         unit_nl1 = nl1 / norm_nl1[:, np.newaxis]
         if self.debug_level > 0:
-            print 'unit_vl', unit_vl.shape
-            print unit_vl
-            print 'unit_nl0', unit_nl0.shape
-            print unit_nl0
-            print 'unit_nl1', unit_nl1.shape
-            print unit_nl1
+            print('unit_vl', unit_vl.shape)
+            print(unit_vl)
+            print('unit_nl0', unit_nl0.shape)
+            print(unit_nl0)
+            print('unit_nl1', unit_nl1.shape)
+            print(unit_nl1)
 
         # construct transformation matrix
         Tl0 = np.einsum('ij...->ji...',
@@ -363,31 +363,31 @@ class CreaseLineOperators(HasStrictTraits):
                                        unit_vl, unit_nl0, EPS)]
                         ))
         if self.debug_level > 0:
-            print 'Tl0', Tl0.shape
-            print Tl0
+            print('Tl0', Tl0.shape)
+            print(Tl0)
 
         unit_nl01 = np.einsum('...ij,...j->...i', Tl0, unit_nl1)
         if self.debug_level > 0:
-            print 'unit_nl01[:,2]', unit_nl01[:, 2]
-            print unit_nl01[:, 2]
+            print('unit_nl01[:,2]', unit_nl01[:, 2])
+            print(unit_nl01[:, 2])
 
         n1_cos, n1_sin = unit_nl01[:, 1:].T
         oa_idx = np.where(n1_cos < 0.0)[0]
 
         psi = np.arcsin(unit_nl01[:, 2])
         if self.debug_level > 0:
-            print 'psi', psi
+            print('psi', psi)
 
         vl_dul = self.iL_vectors_dul
         nl0_dul0, nl1_dul1 = np.einsum('fi...->if...', self.iL_F_normals_du)
         if self.debug_level > 0:
-            print cp.iL_N.shape
-            print 'vl_dul', vl_dul.shape
-            print vl_dul
-            print 'nl0_dul0', nl0_dul0.shape
-            print nl0_dul0
-            print 'nl1_dul1', nl1_dul1.shape
-            print nl1_dul1
+            print(cp.iL_N.shape)
+            print('vl_dul', vl_dul.shape)
+            print(vl_dul)
+            print('nl0_dul0', nl0_dul0.shape)
+            print(nl0_dul0)
+            print('nl1_dul1', nl1_dul1.shape)
+            print(nl1_dul1)
 
         unit_nl0_dul0 = 1 / norm_nl0[:, np.newaxis, np.newaxis, np.newaxis] * (
             nl0_dul0 -
@@ -402,12 +402,12 @@ class CreaseLineOperators(HasStrictTraits):
             np.einsum('...j,...i,...iNd->...jNd', unit_vl, unit_vl, vl_dul)
         )
         if self.debug_level > 0:
-            print 'unit_nl0_dul0', unit_nl0_dul0.shape
-            print unit_nl0_dul0
-            print 'unit_nl1_dul1', unit_nl1_dul1.shape
-            print unit_nl1_dul1
-            print 'unit_vl_dul', unit_vl_dul.shape
-            print unit_vl_dul
+            print('unit_nl0_dul0', unit_nl0_dul0.shape)
+            print(unit_nl0_dul0)
+            print('unit_nl1_dul1', unit_nl1_dul1.shape)
+            print(unit_nl1_dul1)
+            print('unit_vl_dul', unit_vl_dul.shape)
+            print(unit_vl_dul)
 
         Tl0_dul0 = np.einsum('ij...->ji...',
                              np.array([np.zeros_like(unit_nl0_dul0),
@@ -419,8 +419,8 @@ class CreaseLineOperators(HasStrictTraits):
                              ))
 
         if self.debug_level > 0:
-            print 'Tl0_dul0', Tl0_dul0.shape
-            print Tl0_dul0
+            print('Tl0_dul0', Tl0_dul0.shape)
+            print(Tl0_dul0)
 
         Tl0_dul = np.einsum('ij...->ji...',
                             np.array([unit_vl_dul,
@@ -432,12 +432,12 @@ class CreaseLineOperators(HasStrictTraits):
                                      )
                             )
         if self.debug_level > 0:
-            print 'Tl0_dul0', Tl0_dul.shape
-            print Tl0_dul
+            print('Tl0_dul0', Tl0_dul.shape)
+            print(Tl0_dul)
 
         rho = 1 / np.sqrt((1 - unit_nl01[:, 2]**2))
         if self.debug_level > 0:
-            print 'rho', unit_nl01[:, 2]
+            print('rho', unit_nl01[:, 2])
 
         unit_nl01_dul = np.einsum(
             '...,...j,...ijNd->...iNd',
@@ -449,12 +449,12 @@ class CreaseLineOperators(HasStrictTraits):
             '...,...jNd,...ij->...iNd',
             rho, unit_nl1_dul1, Tl0)[:, 2, ...]
         if self.debug_level > 0:
-            print 'unit_nl01_dul', unit_nl01_dul.shape
-            print unit_nl01_dul
-            print 'unit_nl01_dul0', unit_nl01_dul0.shape
-            print unit_nl01_dul0
-            print 'unit_nl01_dul1', unit_nl01_dul1.shape
-            print unit_nl01_dul1
+            print('unit_nl01_dul', unit_nl01_dul.shape)
+            print(unit_nl01_dul)
+            print('unit_nl01_dul0', unit_nl01_dul0.shape)
+            print(unit_nl01_dul0)
+            print('unit_nl01_dul1', unit_nl01_dul1.shape)
+            print(unit_nl01_dul1)
 
         # get the map of facet nodes attached to interior lines
         iL0_N_map = self.F_N[self.iL_F[:, 0]].reshape(self.n_iL, -1)
@@ -477,22 +477,22 @@ class CreaseLineOperators(HasStrictTraits):
         # assembly is not possible within a single index expression.
         psi_du[iL_map, l_map, D_map] += unit_nl01_dul
         if self.debug_level > 0:
-            print 'l_map', l_map.shape
-            print l_map
-            print 'psi_du', psi_du.shape
-            print psi_du
+            print('l_map', l_map.shape)
+            print(l_map)
+            print('psi_du', psi_du.shape)
+            print(psi_du)
         psi_du[iL_map, l0_map, D_map] += unit_nl01_dul0
         if self.debug_level > 0:
-            print 'l0_map', l0_map.shape
-            print l0_map
-            print 'psi_du', psi_du.shape
-            print psi_du
+            print('l0_map', l0_map.shape)
+            print(l0_map)
+            print('psi_du', psi_du.shape)
+            print(psi_du)
         psi_du[iL_map, l1_map, D_map] += unit_nl01_dul1
         if self.debug_level > 0:
-            print 'l1_map', l1_map.shape
-            print l1_map
-            print 'psi_du', psi_du.shape
-            print psi_du
+            print('l1_map', l1_map.shape)
+            print(l1_map)
+            print('psi_du', psi_du.shape)
+            print(psi_du)
         psi_du[oa_idx, ...] *= -1.0
         return psi_du
 
@@ -929,7 +929,7 @@ class CreaseViewRelatedOperators(HasStrictTraits):
 
 
 if __name__ == '__main__':
-    from crease_pattern_state import CreasePatternState
+    from .crease_pattern_state import CreasePatternState
     cp = CreasePatternState(X=[[0, 0, 0],
                                [1, 0, 0],
                                [1, 1, 0],
@@ -941,129 +941,129 @@ if __name__ == '__main__':
 
     # structural mappings
 
-    print 'nodes'
-    print cp.X
-    print 'lines'
-    print cp.L
-    print 'faces'
-    print cp.F
-    print 'faces counter-clockwise'
-    print cp.F_N
-    print 'node neighbors'
-    print cp.N_nbr
-    print 'interior nodes'
-    print cp.iN
-    print 'edge nodes'
-    print cp.eN
-    print 'interior node neighbor (cycles ordered)'
-    print cp.iN_nbr
-    print 'lines associated with the interior nodes'
-    print cp.iN_aln
-    print 'interior lines'
-    print cp.iL
-    print 'edge lines'
-    print cp.eL
-    print 'iL_F: faces of interior lines'
-    print cp.iL_F
-    print 'F_L: lines of faces'
-    print cp.F_L
+    print('nodes')
+    print(cp.X)
+    print('lines')
+    print(cp.L)
+    print('faces')
+    print(cp.F)
+    print('faces counter-clockwise')
+    print(cp.F_N)
+    print('node neighbors')
+    print(cp.N_nbr)
+    print('interior nodes')
+    print(cp.iN)
+    print('edge nodes')
+    print(cp.eN)
+    print('interior node neighbor (cycles ordered)')
+    print(cp.iN_nbr)
+    print('lines associated with the interior nodes')
+    print(cp.iN_aln)
+    print('interior lines')
+    print(cp.iL)
+    print('edge lines')
+    print(cp.eL)
+    print('iL_F: faces of interior lines')
+    print(cp.iL_F)
+    print('F_L: lines of faces')
+    print(cp.F_L)
 
     # dependent attributes in initial state
 
-    print 'L_lengths: line lengths'
-    print cp.L_lengths
-    print
-    print 'F0_normals: facet normals'
-    print cp.F0_normals
-    print
-    print 'F_area: facet area'
-    print cp.F_area
-    print
-    print 'iN_theta: angles around the interior nodes'
-    print cp.iN_theta
-    print
-    print 'iL_psi: dihedral angles around interior lines'
-    print cp.iL_psi
-    print
+    print('L_lengths: line lengths')
+    print(cp.L_lengths)
+    print()
+    print('F0_normals: facet normals')
+    print(cp.F0_normals)
+    print()
+    print('F_area: facet area')
+    print(cp.F_area)
+    print()
+    print('iN_theta: angles around the interior nodes')
+    print(cp.iN_theta)
+    print()
+    print('iL_psi: dihedral angles around interior lines')
+    print(cp.iL_psi)
+    print()
 
     u = np.zeros_like(cp.x_0)
     cp.u = u
     # dependent attributes in initial state
 
-    print 'L_lengths: line lengths'
-    print cp.L_lengths
-    print
-    print 'F_normals: facet normals'
-    print cp.F_normals
-    print
-    print 'F_area: facet area'
-    print cp.F_area
-    print
-    print 'iN_theta: angles around the interior nodes'
-    print cp.iN_theta
-    print
-    print 'iL_psi: dihedral angles around interior lines'
-    print cp.iL_psi
-    print
+    print('L_lengths: line lengths')
+    print(cp.L_lengths)
+    print()
+    print('F_normals: facet normals')
+    print(cp.F_normals)
+    print()
+    print('F_area: facet area')
+    print(cp.F_area)
+    print()
+    print('iN_theta: angles around the interior nodes')
+    print(cp.iN_theta)
+    print()
+    print('iL_psi: dihedral angles around interior lines')
+    print(cp.iL_psi)
+    print()
 #     print 'iL_psi_du: dihedral angles around interior lines'
 #     print cp.get_iL_psi_du(u)
 #     print
-    print 'F_theta: crease angles within each triangular facet'
-    print cp.F_theta
-    print
-    print 'NN_theta: '
-    print cp.NN_theta
+    print('F_theta: crease angles within each triangular facet')
+    print(cp.F_theta)
+    print()
+    print('NN_theta: ')
+    print(cp.NN_theta)
 
     # tests the counter-clockwise enumeration of facets (the second faces
     # is reversed from [2,0,3] to [3,0,2]
     # test the face angles around a node
-    print 'F_N'
-    print cp.F_N
-    print
-    print 'iN_L'
-    print cp.iN_aln
-    print
-    print 'F_theta'
-    print cp.F_theta
-    print
-    print 'NN_theta'
-    print cp.NN_theta
-    print
-    print 'iN'
-    print cp.iN
-    print
-    print 'iN_neighbors'
-    print cp.iN_nbr
-    print
-    print 'iN_theta'
-    print cp.iN_theta
-    print
-    print 'F_L_vectors'
-    print cp.F_L_vectors
-    print
-    print 'L_vectors_du'
-    print cp.L_vectors_du
-    print
-    print 'F_L_vectors_du'
-    print cp.F_L_vectors_du
-    print
-    print 'F_theta'
-    print [cp.F_theta]
-    print
-    print 'F_theta_du'
-    print [cp.F_theta_du]
-    print
-    print 'NN_theta_du'
-    print cp.NN_theta_du
-    print
-    print 'iN_theta_du'
-    print cp.iN_theta_du
-    print
+    print('F_N')
+    print(cp.F_N)
+    print()
+    print('iN_L')
+    print(cp.iN_aln)
+    print()
+    print('F_theta')
+    print(cp.F_theta)
+    print()
+    print('NN_theta')
+    print(cp.NN_theta)
+    print()
+    print('iN')
+    print(cp.iN)
+    print()
+    print('iN_neighbors')
+    print(cp.iN_nbr)
+    print()
+    print('iN_theta')
+    print(cp.iN_theta)
+    print()
+    print('F_L_vectors')
+    print(cp.F_L_vectors)
+    print()
+    print('L_vectors_du')
+    print(cp.L_vectors_du)
+    print()
+    print('F_L_vectors_du')
+    print(cp.F_L_vectors_du)
+    print()
+    print('F_theta')
+    print([cp.F_theta])
+    print()
+    print('F_theta_du')
+    print([cp.F_theta_du])
+    print()
+    print('NN_theta_du')
+    print(cp.NN_theta_du)
+    print()
+    print('iN_theta_du')
+    print(cp.iN_theta_du)
+    print()
 
-    print '----------------'
-    print '  VIEW RELATED  '
-    print '----------------'
-    print 'bounding box'
-    print cp.bounding_box
-    print 'center'
-    print cp.center
+    print('----------------')
+    print('  VIEW RELATED  ')
+    print('----------------')
+    print('bounding box')
+    print(cp.bounding_box)
+    print('center')
+    print(cp.center)

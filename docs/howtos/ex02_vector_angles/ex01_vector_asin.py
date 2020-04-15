@@ -77,4 +77,4 @@ if __name__ == '__main__':
     a = np.array([[1, 0, 0], [1, 0, 0], [1, 0, 0]], dtype='f')
     b = np.array([[0, 1, 0], [1, 1, 0], [1, -1, 0]], dtype='f')
 
-    print 'gamma', get_sin_theta(a, b)
+    print('gamma', get_sin_theta(a, b))

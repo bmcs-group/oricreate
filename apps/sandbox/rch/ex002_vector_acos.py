@@ -44,9 +44,9 @@ if __name__ == '__main__':
     mag_b = np.sqrt(np.einsum('...i,...i->...', b, b))
     mag_ab = mag_a * mag_b
     gamma = ab / mag_ab
-    print 'gamma', gamma
+    print('gamma', gamma)
     theta = np.arccos(gamma)
-    print 'theta', theta
+    print('theta', theta)
 
     # calculate the derivatives of the angle between the two normal vectors
     iL_Fa_x = b - gamma * mag_b / mag_a * a
@@ -80,17 +80,17 @@ if __name__ == '__main__':
     # assembly is not possible within a single index expression.
     gamma_du[iL_map, Na_map, D_map] += iL_Fa_gamma_du
     gamma_du[iL_map, Nb_map, D_map] += iL_Fb_gamma_du
-    print 'Na_map'
-    print Na_map
-    print Nb_map
-    print 'iL_Fa_gamma_du'
-    print iL_Fa_gamma_du
-    print iL_Fb_gamma_du
-    print 'gamma_du'
-    print gamma_du
+    print('Na_map')
+    print(Na_map)
+    print(Nb_map)
+    print('iL_Fa_gamma_du')
+    print(iL_Fa_gamma_du)
+    print(iL_Fb_gamma_du)
+    print('gamma_du')
+    print(gamma_du)
 
     theta_du = np.einsum(
         '...,...Ie->...Ie', -1. / np.sqrt(1. - gamma ** 2), gamma_du)
 
-    print 'theta_du'
-    print theta_du
+    print('theta_du')
+    print(theta_du)

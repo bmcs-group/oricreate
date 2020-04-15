@@ -98,9 +98,9 @@ class WBShellFormingProcess(HasStrictTraits):
 
         if True:
             e = (self.a + 2 * self.c) / 3.0
-            print 'e', e
+            print('e', e)
             d_x = e - self.c
-            print 'delta', d_x
+            print('delta', d_x)
             cp.X[N_h[1::3, :].flatten(), 0] -= d_x
             cp.X[N_h[2::3, :].flatten(), 0] += d_x
             cp.X[N_i[0::3, :].flatten(), 0] += d_x
@@ -164,7 +164,7 @@ class WBShellFormingProcess(HasStrictTraits):
             base_h_y = np.hstack([base_h_y, right2_h_y])
 
         for c_y in range(0, self.n_cell_y - 1):
-            print 'c_y', c_y
+            print('c_y', c_y)
             base_i_x = np.hstack([base_i_x, up2_i_x])
             base_i_y = np.hstack([base_i_y, c_y + up2_i_y])
             base_h_x = np.hstack([base_h_x, up2_h_x])
@@ -176,12 +176,12 @@ class WBShellFormingProcess(HasStrictTraits):
         n_nodes = f.N_h[base_h_x, base_h_y]
 
         psi_lines = cp.NN_L[[m_nodes], n_nodes].flatten()
-        print 'psi_lines', psi_lines
+        print('psi_lines', psi_lines)
 
         cm_node = f.N_i[0, 0]
         cn_node = f.N_h[1, 1]
         cpsi_line = cp.NN_L[cm_node, cn_node]
-        print 'cpsi_lines', cpsi_line
+        print('cpsi_lines', cpsi_line)
 
         N_h = f.N_h
         N_i = f.N_i
@@ -201,10 +201,10 @@ class WBShellFormingProcess(HasStrictTraits):
             lambda t: t * u_max
         )
 
-        print '--------------------------'
-        print N_i[0, 0].flatten()
-        print N_i[2, 0].flatten()
-        print '--------------------------'
+        print('--------------------------')
+        print(N_i[0, 0].flatten())
+        print(N_i[2, 0].flatten())
+        print('--------------------------')
 
         dof_constraints = fixed_nodes_x + fixed_nodes_z + fixed_nodes_y  # + \
         # link_mid
@@ -237,11 +237,11 @@ class WBShellFormingProcess(HasStrictTraits):
         N_down = np.hstack([N_h[::3, :].flatten(),
                             N_i[1::3, :].flatten()
                             ])
-        print 'N_down', N_down
+        print('N_down', N_down)
         N_up = np.hstack([N_i[::3, :].flatten(),
                           N_i[2::3, :].flatten(),
                           N_v[:, :].flatten()])
-        print 'N_up', N_up
+        print('N_up', N_up)
         cp.u[N_down, 2] -= self.d_down
         cp.u[N_up, 2] += self.d_up
         cp.u[:, 2] += self.d_down
@@ -340,8 +340,8 @@ if __name__ == '__main__':
 
         arg_phi, phi = bsf_process.max_slope
         n_u, n_v, c = bsf_process.curvature_t
-        print ft.t_arr
-        print c
+        print(ft.t_arr)
+        print(c)
         ax1.plot(ft.t_arr, c, 'b-',
                  label='curvature')
         ax2.plot(ft.t_arr, n_u, 'g-', label='height u')

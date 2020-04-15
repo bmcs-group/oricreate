@@ -4,7 +4,7 @@ used in the examples below demonstrating the evaluation of goal functions
 and constraints.
 '''
 
-from sim03_map_pattern_to_target_face import create_sim_step
+from .sim03_map_pattern_to_target_face import create_sim_step
 
 
 if __name__ == '__main__':

@@ -53,8 +53,8 @@ def create_sim_step():
                             target_faces=[target_face],
                             dof_constraints=dof_constraints
                             )
-    print 'initial position\n', cp_factory.formed_object.x
-    print 'target position:\n', sim_step.x_1
+    print('initial position\n', cp_factory.formed_object.x)
+    print('target position:\n', sim_step.x_1)
     # end
     return sim_step
 

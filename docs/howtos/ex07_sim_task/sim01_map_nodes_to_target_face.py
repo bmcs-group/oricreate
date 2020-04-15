@@ -12,7 +12,7 @@ that is configured using the RFKConfig.
 The target face is defined as horizontal plane at the height 8
 and nodes [0,1,2] are involved in the minimum distance criterion.
 '''
-from custom_factory_mpl import create_cp_factory
+from .custom_factory_mpl import create_cp_factory
 from oricreate.forming_tasks import \
     FormingTask
 from oricreate.simulation_step import \
@@ -34,18 +34,18 @@ def create_sim_step():
     sim_step = SimulationStep(forming_task=do_something,
                               config=sim_config)
     sim_step.t = 0.4
-    print 'goal function for t = 0.4:', sim_step.get_f()
+    print('goal function for t = 0.4:', sim_step.get_f())
     sim_step.t = 0.8
-    print 'goal function for t = 0.8:', sim_step.get_f()
-    print 'goal function derivatives'
-    print sim_step.get_f_du()
-    print 'constraints'
-    print sim_step.get_G()
-    print 'constraint derivatives'
-    print sim_step.get_G_du()
+    print('goal function for t = 0.8:', sim_step.get_f())
+    print('goal function derivatives')
+    print(sim_step.get_f_du())
+    print('constraints')
+    print(sim_step.get_G())
+    print('constraint derivatives')
+    print(sim_step.get_G_du())
     sim_step.cp_state.u = sim_step.u_t
-    print 'target displacement:\n', sim_step.cp_state.u
-    print 'target position:\n', sim_step.cp_state.x
+    print('target displacement:\n', sim_step.cp_state.u)
+    print('target position:\n', sim_step.cp_state.x)
     # end
     return sim_step
 

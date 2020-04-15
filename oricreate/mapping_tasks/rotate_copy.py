@@ -6,7 +6,7 @@ Created on Jun 20, 2013
 import math
 from traits.api import Property, Str, Int, Float, Array, cached_property
 
-from mapping_task import \
+from .mapping_task import \
     MappingTask
 import numpy as np
 
@@ -169,22 +169,22 @@ def q_conjugate(q):
 
 
 def qv_mult(q1, u):
-    print 'shapes'
-    print 'q1', q1.shape, 'u', u.shape
+    print('shapes')
+    print('q1', q1.shape, 'u', u.shape)
     zero_re = np.zeros((u.shape[0], u.shape[1]), dtype='f')
-    print 'zero_re', zero_re.shape
+    print('zero_re', zero_re.shape)
     q2 = np.concatenate([zero_re[:, :, np.newaxis], u], axis=2)
-    print 'q2', q2.shape
+    print('q2', q2.shape)
     q2 = np.rollaxis(q2, 2)
-    print 'q2', q2.shape
+    print('q2', q2.shape)
     q12 = q_mult(q1[:, :, np.newaxis], q2[:, :, :])
-    print 'q12', q12.shape
+    print('q12', q12.shape)
     q_con = q_conjugate(q1)
-    print 'q_con', q_con.shape
+    print('q_con', q_con.shape)
     q = q_mult(q12, q_con[:, :, np.newaxis])
-    print 'q', q.shape
+    print('q', q.shape)
     q = np.rollaxis(np.rollaxis(q, 2), 2)
-    print 'q', q.shape
+    print('q', q.shape)
     return q[:, :, 1:]
 
 

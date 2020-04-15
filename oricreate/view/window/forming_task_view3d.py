@@ -89,8 +89,8 @@ class FormingTaskView3D(HasStrictTraits):
         '''
         mm = []
         if len(self.viz3d_list) == 0:
-            raise IndexError, 'No vizualization module inserted' \
-                'into fold television'
+            raise IndexError('No vizualization module inserted' \
+                'into fold television')
         for viz3d in self.viz3d_list:
             x_min, x_max = viz3d.min_max
             if x_min != None and x_max != None:
@@ -144,8 +144,8 @@ class FormingTaskView3D(HasStrictTraits):
                                   str(viz3d.__class__),
                                   vis3d
                                   )
-        if self.viz3d_dict.has_key(label):
-            raise KeyError, 'viz3d object named %s already registered' % label
+        if label in self.viz3d_dict:
+            raise KeyError('viz3d object named %s already registered' % label)
         viz3d.order = order
         self.viz3d_dict[label] = viz3d
 
@@ -237,7 +237,7 @@ class FormingTaskView3D(HasStrictTraits):
 FTV = FormingTaskView3D
 
 if __name__ == '__main__':
-    from point_cloud_viz3d import PointCloud
+    from .point_cloud_viz3d import PointCloud
     ftv = FTV()
     pc = PointCloud()
     ftv.add(pc.viz3d['default'])

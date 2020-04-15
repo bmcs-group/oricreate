@@ -14,8 +14,8 @@ def create_cp():
     cp_factory = RonReshCPFactory()
     cp = cp_factory.formed_object
 
-    print 'Nodes of facets enumerated counter clock-wise\n', cp.F_N[:10]
-    print 'Lines of facets enumerated counter clock-wise\n', cp.F_L[:10]
+    print('Nodes of facets enumerated counter clock-wise\n', cp.F_N[:10])
+    print('Lines of facets enumerated counter clock-wise\n', cp.F_L[:10])
     # end
     return cp
 

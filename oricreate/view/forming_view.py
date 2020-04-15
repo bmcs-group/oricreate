@@ -30,7 +30,7 @@ from traitsui.api import \
     VGroup, HSplit, TreeEditor, \
     TreeNode, VSplit
 
-from face_view import FaceView
+from .face_view import FaceView
 import numpy as np
 from oricreate.crease_pattern import \
     CreasePattern
@@ -100,7 +100,7 @@ class FormingView(HasTraits):
         self.elevation = view[1]
         self.distance = view[2]
         self.f_point = view[3].reshape((1, 3))
-        print view
+        print(view)
 
     def _set_view_fired(self):
         self.scene.mlab.view(self.azimuth,
@@ -807,7 +807,7 @@ class FormingView(HasTraits):
         '''
         prints the actual camera position to the console.
         '''
-        print self.scene.mlab.view()
+        print(self.scene.mlab.view())
 
     frame_width = Int(800, auto_set=False, enter_set=True)
 
@@ -885,7 +885,7 @@ class FormingView(HasTraits):
         else:
             raise NotImplementedError(
                 'film production available only on linux')
-        print 'animation saved in', destination
+        print('animation saved in', destination)
 
     # The layout of the dialog created
     # The main view

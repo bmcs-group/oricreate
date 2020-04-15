@@ -4,7 +4,7 @@ Created on Nov 6, 2014
 @author: rch
 '''
 
-from i_forming_task import \
+from .i_forming_task import \
     IFormingTask
 import traits.api as tr
 

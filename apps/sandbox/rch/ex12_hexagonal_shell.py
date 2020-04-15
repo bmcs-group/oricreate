@@ -93,13 +93,13 @@ class HexagonalShellFormingProcess(HasStrictTraits):
         L_rigid = self.factory_task.L_rigid
         N_up = self.factory_task.N_up
         N_down = self.factory_task.N_down
-        print 'N_up', N_up
-        print 'N_down', N_down
+        print('N_up', N_up)
+        print('N_down', N_down)
         N_x_sym = self.factory_task.N_x_sym[2]
-        print 'N_x_sym', N_x_sym
+        print('N_x_sym', N_x_sym)
 #        N_x_sym = []  # self.factory_task.N_x_sym[[0, -1]]
 
-        print 'n_dofs', self.factory_task.formed_object.n_dofs
+        print('n_dofs', self.factory_task.formed_object.n_dofs)
 
         self.init_displ_task.x_1
 
@@ -143,7 +143,7 @@ class HexagonalShellFormingProcess(HasStrictTraits):
         gu_dof_constraints.forming_task = st
 
         st.sim_step.print_gu_lst()
-        print 'dofs', st.formed_object.n_dofs
+        print('dofs', st.formed_object.n_dofs)
 
         cp = st.formed_object
         cp.u[N_up, 2] += 0.1
@@ -262,7 +262,7 @@ if __name__ == '__main__':
 
     it = bsf_process.init_displ_task
 
-    print 'n_dofs', it.formed_object.n_dofs
+    print('n_dofs', it.formed_object.n_dofs)
     ft = bsf_process.fold_task
 
     show_init_task = False

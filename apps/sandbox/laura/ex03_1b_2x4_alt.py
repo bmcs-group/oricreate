@@ -88,11 +88,11 @@ class BarrellVaultGravityFormingProcess(HasTraits):
         n_l_h = cp.N_h[0, (0, -1)].flatten()
         n_r_h = cp.N_h[-1, (0, -1)].flatten()
 
-        print'N_h', cp.N_h
-        print'N_v', cp.N_v
+        print('N_h', cp.N_h)
+        print('N_v', cp.N_v)
 
-        print'n_l_h', n_l_h
-        print'n_r_h', n_r_h
+        print('n_l_h', n_l_h)
+        print('n_r_h', n_r_h)
 
         dof_constraints = fix(n_l_h, [0, 1, 2]) + fix(n_r_h, [0, 1, 2])
 

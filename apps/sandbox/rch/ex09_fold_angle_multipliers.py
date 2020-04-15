@@ -121,13 +121,13 @@ if __name__ == '__main__':
             np.cos(0.5 * (N_alpha[:, 1] - N_alpha[:, 2])))
     mu_3 = - mu_1
     mu_4 = 1.0 / mu_1
-    print 'mu_1', mu_1
-    print 'mu_2', mu_2
-    print 'mu_3', mu_3
-    print 'mu_4', mu_4
+    print('mu_1', mu_1)
+    print('mu_2', mu_2)
+    print('mu_3', mu_3)
+    print('mu_4', mu_4)
     polygon_mu = np.array([mu_1[2], mu_2[3], mu_3[2], mu_4[3]])
-    print polygon_mu
-    print 'product', np.product(polygon_mu)
+    print(polygon_mu)
+    print('product', np.product(polygon_mu))
 
     N_alpha = np.array([
         [alpha_min, alpha_max, alpha_max, alpha_min],
@@ -142,17 +142,17 @@ if __name__ == '__main__':
             np.cos(0.5 * (N_alpha[:, 1] - N_alpha[:, 2])))
     mu_3 = - mu_1
     mu_4 = 1.0 / mu_1
-    print 'mu_1', mu_1
-    print 'mu_2', mu_2
-    print 'mu_3', mu_3
-    print 'mu_4', mu_4
+    print('mu_1', mu_1)
+    print('mu_2', mu_2)
+    print('mu_3', mu_3)
+    print('mu_4', mu_4)
     polygon_mu = np.array([mu_1[2], mu_2[1], mu_3[2], mu_4[3]])
-    print polygon_mu
-    print 'product', np.product(polygon_mu)
+    print(polygon_mu)
+    print('product', np.product(polygon_mu))
 
     # version - 3 - HP -
 
-    print 'HP'
+    print('HP')
 
     N_alpha = np.array([
         [alpha_min, alpha_max, alpha_max, alpha_min],
@@ -167,17 +167,17 @@ if __name__ == '__main__':
             np.cos(0.5 * (N_alpha[:, 1] - N_alpha[:, 2])))
     mu_3 = - mu_1
     mu_4 = 1.0 / mu_1
-    print 'mu_1', mu_1
-    print 'mu_2', mu_2
-    print 'mu_3', mu_3
-    print 'mu_4', mu_4
+    print('mu_1', mu_1)
+    print('mu_2', mu_2)
+    print('mu_3', mu_3)
+    print('mu_4', mu_4)
     polygon_mu = np.array([mu_2[0], mu_3[1], mu_4[2], mu_1[3]])
-    print polygon_mu
-    print 'product', np.product(polygon_mu)
+    print(polygon_mu)
+    print('product', np.product(polygon_mu))
 
     # version - 4 - Miura-Ori
 
-    print 'Miura-Ori'
+    print('Miura-Ori')
     N_alpha = np.array([
         [alpha_min, alpha_max, alpha_max, alpha_min],
         [alpha_min, alpha_max, alpha_max, alpha_min],
@@ -191,17 +191,17 @@ if __name__ == '__main__':
             np.cos(0.5 * (N_alpha[:, 1] - N_alpha[:, 2])))
     mu_3 = - mu_1
     mu_4 = 1.0 / mu_1
-    print 'mu_1', mu_1
-    print 'mu_2', mu_2
-    print 'mu_3', mu_3
-    print 'mu_4', mu_4
+    print('mu_1', mu_1)
+    print('mu_2', mu_2)
+    print('mu_3', mu_3)
+    print('mu_4', mu_4)
     polygon_mu = np.array([mu_3[0], mu_4[1], mu_3[2], mu_4[3]])
-    print polygon_mu
-    print 'product', np.product(polygon_mu)
+    print(polygon_mu)
+    print('product', np.product(polygon_mu))
 
     # version - 5 - Twist
 
-    print 'Twist'
+    print('Twist')
 
     N_alpha = np.array([
         [70, 90, 110, 90],
@@ -217,10 +217,10 @@ if __name__ == '__main__':
             np.cos(0.5 * (N_alpha[:, 1] - N_alpha[:, 2])))
     mu_3 = - mu_1
     mu_4 = 1.0 / mu_1
-    print 'mu_1', mu_1
-    print 'mu_2', mu_2
-    print 'mu_3', mu_3
-    print 'mu_4', mu_4
+    print('mu_1', mu_1)
+    print('mu_2', mu_2)
+    print('mu_3', mu_3)
+    print('mu_4', mu_4)
     polygon_mu = np.array([mu_3[0], mu_4[1], mu_4[2]])
-    print polygon_mu
-    print 'product', np.product(polygon_mu)
+    print(polygon_mu)
+    print('product', np.product(polygon_mu))

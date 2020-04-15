@@ -7,11 +7,11 @@ Created on Nov 6, 2014
 from traits.api import \
     implements, on_trait_change, Property, Instance, cached_property
 
-from forming_task import \
+from .forming_task import \
     FormingTask
-from i_formed_object import \
+from .i_formed_object import \
     IFormedObject
-from i_forming_task import \
+from .i_forming_task import \
     IFormingTask
 
 
@@ -45,6 +45,6 @@ class FactoryTask(FormingTask):
 
 if __name__ == '__main__':
     ft = FactoryTask()
-    print ft.source_task
+    print(ft.source_task)
     # print ft.formed_object
     ft.configure_traits()

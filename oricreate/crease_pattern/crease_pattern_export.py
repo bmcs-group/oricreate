@@ -35,7 +35,7 @@ class CreasePatternExport(HasStrictTraits):
 
         @todo this should be moved to FormingTask
         '''
-        print 'get position'
+        print('get position')
         u_t = self.fold_steps[iteration_step]
         pts_p, faces_p = self.cnstr[0].get_cnstr_view(u_t, 1.0)
         pts_l = None
@@ -52,7 +52,7 @@ class CreasePatternExport(HasStrictTraits):
         '''
 
         if(len(self.line_pts) == 0):
-            print ' NO LINE POINTS'
+            print(' NO LINE POINTS')
             return
 
         for p in range(len(self.fold_steps)):
@@ -80,7 +80,7 @@ class CreasePatternExport(HasStrictTraits):
                 r = ry
             else:
                 r = rz
-            print 'Step ', p, ': r = ', r
+            print('Step ', p, ': r = ', r)
 
     def create_rcp_tex(self, name='rcp_output.tex', x=15., y=15.):
         '''
@@ -177,5 +177,5 @@ class CreasePatternExport(HasStrictTraits):
                 a_f.append(i)
 
         a_f = np.array(a_f)
-        print a_f + 1
+        print(a_f + 1)
         return a_f

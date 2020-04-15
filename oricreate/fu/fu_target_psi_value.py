@@ -9,8 +9,8 @@ from traits.api import \
     cached_property, Property
 import types
 
-from fu import Fu
-from fu_target_psi_value_viz3d2 import \
+from .fu import Fu
+from .fu_target_psi_value_viz3d2 import \
     FuTargetPsiValueViz3D
 from oricreate.opt import \
     IFu
@@ -43,10 +43,9 @@ class FuTargetPsiValue(Fu, Visual3D):
         cp = self.formed_object
         l, value = self.psi_value  # @UnusedVariable
         if cp.L_iL[l] < 0:
-            raise IndexError, \
-                'GuPsiConstraint: line index %d does ' \
+            raise IndexError('GuPsiConstraint: line index %d does ' \
                 'not refer to an interior line: '\
-                'must be one of %s' % (l, cp.iL)
+                'must be one of %s' % (l, cp.iL))
 
     def get_f(self, t=0):
         ''' Calculate the residue for given constraint equations

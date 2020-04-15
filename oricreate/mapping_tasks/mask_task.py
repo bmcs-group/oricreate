@@ -5,7 +5,7 @@ Created on Jun 20, 2013
 '''
 from traits.api import \
     Array
-from mapping_task import \
+from .mapping_task import \
     MappingTask
 import numpy as np
 from oricreate.crease_pattern.crease_pattern_state import CreasePatternState
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     yf = YoshimuraCPFactory(n_x=2, n_y=2)
     m = MaskTask(previous_task=yf,
                  N_mask=[7], L_mask=[5, 7, 17], F_mask=[4, 9])
-    print yf.formed_object.F
+    print(yf.formed_object.F)
 
     import pylab as p
     ax = p.axes()

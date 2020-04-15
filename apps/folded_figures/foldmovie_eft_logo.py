@@ -13,7 +13,7 @@ import os
 import string
 import tempfile
 
-from folded_figures_viz3d import \
+from .folded_figures_viz3d import \
     FacetsWithTextViz3D, FacetsWithImageViz3D
 import matplotlib.pyplot as plt
 import numpy as np
@@ -25,7 +25,7 @@ from oricreate.crease_pattern.crease_pattern_viz3d import \
 from oricreate.gu import GuConstantLength, GuDofConstraints, fix
 from oricreate.simulation_step import \
     SimulationStep, SimulationConfig
-from sim_task_twist_folding import \
+from .sim_task_twist_folding import \
     TwistFolding, create_cp_factory, damped_range
 
 
@@ -84,7 +84,7 @@ def run_sim():
         c45 = np.cos(np.pi / 4)
         shift_x = x_offset + edge_len / c45 - edge_len
         shift_l = shift_x * c45
-        print 'shift_l', shift_l
+        print('shift_l', shift_l)
         F_ref = [0, 2, 4, 6, 8, 16, 1, 12, 14, ]
         N_ref = [0, 3, 15, 12, 7, 4, 1, 11, 13]
         F_covered = [[0, 9], [2, 11], [4, 13], [6, 15],
@@ -305,13 +305,13 @@ def run_sim():
         gu_dof_constraints.dof_constraints[-1][-1] = u
         sim_step._solve_nr()
         f = sim_step.forming_task.formed_object.center
-        print 'perspective - before', ftv.mlab.view()
-        print 'roll', ftv.mlab.roll()
-        print 'a,e,d,f', a, e, d, f
+        print('perspective - before', ftv.mlab.view())
+        print('roll', ftv.mlab.roll())
+        print('a,e,d,f', a, e, d, f)
         ftv.mlab.view(a, e, d, f)
         ftv.mlab.roll(r)
-        print 'perspective', ftv.mlab.view()
-        print 'roll', ftv.mlab.roll()
+        print('perspective', ftv.mlab.view())
+        print('roll', ftv.mlab.roll())
         ftv.update(force=True)
         fname = os.path.join(tdir, 'eftlogo%03d.jpg' % i)
         fname_list.append(fname)
@@ -330,7 +330,7 @@ def run_sim():
         else:
             raise NotImplementedError(
                 'film production available only on linux')
-        print 'animation saved in', destination
+        print('animation saved in', destination)
 
     ftv.show()
 

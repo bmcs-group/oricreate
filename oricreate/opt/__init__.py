@@ -1,13 +1,13 @@
 
-from i_fu import \
+from .i_fu import \
     IFu
-from i_gu import \
+from .i_gu import \
     IGu
-from i_hu import \
+from .i_hu import \
     IHu
-from i_opt import \
+from .i_opt import \
     IOpt
-from opt_component import \
+from .opt_component import \
     OptComponent
 
 

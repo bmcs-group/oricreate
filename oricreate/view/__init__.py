@@ -1,3 +1,3 @@
 
-from window.forming_process_view import \
+from .window.forming_process_view import \
     FormingProcessView

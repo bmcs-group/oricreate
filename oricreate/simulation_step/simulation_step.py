@@ -27,7 +27,7 @@ from oricreate.crease_pattern import \
     CreasePatternState
 from oricreate.forming_tasks import \
     FormingTask
-from simulation_config import \
+from .simulation_config import \
     SimulationConfig
 
 
@@ -180,7 +180,7 @@ class SimulationStep(HasStrictTraits):
             U_t = self._solve_fmin()
         else:
             # no goal function - switch to an implicit time-stepping algorithm
-            print 'SOLVING NR'
+            print('SOLVING NR')
             U_t = self._solve_nr()
 
         return U_t
@@ -197,20 +197,20 @@ class SimulationStep(HasStrictTraits):
             R = self.get_G_t(self.U)
             nR = np.linalg.norm(R)
             if nR < acc:
-                print '==== converged in ', i, 'iterations ===='
+                print('==== converged in ', i, 'iterations ====')
                 break
             try:
                 d_U = np.linalg.solve(dR, -R)
                 self.U += d_U  # in-place increment
                 i += 1
             except Exception as inst:
-                print '=== Problems solving iteration step %d  ====' % i
-                print '=== Exception message: ', inst
+                print('=== Problems solving iteration step %d  ====' % i)
+                print('=== Exception message: ', inst)
                 self.U = U_save
                 raise inst
         else:
             self.U = U_save
-            print '==== did not converge in %d iterations ====' % i
+            print('==== did not converge in %d iterations ====' % i)
 
         # update the state object with the new displacement vector
         return self.U
@@ -219,7 +219,7 @@ class SimulationStep(HasStrictTraits):
         '''Solve the problem using the
         Sequential Least Square Quadratic Programming method.
         '''
-        print '==== solving with SLSQP optimization ===='
+        print('==== solving with SLSQP optimization ====')
         U_save = np.copy(self.U)
         d0 = self.get_f_t(self.U)
         eps = d0 * 1e-4
@@ -252,12 +252,12 @@ class SimulationStep(HasStrictTraits):
                           epsilon=eps)
         U, f, n_iter, imode, smode = info
         if imode == 0:
-            print '(time: %g, iter: %d, f: %g)' % (self.t, n_iter, f)
+            print('(time: %g, iter: %d, f: %g)' % (self.t, n_iter, f))
         else:
             # no convergence reached.
             self.U = U_save
-            print '(time: %g, iter: %d, f: %g, err: %d, %s)' % \
-                (self.t, n_iter, f, imode, smode)
+            print('(time: %g, iter: %d, f: %g, err: %d, %s)' % \
+                (self.t, n_iter, f, imode, smode))
         return U
 
     def clear_iter(self):
@@ -277,7 +277,7 @@ class SimulationStep(HasStrictTraits):
         self.cp_state.U = U
         f = self.get_f()
         if self.debug_level > 0:
-            print 'f:\n', f
+            print('f:\n', f)
         return f
 
     def get_f(self):
@@ -289,8 +289,8 @@ class SimulationStep(HasStrictTraits):
         self.cp_state.U = U
         f_du = self.get_f_du()
         if self.debug_level > 2:
-            print 'f_du.shape:\n', f_du.shape
-            print 'f_du:\n', f_du
+            print('f_du.shape:\n', f_du.shape)
+            print('f_du:\n', f_du)
         return f_du
 
     def get_f_du(self):
@@ -303,7 +303,7 @@ class SimulationStep(HasStrictTraits):
         self.cp_state.U = U
         g = self.get_G(self.t)
         if self.debug_level > 1:
-            print 'G:\n', [g]
+            print('G:\n', [g])
         return g
 
     def get_G(self, t=0):
@@ -322,8 +322,8 @@ class SimulationStep(HasStrictTraits):
             return []
         g_du = np.vstack(g_du_lst)
         if self.debug_level > 3:
-            print 'G_du.shape:\n', g_du.shape
-            print 'G_du:\n', [g_du]
+            print('G_du.shape:\n', g_du.shape)
+            print('G_du:\n', [g_du])
         return g_du
 
     # ==========================================================================
@@ -333,7 +333,7 @@ class SimulationStep(HasStrictTraits):
         self.cp_state.U = U
         h = self.get_H(self.t)
         if self.debug_level > 1:
-            print 'H:\n', [h]
+            print('H:\n', [h])
         return h
 
     def get_H(self, t=0):
@@ -352,6 +352,6 @@ class SimulationStep(HasStrictTraits):
             return []
         h_du = np.vstack(h_du_lst)
         if self.debug_level > 3:
-            print 'G_du.shape:\n', h_du.shape
-            print 'G_du:\n', [h_du]
+            print('G_du.shape:\n', h_du.shape)
+            print('G_du:\n', [h_du])
         return h_du

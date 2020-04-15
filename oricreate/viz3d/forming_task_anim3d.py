@@ -67,7 +67,7 @@ from traitsui.api import \
 import numpy as np
 from oricreate.view.window.forming_task_view3d import \
     FTV
-from viz3d import \
+from .viz3d import \
     Viz3D
 
 
@@ -508,7 +508,7 @@ FTA = FormingTaskAnim3D
 
 if __name__ == '__main__':
 
-    from visual3d import Visual3D
+    from .visual3d import Visual3D
 
     class PointCloudViz3D(Viz3D):
         '''Visualization object
@@ -551,7 +551,7 @@ if __name__ == '__main__':
             x, y, z, s = self.p
             s = np.array(s, float)
             s[-1] *= (1.0 - 0.9 * self.vot)
-            print x, y, z, s
+            print(x, y, z, s)
             return x, y, z, s
 
         viz3d_classes = dict(default=PointCloudViz3D,

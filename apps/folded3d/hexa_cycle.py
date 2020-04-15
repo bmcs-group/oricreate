@@ -144,8 +144,8 @@ class HexaCycleFTV(FTV):
 if __name__ == '__main__':
     hc = HexaCycle(H=0.1, n_steps=1, u_max=0.1)
 
-    print 'load_vector', hc.sim_step.gu_lst[0].get_G(0.1)
-    print 'load_vector', hc.sim_step.gu_lst[0].get_G_du(0.1)
+    print('load_vector', hc.sim_step.gu_lst[0].get_G(0.1))
+    print('load_vector', hc.sim_step.gu_lst[0].get_G_du(0.1))
 
     hc.sim_step.debug_level = 0
     ftv = HexaCycleFTV(model=hc)
@@ -155,7 +155,7 @@ if __name__ == '__main__':
     ftv.add(hc.sim_history.viz3d)
 #    ftv.add(hc.config.gu['dofs'].viz3d)
 
-    print hc.formed_object.x
+    print(hc.formed_object.x)
     ftv.plot()
     ftv.update(vot=1, force=True)
     ftv.show()

@@ -134,7 +134,7 @@ if __name__ == '__main__':
     ft = bsf_process.fold_task
     lt = bsf_process.load_task
 
-    print 'ndofs', lt.formed_object.n_dofs - lt.formed_object.n_L
+    print('ndofs', lt.formed_object.n_dofs - lt.formed_object.n_L)
     ftv = BikeShellterFormingProcessFTV(model=bsf_process)
 
     animate = False
@@ -173,18 +173,18 @@ if __name__ == '__main__':
         n_max_uy = np.argmax(lt.u_1[:, 1])
         n_max_ux = np.argmax(lt.u_1[:, 0])
 
-        print 'node max_uz', n_max_uz
-        print 'uz_max', lt.u_1[n_max_uz, 2]
-        print 'node max_uy', n_max_uy
-        print 'uy_max', lt.u_1[n_max_uy, 2]
-        print 'node max_ux', n_max_ux
-        print 'ux_max', lt.u_1[n_max_ux, 2]
+        print('node max_uz', n_max_uz)
+        print('uz_max', lt.u_1[n_max_uz, 2])
+        print('node max_uy', n_max_uy)
+        print('uy_max', lt.u_1[n_max_uy, 2])
+        print('node max_ux', n_max_ux)
+        print('ux_max', lt.u_1[n_max_ux, 2])
 
         cp = lt.formed_object
         iL_phi = cp.iL_psi2 - cp.iL_psi_0
         iL_m = lt.config._fu.kappa * iL_phi
-        print 'moment', iL_m
-        print 'max moment', np.max(np.fabs(iL_m))
+        print('moment', iL_m)
+        print('max moment', np.max(np.fabs(iL_m)))
 
         ftv.plot()
         ftv.update(vot=1, force=True)

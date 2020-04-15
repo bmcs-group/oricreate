@@ -27,10 +27,10 @@ def create_hu():
                          psi_value=(1, lambda t: -0.5 * t)
                          )
     cp = cp_factory.formed_object
-    print cp.iL
-    print cp.iL_psi
-    print 'fu:', fu_target_psi_value.get_f(1.0)
-    print 'f_du:\n', fu_target_psi_value.get_f_du(1.0)
+    print(cp.iL)
+    print(cp.iL_psi)
+    print('fu:', fu_target_psi_value.get_f(1.0))
+    print('f_du:\n', fu_target_psi_value.get_f_du(1.0))
     # end
     return fu_target_psi_value
 

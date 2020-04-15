@@ -126,12 +126,12 @@ class OctahederFormingProcess(HasTraits):
         def fold_step(t, fold_index):
 
             n_steps = len(inner_lines)
-            print 'n_steps', n_steps, fold_index
+            print('n_steps', n_steps, fold_index)
             dt = 1.0 / float(n_steps)
             start_t = fold_index * dt
             end_t = (fold_index + 1) * dt
 
-            print 't', t, start_t, end_t
+            print('t', t, start_t, end_t)
             if t < start_t:
                 return 0.0
             elif t > end_t:

@@ -36,4 +36,4 @@ if __name__ == '__main__':
 
     animation.write_videofile(target_file, fps=20)
     # animation.write_gif("wireframe.gif", fps=20)
-    print 'movie saved in %s' % target_file
+    print('movie saved in %s' % target_file)

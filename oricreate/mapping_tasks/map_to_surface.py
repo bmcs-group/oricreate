@@ -8,7 +8,7 @@ from traits.api import \
     Property, cached_property, \
     Str, List, Instance
 
-from mapping_task import MappingTask
+from .mapping_task import MappingTask
 from oricreate.fu import FuTargetFaces
 from oricreate.gu import GuDofConstraints
 from oricreate.simulation_step import \

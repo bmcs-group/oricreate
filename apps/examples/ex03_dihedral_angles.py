@@ -90,8 +90,8 @@ if __name__ == '__main__':
     a = np.array([[1, 0], [1, 0]], dtype='f')
     b = np.array([[0, 1], [1, 1]], dtype='f')
 
-    print get_cos_theta(a, b)
-    print get_theta(a, b)
+    print(get_cos_theta(a, b))
+    print(get_theta(a, b))
 
     a_du = np.array([[
         [[-1, 0]],
@@ -113,7 +113,7 @@ if __name__ == '__main__':
     ]],
         dtype='f')
 
-    print 'gamma_du'
-    print get_cos_theta_du(a, a_du, b, b_du)
+    print('gamma_du')
+    print(get_cos_theta_du(a, a_du, b, b_du))
 
-    print(get_theta_du(a, a_du, b, b_du))
+    print((get_theta_du(a, a_du, b, b_du)))

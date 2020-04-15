@@ -40,8 +40,8 @@ if __name__ == '__main__':
     oc = FuPotentialEnergy(forming_task=init)
 
     u = np.zeros_like(cp.X)
-    print 'f', oc.get_f(u)
-    print 'f_du', oc.get_f_du(u)
+    print('f', oc.get_f(u))
+    print('f_du', oc.get_f_du(u))
 
     cpw = FormingView(root=init)
     cpw.configure_traits()

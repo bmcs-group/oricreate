@@ -139,16 +139,16 @@ if __name__ == '__main__':
     ftv.add(lt.config.fu.viz3d)
     ftv.add(lt.config.fu.viz3d_dict['node_load'])
 
-    print 'ft_x1', ft.x_1
+    print('ft_x1', ft.x_1)
     cp = lt.formed_object
-    print 'lt_x0', cp.x_0
-    print 'lt_u', cp.u
+    print('lt_x0', cp.x_0)
+    print('lt_u', cp.u)
     cp.u[(2, 3), 2] = -0.001
-    print 'lt.u_1', lt.u_1
+    print('lt.u_1', lt.u_1)
 
     cp = lt.formed_object
     iL_phi = cp.iL_psi2 - cp.iL_psi_0
-    print 'phi',  iL_phi
+    print('phi',  iL_phi)
 
     ftv.plot()
     ftv.update(vot=1, force=True)

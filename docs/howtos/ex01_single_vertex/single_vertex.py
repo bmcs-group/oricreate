@@ -22,10 +22,10 @@ def create_cp():
                                [0, 4], [1, 4], [3, 4], [2, 4]],
                             F=[[0, 1, 4], [1, 3, 4], [3, 2, 4], [0, 2, 4]])
 
-    print 'Nodes of facets enumerated counter clock-wise\n', cp.F_N
-    print 'Lines of facets enumerated counter clock-wise\n', cp.F_L
-    print 'Facet areas\n', cp.F_area
-    print 'Vector normal to a face\nt', cp.F_normals
+    print('Nodes of facets enumerated counter clock-wise\n', cp.F_N)
+    print('Lines of facets enumerated counter clock-wise\n', cp.F_L)
+    print('Facet areas\n', cp.F_area)
+    print('Vector normal to a face\nt', cp.F_normals)
     # end
     return cp
 

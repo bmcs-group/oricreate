@@ -350,12 +350,12 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
         x_42 = x_1[42][0]
 
         ref_lines = np.c_[self.scaff_ref_nodes[:-1], self.scaff_ref_nodes[1:]]
-        print 'ref', ref_lines
+        print('ref', ref_lines)
         ref_midpoints = (x_1[ref_lines[:, 1]] + x_1[ref_lines[:, 0]]) / 2.0
-        print 'mp', ref_midpoints[:, 0]
+        print('mp', ref_midpoints[:, 0])
 
         scaff_positions = ref_midpoints[:, 0] - L_mid
-        print 'sp', scaff_positions
+        print('sp', scaff_positions)
 
         #scaff_positions = self.scaff_positions
         scaff_positions = np.hstack([[0, x_42 - L_mid], scaff_positions])
@@ -363,7 +363,7 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
         #centered_pos = pos + offset
 
         centered_pos = np.hstack([[L_mid, x_42], ref_midpoints[:, 0]])
-        print 'cp', centered_pos
+        print('cp', centered_pos)
 
         scaff_plates = []
         min_max = []
@@ -408,7 +408,7 @@ class DoublyCurvedYoshiFormingProcess(HasTraits):
             ax.annotate('scaffold x - position %5.3f' % -s_pos, xy=(0, 0.04))
 
             fname_path = os.path.join(tdir, 'scaff%d.pdf' % idx)
-            print 'saving in %s', fname_path
+            print('saving in %s', fname_path)
             p.savefig(fname_path)
 
         p.show()
@@ -468,15 +468,15 @@ if __name__ == '__main__':
         ftv.add(lt.config.fu.viz3d)
 
         ftv.add(lt.config.fu.viz3d_dict['node_load'])
-        print 'u_13', lt.u_1[13, 2]
+        print('u_13', lt.u_1[13, 2])
         n_max_u = np.argmax(lt.u_1[:, 2])
-        print 'node max_u', n_max_u
-        print 'u_max', lt.u_1[n_max_u, 2]
+        print('node max_u', n_max_u)
+        print('u_max', lt.u_1[n_max_u, 2])
 
         cp = lt.formed_object
         iL_phi = cp.iL_psi2 - cp.iL_psi_0
         iL_m = lt.config._fu.kappa * iL_phi
-        print 'moments', np.max(np.fabs(iL_m))
+        print('moments', np.max(np.fabs(iL_m)))
 
         ftv.plot()
         ftv.update(vot=1, force=True)

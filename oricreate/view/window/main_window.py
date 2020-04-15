@@ -5,11 +5,11 @@
 
 from traitsui.menu import \
     Menu, MenuBar, Separator
-from forming_process_view import FormingProcessView
-from forming_task_view3d import FormingTaskView3D
+from .forming_process_view import FormingProcessView
+from .forming_task_view3d import FormingTaskView3D
 import traits.api as tr
 import traitsui.api as tu
-from tree_view_handler import \
+from .tree_view_handler import \
     TreeViewHandler, \
     menu_exit, \
     toolbar_actions, key_bindings
@@ -94,7 +94,7 @@ class MainWindow(tr.HasStrictTraits):
 if __name__ == '__main__':
     from oricreate.forming_tasks.forming_process import FormingProcess
     from oricreate.factories.miura_ori_cp_factory import MiuraOriCPFactory
-    from point_cloud_viz3d import PointCloud
+    from .point_cloud_viz3d import PointCloud
     pc = PointCloud()
     fp = FormingProcess(factory_task=MiuraOriCPFactory())
     tv = MainWindow(forming_process=fp)

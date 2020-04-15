@@ -226,11 +226,11 @@ if __name__ == '__main__':
                            d_0=1.0,
                            d_1=-1.0)
 
-    print yf.N_grid[:, 0]
-    print yf.L_d_grid[:, 0]
+    print(yf.N_grid[:, 0])
+    print(yf.L_d_grid[:, 0])
     cp = yf.formed_object
 
-    print cp.F
+    print(cp.F)
 
     import pylab as p
     cp.plot_mpl(p.axes())

@@ -1,15 +1,15 @@
 
-from gu import \
+from .gu import \
     Gu
-from gu_angle_based import \
+from .gu_angle_based import \
     GuDevelopability, GuFlatFoldability
-from gu_constant_length import \
+from .gu_constant_length import \
     GuConstantLength
-from gu_control_face import \
+from .gu_control_face import \
     GuPointsOnSurface, CF
-from gu_disp_control import \
+from .gu_disp_control import \
     GuGrabPoints, GuPointsOnLine, GuDofConstraints
-from gu_dofs import \
+from .gu_dofs import \
     fix, link
-from gu_psi_constraints import \
+from .gu_psi_constraints import \
     GuPsiConstraints

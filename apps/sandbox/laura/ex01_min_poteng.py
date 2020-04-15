@@ -68,17 +68,17 @@ if __name__ == '__main__':
 
     cp = sim_task.formed_object
     iL_phi = cp.iL_psi2 - cp.iL_psi_0
-    print 'phi',  iL_phi
+    print('phi',  iL_phi)
 
-    print 'V', cp.V
-    print 'F_V', cp.F_V
+    print('V', cp.V)
+    print('F_V', cp.F_V)
     V_du = cp.V_du.reshape((-1, 3))
-    print 'V_du', V_du
+    print('V_du', V_du)
 
     iL_length = np.linalg.norm(cp.iL_vectors, axis=1)
     iL_m = sim_config._fu.kappa * iL_phi
 
-    print 'moments', iL_m
+    print('moments', iL_m)
 
     ftv = FTV()
 

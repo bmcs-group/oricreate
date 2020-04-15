@@ -182,7 +182,7 @@ class OctaHedronFormingProcess(HasTraits):
         FN = lambda psi, start_t, end_t: lambda t: psi * \
             fold_step(t, start_t, end_t)
 
-        print 'iL', iL
+        print('iL', iL)
 
         trange = np.zeros((len(iL), 2), dtype=np.float_)
         trange[:, 0] = 0.0
@@ -352,7 +352,7 @@ if __name__ == '__main__':
     single_step_fold_task.u_1
 
     sscp = single_step_fold_task.formed_object
-    print 'phi', sscp.iL_psi
+    print('phi', sscp.iL_psi)
 
     fts = fts4
     fts = single_step_fold_task
