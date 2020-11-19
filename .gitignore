@@ -1,7 +1,6 @@
 .directory
 *.pyc
 *.py.bak
-.pydevproject
 *.o
 *.so
 *.gif
