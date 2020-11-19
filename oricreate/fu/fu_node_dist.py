@@ -15,6 +15,7 @@
 from traits.api import \
     provides, Array
 
+
 import numpy as np
 from oricreate.opt import \
     IFu

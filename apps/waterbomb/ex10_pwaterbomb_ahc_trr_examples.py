@@ -14,10 +14,11 @@ from oricreate.api import YoshimuraCPFactory, CustomCPFactory, \
     fix, link, r_, s_, t_, MapToSurface,\
     GuConstantLength, GuDofConstraints, \
     GuPsiConstraints, SimulationConfig, SimulationTask, \
-    FTV, FTA, CreasePatternState, MoveTask
+    FTV, FTA, CreasePatternState
 from oricreate.export import \
     InfoCadMeshExporter
 from oricreate.forming_tasks.forming_task import FormingTask
+from oricreate.mapping_tasks.move_task import MoveTask
 from oricreate.util.einsum_utils import \
     EPS
 import sympy as sp
@@ -513,7 +514,6 @@ def run_examples():
 
     fta.plot()
     fta.render()
-    # fta.configure_traits()
 
 
 if __name__ == '__main__':

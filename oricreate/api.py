@@ -15,7 +15,7 @@ from .gu import \
 from .hu import \
     HuPsiConstraints
 from .mapping_tasks import \
-    MappingTask, MapToSurface
+    MappingTask, MapToSurface, MoveTask
 from .simulation_step import \
     SimulationStep, SimulationConfig
 from .simulation_tasks import \

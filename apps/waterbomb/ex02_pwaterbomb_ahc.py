@@ -96,17 +96,6 @@ class WBShellFormingProcess(HasStrictTraits):
         N_h = yf.N_h
         N_i = yf.N_i
 
-<<<<<<< HEAD
-        if True:
-            e = (self.a + 2 * self.c) / 3.0
-            print('e', e)
-            d_x = e - self.c
-            print('delta', d_x)
-            cp.X[N_h[1::3, :].flatten(), 0] -= d_x
-            cp.X[N_h[2::3, :].flatten(), 0] += d_x
-            cp.X[N_i[0::3, :].flatten(), 0] += d_x
-            cp.X[N_i[2::3, :].flatten(), 0] -= d_x
-=======
         e = (self.a + 2 * self.c) / 3.0
         print('e', e)
         d_x = e - self.c
@@ -115,7 +104,6 @@ class WBShellFormingProcess(HasStrictTraits):
         cp.X[N_h[2::3, :].flatten(), 0] += d_x
         cp.X[N_i[0::3, :].flatten(), 0] += d_x
         cp.X[N_i[2::3, :].flatten(), 0] -= d_x
->>>>>>> 2to3
         return yf
 
     init_displ_task = Property(Instance(FormingTask))
@@ -301,10 +289,7 @@ class WBShellFormingProcess(HasStrictTraits):
         n_vv = np.sqrt(np.einsum('...i,...i', v, v))
         phi = np.arcsin(s_uxv * n_uxv / (n_uu * n_vv))
 
-<<<<<<< HEAD
-=======
         print(type(phi))
->>>>>>> 2to3
         return n_uu, n_vv, phi
 
 

@@ -587,26 +587,14 @@ def run_examples():
     if show_fold_angle_cntl:
         ft = bsf_process.fold_angle_cntl
 
-<<<<<<< master
-<<<<<<< HEAD
         ft.sim_history.trait_set(anim_t_start=0, anim_t_end=10)
 #        ft.config.gu['dofs'].trait_set(anim_t_start=0, anim_t_end=5)
         ft.sim_history.viz3d['cp'].trait_set(tube_radius=0.02)
-=======
-=======
-        cp = ft.formed_object
-        print('NDOFS', cp.n_dofs)
-
-<<<<<<< HEAD
->>>>>>> interim stage 1
-=======
->>>>>>> bypass2
         print(ft.sim_step)
 
         ft.sim_history.set(anim_t_start=0, anim_t_end=10)
 #        ft.config.gu['dofs'].set(anim_t_start=0, anim_t_end=5)
         ft.sim_history.viz3d['cp'].set(tube_radius=0.002)
->>>>>>> 2to3
         ftv.add(ft.sim_history.viz3d['cp'])
 #        ftv.add(ft.sim_history.viz3d['node_numbers'])
 #        ft.config.gu['dofs'].viz3d['default'].scale_factor = 0.5
