@@ -1,0 +1,21 @@
+name: bmcs_env
+channels:
+- conda-forge
+dependencies:
+- appmode
+- jupyter_contrib_nbextensions
+- traits>=6.1.1
+- traitsui
+- matplotlib-base
+- numpy
+- scipy
+- sympy
+- ipywidgets
+- ipyevents
+- ipympl
+- vtk
+- mayavi
+- pip
+- pip:
+  - -e .
+  - bmcs_utils

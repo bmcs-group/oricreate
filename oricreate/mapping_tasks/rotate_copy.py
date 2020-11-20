@@ -80,11 +80,11 @@ class RotateCopy(MappingTask):
         idx_unique = np.ones((len(x_0),), dtype='bool')
         idx_unique[i_idx_delete] = False
         # enumerate the new compressed index range
-        remaped_range = np.arange(len(x_0) - len(i_idx_delete), dtype='int_')
+        remapped_range = np.arange(len(x_0) - len(i_idx_delete), dtype='int_')
         # construct the index mapping from old indexes to the compressed range
         idx_remap = np.zeros((len(x_0),), dtype='int')
         # put the compressed indexes at the valid index positions
-        idx_remap[idx_unique] = remaped_range
+        idx_remap[idx_unique] = remapped_range
         # copy the identified higher indices at the position of the deleted
         # ones.
         idx_remap[i_idx_delete] = idx_remap[j_idx_insert]
@@ -151,7 +151,6 @@ def q_normalize(q, axis=1):
 
 def v_normalize(q, axis=1):
     sq = np.einsum('...a,...a->...', q, q)
-    #sq = np.sqrt(np.sum(q * q, axis=axis))
     sq[np.where(sq == 0)] = 1.e-19
     return q / sq[..., np.newaxis]
 
